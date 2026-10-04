@@ -56,22 +56,22 @@ Then, in your game project, run `/roblox-status` (health check), then `/roblox-i
 
 Skills: see [docs/SKILL-INDEX.md](docs/SKILL-INDEX.md). Design: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Verified so far (v1.1.0)
-Numbers, method and raw data are in [docs/BENCHMARKS.md](docs/BENCHMARKS.md).
-- **Fresh install from GitHub:** all checks pass for the project and plugin methods in isolated configs. Skills are discovered, `/roblox`, `/roblox-status`, `/roblox-route` and `/roblox-init` work, the CLAUDE.md block and `.apex/` memory are used, and specialists auto-route.
-- **Smoke suite:** 10/10 cases. These check which skills *actually* fired, and the behavior they caused.
-- **Q&A benchmark:** Apex beat baseline Claude 9–1 on 10 tasks in blind judging. Rubric coverage went 0.78 → 0.98.
-- **Real-project benchmark:** working on a real Rojo game with Studio-like tools, Apex won 7–0 after fixes (6–1 before). After editing, it **playtested and read the console in 5/5 tasks, vs the baseline's 0/5.**
-- **Knowledge:** every engine API named in the skills exists and isn't deprecated in Roblox's official reference (`tests/check_api.py`). Version-sensitive facts are dated, with sources.
+## Verified so far (v1.2.0)
+**Live Roblox Studio: NOT VERIFIED — requires local Windows Roblox Studio validation.** The test kit is ready: [tests/STUDIO-TEST.md](tests/STUDIO-TEST.md) plus `tests/fixtures/LighthouseKeeper.rbxl`.
 
-**Not verified yet:**
-- **Real Roblox Studio.** Nothing has run against live Studio. The test kit is ready: [tests/STUDIO-TEST.md](tests/STUDIO-TEST.md) plus `tests/fixtures/LighthouseKeeper.rbxl`.
-- **`install.ps1`** has not been executed. On Windows, the plugin method or Git Bash is verified.
-- **Models other than Sonnet** as the working model.
+Numbers, method and raw data are in [docs/BENCHMARKS.md](docs/BENCHMARKS.md). All of these are single-sample or small-sample runs judged blind by an LLM.
+- **Fresh install from GitHub:** 15/15 checks for the project and plugin methods in isolated configs. That covers discovery, `/roblox`, `/roblox-status`, `/roblox-route`, `/roblox-init`, the CLAUDE.md block, `.apex/` memory and specialist auto-routing.
+- **Installers:** `install.sh` and `install.ps1` pass install, update, uninstall, conflict and user-level tests (PowerShell 7). `.gitattributes` keeps Windows checkouts working in Git Bash; before v1.2, a Windows checkout broke `install.sh`. **Windows PowerShell 5.1 is untested.**
+- **Q&A benchmark (10 tasks, full run):** Apex beat baseline Claude **9–1**, with rubric coverage 0.78 → 0.98.
+- **Real-project benchmark** (a Rojo game with a simulator standing in for Studio's tools, *not* real Studio): full run **6–1** at v1.1. The v1.2 run on five tasks went **5–0**. After editing, Apex playtested and read the console in every implementation task, and it detected unsynced code instead of claiming a stale playtest proved anything.
+- **Models:** Sonnet passes 13/13 smoke cases and Opus 12/13. **Haiku routes correctly but applies security and data checklists less fully, so use Sonnet or Opus for that work.**
+- **Knowledge:** every engine API named in the skills exists and isn't deprecated in Roblox's official reference (`tests/check_api.py`).
 
 ## Test it yourself
 ```bash
-python3 tests/validate.py            # structure, YAML, routing coverage, budgets (free)
+tests/get_tools.sh                   # one-time: luau-compile, rojo, pwsh, creator-docs into tests/.tools/
+python3 tests/validate.py            # structure, YAML, CRLF, reference paths, routing coverage, budgets (free)
+tests/test_installers.sh tests/.tools/pwsh/pwsh   # installer matrix, bash + PowerShell 7 (free)
 python3 tests/smoke.py               # real sessions, ~$1
 python3 tests/install_test.py --ref main   # fresh clone + both install methods, ~$1
 python3 benchmarks/run.py            # Q&A baseline vs Apex, ~$3

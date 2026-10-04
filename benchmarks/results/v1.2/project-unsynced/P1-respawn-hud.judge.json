@@ -1,0 +1,62 @@
+{
+  "apex_score": 1.0,
+  "base_score": 0.8,
+  "winner": "apex",
+  "reason": "B also binds HealthChanged to a character that already exists and disconnects the old connection on respawn, while A only binds on CharacterAdded; B also says exactly what it verified, what it didn't, and why it couldn't playtest.",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": [
+      "Type annotations, a 10s WaitForChild timeout and the player.Character ~= character re-check are slightly more than this small fix needed, though each is defensible"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": []
+  },
+  "raw": {
+    "items": [
+      {
+        "item": "Identifies top-level player.Character.Humanoid as nil-on-load and stale-after-respawn",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Fix rebinds on CharacterAdded (and handles an already-existing character) instead of a one-time wait",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Fix keeps the HUD working (fuel display still updates)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Verifies: playtests and checks console output after the fix, or clearly states what wasn't verified",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Change is minimal and drop-in (no unrelated rewrites)",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": [
+        "Type annotations, a 10s WaitForChild timeout and the player.Character ~= character re-check are slightly more than this small fix needed, though each is defensible"
+      ]
+    },
+    "preference": "B",
+    "reason": "B also binds HealthChanged to a character that already exists and disconnects the old connection on respawn, while A only binds on CharacterAdded; B also says exactly what it verified, what it didn't, and why it couldn't playtest."
+  },
+  "judge_cost": 0.29276800000000003
+}

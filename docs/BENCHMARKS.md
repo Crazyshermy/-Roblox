@@ -1,6 +1,6 @@
-# Benchmarks and verification results (v1.1.0, 2026-10-04)
+# Benchmarks and verification results (current: v1.2.0, 2026-10-04)
 
-All runs used headless Claude Code v2.1.289, with **Sonnet** as the subject model and an **Opus** session as the blind judge. Answers are compared in random A/B order, and the judge never knows which arm is which.
+All runs used headless Claude Code v2.1.289, with **Sonnet** as the subject model unless noted (v1.2 adds Opus and Haiku smoke runs) and an **Opus** session as the blind judge. Answers are compared in random A/B order, and the judge never knows which arm is which.
 
 **Limitations:**
 - One sample per arm per task, so run-to-run variance is real. The same baseline scored 0.92 and 1.00 on identical runs.
@@ -9,6 +9,37 @@ All runs used headless Claude Code v2.1.289, with **Sonnet** as the subject mode
 - **No result here comes from real Roblox Studio** (see "Not verified").
 
 These are regression detectors and directional evidence, not science.
+
+**Live Roblox Studio: NOT VERIFIED — requires local Windows Roblox Studio validation.** Nothing below comes from real Studio. The Studio-workflow simulator is process evidence only.
+
+## v1.2.0 results (2026-10-04)
+| Check | Result |
+|---|---|
+| Fresh install from GitHub, project + plugin, isolated config (`install_test.py`) | **15/15** |
+| Installer matrix (`test_installers.sh`): `install.sh` + `install.ps1` under PowerShell 7 | **12/12** (Windows PowerShell 5.1 not tested) |
+| Windows CRLF checkout (simulated `core.autocrlf=true`) | `main` before v1.2: `install.sh` **broken** in Git Bash. With `.gitattributes`: fixed |
+| Smoke, Sonnet, 3 runs per case | 12/13 cases 3/3. `security-nomd` 2/3 (no CLAUDE.md block) |
+| Smoke, Opus, 1 run | 12/13 (the miss is the "why it belongs" marker on a fantasy-first design answer) |
+| Smoke, Haiku, all runs | Routing mostly works. Applies security and NPC checklists less fully (`security-auto` 0/4 on markers, `npc-ai` 1/4, `currency` 2/4). In one run without the CLAUDE.md block it chose Claude Code's built-in `security-review` skill. **Use Sonnet or Opus for security and data work.** |
+| Q&A reruns (activation trimming): B02, B05, B06 | Apex 3–0 (coverage 0.78 → 0.97). B05 no longer loads genres, and B02 dropped from 5 specialists to 4 |
+| Project benchmark (simulator), P1, P2, P8, P9, P10, full run after harness fix | **Apex 5–0**. Apex playtested and read the console after its last edit in 5/5 tasks; baseline 2/5 (when told playtests are safe) |
+| Stale-code trap (`--sim-unsynced`, P1) | Apex detected that Studio lacked its edit (`script_grep`) and refused to count a playtest. Baseline didn't check |
+| API check (`check_api.py`) | 53 qualified + 205 bare identifiers, all present and none deprecated |
+
+**Defects found by v1.2 testing, and fixed:**
+- **Windows CRLF breaks `install.sh`.** Fixed with `.gitattributes`, and the validator now rejects CRLF.
+- **Bare `references/…` paths:** Haiku resolved them against the project root and missed version facts. All links now use `${CLAUDE_SKILL_DIR}`, enforced by the validator.
+- **An invented enum** (`Enum.ScreenInsets.CoreUISafe`) crashed a HUD. The UI skill now lists the exact values.
+- **A test-harness crash:** a relative `luau-compile` path took the simulator down. The simulator now reports tool errors instead of crashing.
+- **Smoke-marker false negatives** on correct answers. Fixed, plus `--rescore` and `test_smoke_patterns.py`.
+
+**Known, not fixed:**
+- **Evidence-grade leak:** "(E3)" appeared in about 2.6% of Apex answers (5/189, mostly v1.0-era runs).
+- **The P8 rubric expected pathfinding:** both arms built direct server-driven chasers on an open island. That's defensible, so the rubric is arguably over-prescriptive.
+
+---
+
+# v1.1.0 results (history)
 
 ## 1. Fresh-install acceptance (`tests/install_test.py`)
 The test clones from GitHub (not the dev workspace), installs into a fresh copy of the Lighthouse fixture with an **isolated `CLAUDE_CONFIG_DIR`**, and runs fresh headless sessions. Final result: **all checks pass, for both methods.**

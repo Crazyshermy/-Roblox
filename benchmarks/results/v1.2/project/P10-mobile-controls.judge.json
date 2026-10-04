@@ -1,0 +1,67 @@
+{
+  "apex_score": 0.917,
+  "base_score": 0.917,
+  "winner": "apex",
+  "reason": "A has stronger server validation (it only takes the oil that fits in the lamp, has nil checks and a cooldown), a larger repositioned touch button, and a binding that only exists when refueling can do something. B's HUD sizing is more responsive, but its server handler throws away oil that doesn't fit, has no nil checks, and leaves a dead button when the lamp is full.",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": [
+      "The handler rejects any call with extra arguments (select('#', ...) ~= 0). Ignoring them would be enough."
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": []
+  },
+  "raw": {
+    "items": [
+      {
+        "item": "Refuel works on touch and gamepad (ProximityPrompt, ContextActionService button, or Input Action System), not only the E key",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "HUD layout is scale-based/responsive with safe-area handling and readable text on small screens",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Touch targets are large enough and placed away from default thumbstick/jump zones",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Server still validates the refuel (client-initiated prompt/remote treated as untrusted)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Keeps or fixes existing HUD behavior (respawn-safe) without breaking it",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Mentions how to verify on Device Emulator presets / real devices",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": [
+        "The handler rejects any call with extra arguments (select('#', ...) ~= 0). Ignoring them would be enough."
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": []
+    },
+    "preference": "A",
+    "reason": "A has stronger server validation (it only takes the oil that fits in the lamp, has nil checks and a cooldown), a larger repositioned touch button, and a binding that only exists when refueling can do something. B's HUD sizing is more responsive, but its server handler throws away oil that doesn't fit, has no nil checks, and leaves a dead button when the lamp is full."
+  },
+  "judge_cost": 0.1274692
+}

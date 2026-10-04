@@ -1,0 +1,98 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Minimal HUD with clear information hierarchy (critical vs on-demand)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Touch targets sized for thumbs, placed away from default jump/thumbstick, safe areas/notches",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Controller navigation of inventory (selection/focus, back closes)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Responsive layout approach (scale, aspect ratio constraints, UIScale) rather than pixel-absolute",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Accessibility (not color-only, readable text size)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Server does not trust UI/inventory state from client",
+        "A": "partial",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Uses 'sp' as a text-size unit. That is an Android unit; Roblox uses pixels or TextScaled.",
+        "The initial InputProfile resolution never detects Gamepad at startup, so a controller isn't recognised until the next input.",
+        "Advises using UIListLayout and UIGridLayout 'sparingly in hot paths'. This advice is dubious, because layout objects are the normal and efficient approach."
+      ],
+      "slop": [
+        "Compass, quest tracker and time/temp widgets are added without justification for this game.",
+        "Generic feedback list: damage vignette, toast stack, slot flashes.",
+        "Says to 'test for colour-blindness' without saying how."
+      ],
+      "overengineering": [
+        "User-draggable and resizable mobile action buttons as a baseline feature."
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "A stray '*Apex: ui-ux \u2192 genres*' header artifact.",
+        "Diegetic heartbeat and breathing cues and directional damage indicators are offered as genre defaults."
+      ],
+      "overengineering": [
+        "Crafting tab with pinned recipes, container Take All and death-drop UX, all beyond a HUD and inventory scope.",
+        "Optimistic client prediction with server reconciliation for inventory moves.",
+        "Three-tier layout classes on top of input profiles, with no concrete UIScale or aspect-ratio mechanism given."
+      ]
+    },
+    "preference": "B",
+    "reason": "B covers more rubric items in concrete terms: explicit back-to-close and NextSelection grid navigation, detailed server-side intent validation, and the inventory not pausing in a survival game. A is solid but leaves controller back handling and server authority vague."
+  },
+  "judge_cost": 0.0972852,
+  "apex_score": 0.917,
+  "base_score": 0.833,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "A stray '*Apex: ui-ux \u2192 genres*' header artifact.",
+      "Diegetic heartbeat and breathing cues and directional damage indicators are offered as genre defaults."
+    ],
+    "overengineering": [
+      "Crafting tab with pinned recipes, container Take All and death-drop UX, all beyond a HUD and inventory scope.",
+      "Optimistic client prediction with server reconciliation for inventory moves.",
+      "Three-tier layout classes on top of input profiles, with no concrete UIScale or aspect-ratio mechanism given."
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Uses 'sp' as a text-size unit. That is an Android unit; Roblox uses pixels or TextScaled.",
+      "The initial InputProfile resolution never detects Gamepad at startup, so a controller isn't recognised until the next input.",
+      "Advises using UIListLayout and UIGridLayout 'sparingly in hot paths'. This advice is dubious, because layout objects are the normal and efficient approach."
+    ],
+    "slop": [
+      "Compass, quest tracker and time/temp widgets are added without justification for this game.",
+      "Generic feedback list: damage vignette, toast stack, slot flashes.",
+      "Says to 'test for colour-blindness' without saying how."
+    ],
+    "overengineering": [
+      "User-draggable and resizable mobile action buttons as a baseline feature."
+    ]
+  },
+  "reason": "B covers more rubric items in concrete terms: explicit back-to-close and NextSelection grid navigation, detailed server-side intent validation, and the inventory not pausing in a survival game. A is solid but leaves controller back handling and server authority vague."
+}

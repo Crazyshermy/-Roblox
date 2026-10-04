@@ -1,0 +1,73 @@
+{
+  "apex_score": 1.0,
+  "base_score": 0.75,
+  "winner": "apex",
+  "reason": "B waits for the data to finish loading, saves with UpdateAsync, retries, and avoids overwriting saves after a failed load, so the purchase is durable and idempotent. A's leaderstats-as-loaded check lets a receipt that arrives while data is loading overwrite the player's saved data, and it does not flag the existing DataService flaws.",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": [
+      "The save-coalescing queue with lastSaveOk and the per-product handler table are more machinery than one product needs, though they can be defended for paid data."
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "It uses the presence of leaderstats to mean 'loaded', but leaderstats is created before GetAsync returns. A receipt that arrives during the load can be granted and saved with SetAsync as Oil=50 plus one receipt, wiping the player's real saved data. The load then overwrites the in-memory grant and the receipts table.",
+      "If GetAsync fails, the player falls back to Oil=0, and the next save (purchase or leave) overwrites their real data. It does not flag this risk."
+    ],
+    "slop": [],
+    "overengineering": []
+  },
+  "raw": {
+    "items": [
+      {
+        "item": "Grants only inside MarketplaceService.ProcessReceipt (not PromptProductPurchaseFinished or a client remote)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Idempotent on PurchaseId; returns PurchaseGranted only after the grant is durably recorded, NotProcessedYet otherwise",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Handles the player not yet loaded / left (yield until loaded or NotProcessedYet), and a single ProcessReceipt handler",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Client only prompts (PromptProductPurchase); no client-trusted grant path",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Persists the purchased oil (not only leaderstats) or flags that DataService must be fixed for it to stick",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "States what wasn't verified (real purchase flow needs Studio test mode / live)",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "It uses the presence of leaderstats to mean 'loaded', but leaderstats is created before GetAsync returns. A receipt that arrives during the load can be granted and saved with SetAsync as Oil=50 plus one receipt, wiping the player's real saved data. The load then overwrites the in-memory grant and the receipts table.",
+        "If GetAsync fails, the player falls back to Oil=0, and the next save (purchase or leave) overwrites their real data. It does not flag this risk."
+      ],
+      "slop": [],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": [
+        "The save-coalescing queue with lastSaveOk and the per-product handler table are more machinery than one product needs, though they can be defended for paid data."
+      ]
+    },
+    "preference": "B",
+    "reason": "B waits for the data to finish loading, saves with UpdateAsync, retries, and avoids overwriting saves after a failed load, so the purchase is durable and idempotent. A's leaderstats-as-loaded check lets a receipt that arrives while data is loading overwrite the player's saved data, and it does not flag the existing DataService flaws."
+  },
+  "judge_cost": 0.1158652
+}

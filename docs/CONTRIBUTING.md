@@ -7,6 +7,7 @@ This guide is for a person or a future Claude session improving Roblox Apex.
 - **One home per rule** (see ARCHITECTURE → Ownership). Point to the owning skill instead of duplicating a rule.
 - Specialist `SKILL.md` stays under about 160 lines and about 1.8k tokens. Depth goes in `references/`, linked with an explicit "read when…" condition.
 - Descriptions are **quoted YAML strings**: start with what the skill covers, include trigger words, and stay under about 330 chars. Unquoted descriptions containing `: ` break YAML, and the skill then loads with *no description*. This happened in development and is now caught by `validate.py`.
+- Link reference files as `` `${CLAUDE_SKILL_DIR}/references/x.md` `` (or `../roblox/references/…`). Some models resolve bare `references/…` paths against the project root. `validate.py` rejects bare paths.
 - Never invent APIs. Version-sensitive facts go in `roblox/references/currency.md` with a source and date.
 - Write standing instructions ("when X, do Y"), not narration.
 

@@ -1,0 +1,70 @@
+{
+  "apex_score": 1.0,
+  "base_score": 0.8,
+  "winner": "apex",
+  "reason": "Both fixes are correct and nearly the same, but B keeps the change limited to the HUD, playtests and checks the console, and states that the respawn itself wasn't tested and how to test it; A edits an unrelated file and runs no playtest.",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Starts with a stray '*Apex: debugging*' header"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Says the stale humanoid could make the next LampChanged update error. Reading .Health on a destroyed Humanoid returns a value; it does not throw."
+    ],
+    "slop": [],
+    "overengineering": [
+      "Edits Refuel.client.luau to make the leaderstats lookup nil-safe. This is not part of the HUD respawn bug."
+    ]
+  },
+  "raw": {
+    "items": [
+      {
+        "item": "Identifies top-level player.Character.Humanoid as nil-on-load and stale-after-respawn",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Fix rebinds on CharacterAdded (and handles an already-existing character) instead of a one-time wait",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Fix keeps the HUD working (fuel display still updates)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Verifies: playtests and checks console output after the fix, or clearly states what wasn't verified",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Change is minimal and drop-in (no unrelated rewrites)",
+        "A": "partial",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Says the stale humanoid could make the next LampChanged update error. Reading .Health on a destroyed Humanoid returns a value; it does not throw."
+      ],
+      "slop": [],
+      "overengineering": [
+        "Edits Refuel.client.luau to make the leaderstats lookup nil-safe. This is not part of the HUD respawn bug."
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Starts with a stray '*Apex: debugging*' header"
+      ],
+      "overengineering": []
+    },
+    "preference": "B",
+    "reason": "Both fixes are correct and nearly the same, but B keeps the change limited to the HUD, playtests and checks the console, and states that the respawn itself wasn't tested and how to test it; A edits an unrelated file and runs no playtest."
+  },
+  "judge_cost": 0.06859320000000001
+}

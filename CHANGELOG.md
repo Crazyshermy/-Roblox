@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.2.0 (2026-10-04)
+Pre-Studio hardening from a critical review. **Live Roblox Studio: NOT VERIFIED — requires local Windows Roblox Studio validation.**
+- **Windows:** added `.gitattributes`, because a Windows (`autocrlf`) checkout broke `install.sh` in Git Bash. `install.ps1` is now tested under PowerShell 7 (`tests/test_installers.sh`).
+- **Real-Studio honesty and safety:**
+  - confirm Studio has the edited code before trusting a playtest
+  - `studio_id`
+  - Edit-DataModel probes stay read-only
+  - ask once before playtesting a game that saves data (playtests can write real DataStores)
+- **Robustness:** all reference links use `${CLAUDE_SKILL_DIR}`, because Haiku resolved bare paths against the project root. The validator enforces this.
+- **Skills:**
+  - anti-slop builds what the user explicitly asks for, with one suggestion at most
+  - `ProximityPrompt`, `ClickDetector` and `Touched` get the remote contract
+  - ProcessReceipt single-callback rule; no `PromptProductPurchaseFinished` grants
+  - doc-verified Audio API, including acoustic simulation
+  - NPC/enemy AI reference
+  - monetization and live-ops reference
+  - exact `ScreenInsets` values
+  - hitstop caveat
+  - genres only load for design, feel or level work; bundles count toward the specialist cap
+- **Tests:** `--repeat` trigger rates, `--rescore`, `--model`, marker unit tests, `--sim-unsynced`, three new project tasks (NPC chase, developer product, mobile controls), `get_tools.sh`.
+
 ## 1.1.0 (2026-10-04)
 Driven by fresh-install testing, a real-project benchmark (Lighthouse fixture plus a Studio-workflow simulator) and an independent red team. Details are in `docs/BENCHMARKS.md`.
 - **Verification behavior:** the router now prescribes a concrete loop when Studio tools exist (playtest → console → fix → stop after the last edit) and ends code answers with `Verified · Not verified`. Apex playtested in 5/5 implementation tasks vs the baseline's 0/5.

@@ -1,0 +1,86 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Recommends measuring/profiling first and comparing before/after",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Replaces per-enemy scripts with one manager loop",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Replaces Humanoids with lightweight server-side movement (CFrame/position along path) and client-side rendering/interpolation",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Replaces Touched-based damage with server-side range/spatial checks",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses rendering cost on mobile (model pooling, LOD/animation reduction)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Preserves the intended experience (doesn't just cap enemy count without discussing it)",
+        "A": "partial",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Says to use Enum.BulkMoveMode.FireCFrameChanged only if something listens to CFrameChanged and that the default is cheaper. The default is FireAllEvents, so FireCFrameChanged is the cheaper mode, not the default.",
+        "Suggests Humanoid:SetStateEnabled, HumanoidRigType and BreakJointsOnDeath as the fallback in the same bullet that recommends switching to AnimationController, which mixes up the two approaches."
+      ],
+      "slop": [
+        "The 'use SmoothPlastic' material advice has no justification.",
+        "Suggests Model.LevelOfDetail and StreamingEnabled as 'cap visible detail' without explaining how they apply to enemies on a fixed TD camera."
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "The 'Apex: performance \u2192 physics-animation' header line is meaningless.",
+        "The trailing 'Verified/Not verified' boilerplate adds noise."
+      ],
+      "overengineering": [
+        "The binary-search cumulative-distance lane sampler is somewhat more machinery than needed, though it does pay off for targeting."
+      ]
+    },
+    "preference": "B",
+    "reason": "B puts profiling first, uses a cleaner distance-along-lane model that also makes targeting easier, and spells out the art and experience tradeoffs; A wrongly says the BulkMoveTo default mode is cheaper than FireCFrameChanged."
+  },
+  "judge_cost": 0.08440120000000001,
+  "apex_score": 1.0,
+  "base_score": 0.833,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "The 'Apex: performance \u2192 physics-animation' header line is meaningless.",
+      "The trailing 'Verified/Not verified' boilerplate adds noise."
+    ],
+    "overengineering": [
+      "The binary-search cumulative-distance lane sampler is somewhat more machinery than needed, though it does pay off for targeting."
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Says to use Enum.BulkMoveMode.FireCFrameChanged only if something listens to CFrameChanged and that the default is cheaper. The default is FireAllEvents, so FireCFrameChanged is the cheaper mode, not the default.",
+      "Suggests Humanoid:SetStateEnabled, HumanoidRigType and BreakJointsOnDeath as the fallback in the same bullet that recommends switching to AnimationController, which mixes up the two approaches."
+    ],
+    "slop": [
+      "The 'use SmoothPlastic' material advice has no justification.",
+      "Suggests Model.LevelOfDetail and StreamingEnabled as 'cap visible detail' without explaining how they apply to enemies on a fixed TD camera."
+    ],
+    "overengineering": []
+  },
+  "reason": "B puts profiling first, uses a cleaner distance-along-lane model that also makes targeting easier, and spells out the art and experience tradeoffs; A wrongly says the BulkMoveTo default mode is cheaper than FireCFrameChanged."
+}
