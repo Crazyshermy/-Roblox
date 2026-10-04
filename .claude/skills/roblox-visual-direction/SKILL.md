@@ -1,6 +1,6 @@
 ---
 name: roblox-visual-direction
-description: "Roblox art direction: visual identity, lighting (Future, Atmosphere, post-processing), color and palette roles, composition, readability, materials and PBR, environmental storytelling, VFX art, escaping the default-Roblox look."
+description: "Roblox art direction: visual identity, lighting (LightingStyle, Atmosphere, post-processing), color and palette roles, composition, readability, materials and PBR, environmental storytelling, VFX art, escaping the default-Roblox look."
 ---
 
 # Visual direction
