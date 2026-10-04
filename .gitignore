@@ -2,3 +2,4 @@ tests/results/
 benchmarks/results/*
 !benchmarks/results/latest/
 __pycache__/
+tests/.tools/

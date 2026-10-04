@@ -27,7 +27,7 @@ Get or infer these, and ask only if they're genuinely missing and they matter:
 - Progression should change **what the player can do or understand**, not just numbers. A pure +X% stat ladder is the weakest form.
 - Pace with novelty: introduce a new verb, space, threat or social situation on a cadence. Grind length should be a deliberate choice, not filler.
 - Rewards: use a mix of predictable (goal clarity) and variable (surprise). Variable rewards mustn't become paid gambling (`PolicyService` and paid-random-item rules) or manipulative.
-- **Economy:** list every source and sink. Each currency needs a distinct purpose. Model inflation over 30 days of play: what does a day-30 player do with their wealth? A currency with no meaningful sink is decoration. Details are in `references/economy.md`.
+- **Economy:** list every source and sink. Each currency needs a distinct purpose. Model inflation over 30 days of play: what does a day-30 player do with their wealth? A currency with no meaningful sink is decoration. Details are in `references/economy.md`. For what to sell, game passes vs dev products vs subscriptions, analytics events and live tuning with `ConfigService`, read `references/monetization-liveops.md`.
 
 ## 4. Onboarding (the first 60 seconds decide retention)
 The player should **act within seconds and understand the goal through play**. Teach by doing, with one new concept at a time. Remove menus before first fun. Mobile-first readability. Look for the first moment of the core fantasy and how fast the player gets there.

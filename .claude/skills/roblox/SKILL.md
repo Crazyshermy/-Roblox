@@ -31,7 +31,7 @@ Load only what the task needs: **trivial → none**, **standard → 1–2**, **s
 | Lag, FPS, memory, profiling, physics or rendering cost, streaming, "optimize" | `roblox-performance` |
 | Tests, playtesting, verification, regressions, multi-client testing, device testing | `roblox-testing` |
 | Bugs, errors, "doesn't work", "sometimes", Output logs, unexpected behavior | `roblox-debugging` |
-| Concept, core loop, progression, economy design, rewards, retention, onboarding, "is this fun", player behavior | `roblox-game-design` |
+| Concept, core loop, progression, economy design, rewards, retention, onboarding, "is this fun", player behavior, **monetization design, analytics, live tuning** | `roblox-game-design` |
 | A genre is named (horror, FPS, RPG, tycoon, obby, TD, racing, social…) or a hybrid, **and** the task is design, feel or level work (not a pure code, UI-layout or perf task) | `roblox-genres` |
 | How an action feels: combat, hits, recoil, camera, juice, responsiveness, impact | `roblox-game-feel` |
 | Lighting, atmosphere, color, art style, materials, VFX look, "make it look good" | `roblox-visual-direction` |
