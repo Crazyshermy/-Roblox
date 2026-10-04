@@ -1,0 +1,7 @@
+# Keep LF everywhere so Git for Windows (core.autocrlf=true) doesn't break install.sh in Git Bash
+# or skill frontmatter. PowerShell handles LF fine.
+* text=auto eol=lf
+*.rbxl binary
+*.rbxm binary
+*.png binary
+*.zip binary

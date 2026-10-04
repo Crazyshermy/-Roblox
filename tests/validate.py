@@ -44,7 +44,10 @@ for d in sorted(os.listdir(ROOT)):
     p = os.path.join(ROOT, d, "SKILL.md")
     if not d.startswith("roblox") or not os.path.isfile(p):
         continue
-    text = open(p, encoding="utf-8").read()
+    raw = open(p, "rb").read()
+    if b"\r\n" in raw:
+        errors.append(f"{d}: CRLF line endings (breaks frontmatter parsing on some setups; see .gitattributes)")
+    text = raw.decode("utf-8").replace("\r\n", "\n")
     fm = frontmatter(text)
     skills[d] = (fm, text)
     if not fm:
