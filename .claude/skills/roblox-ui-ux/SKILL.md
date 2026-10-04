@@ -15,7 +15,7 @@ Prefer **diegetic/in-world** feedback (prompts on objects, world-space markers v
 
 ## Mobile first (majority of Roblox sessions are on phones — E3)
 - Touch targets ≥ ~44–48 px equivalent; keep critical buttons in thumb zones (bottom corners), away from the default jump/thumbstick areas.
-- Respect safe areas/notches (`ScreenGui.ScreenInsets`, `SafeAreaCompatibility`); test the smallest phone preset in the Device Emulator.
+- Respect safe areas/notches. `ScreenGui.ScreenInsets` takes `Enum.ScreenInsets.None` / `DeviceSafeInsets` / `CoreUISafeInsets` / `TopbarSafeInsets` (E4, exact names), plus `SafeAreaCompatibility`; test the smallest phone preset in the Device Emulator.
 - Text: minimum readable size on phone at actual scale; use `TextScaled` sparingly (inconsistent sizes) — prefer fixed sizes with `UIScale`/`UITextSizeConstraint`.
 - Layout: Scale-based sizing + `UIAspectRatioConstraint`; `UIListLayout`/`UIGridLayout` (flex options) for lists; avoid pixel-absolute layouts that break across resolutions.
 

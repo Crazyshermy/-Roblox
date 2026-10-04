@@ -174,7 +174,10 @@ def main():
                              for n, d, props in TOOLS]}
         elif method == "tools/call":
             p = msg.get("params", {})
-            res = {"content": [{"type": "text", "text": call(p.get("name"), p.get("arguments") or {})}]}
+            try:
+                res = {"content": [{"type": "text", "text": call(p.get("name"), p.get("arguments") or {})}]}
+            except Exception as e:  # report tool errors instead of dropping the connection
+                res = {"content": [{"type": "text", "text": f"Studio tool error: {e!r}"}], "isError": True}
         elif method == "ping":
             res = {}
         else:

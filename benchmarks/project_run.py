@@ -21,7 +21,8 @@ SIM = os.path.join(REPO, "tests", "studio_sim", "server.py")
 SKILLS = os.path.join(REPO, ".claude", "skills")
 CLAUDE_BLOCK = os.path.join(SKILLS, "roblox-init", "templates", "CLAUDE-block.md")
 EDIT = ("Read Glob Grep Edit Write Skill mcp__roblox_studio", "Bash WebFetch WebSearch Agent")
-CTX = "This is my Roblox game (Rojo project; Roblox Studio is connected through MCP). "
+CTX = ("This is my Roblox game (Rojo project; Roblox Studio is connected through MCP; playtesting is safe: "
+       "Studio uses a separate test place with its own DataStores). ")
 
 TASKS = [
     {"id": "P1-respawn-hud", "prompt": CTX + "Players say the HUD breaks and sometimes errors after they respawn. Fix it.",
@@ -183,6 +184,7 @@ def main():
     ap.add_argument("--jobs", type=int, default=8)
     ap.add_argument("--sim-unsynced", action="store_true", help="Studio never receives file edits (Rojo/Script Sync not running)")
     a = ap.parse_args()
+    a.luau_compile = os.path.abspath(a.luau_compile)  # the simulator runs with cwd = temp project
     tasks = [t for t in TASKS if not a.only or any(t["id"].startswith(x) for x in a.only.split(","))]
     out = os.path.join(HERE, "results", ("project-unsynced-" if a.sim_unsynced else "project-") + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
     os.makedirs(out, exist_ok=True)

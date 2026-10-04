@@ -18,6 +18,10 @@ EXAMPLES = [
     ("currency", "must", 1, "Experience: 300 + CCU × 40 per minute", True),
     ("ambition", "must_not", 0, "Yes, good plan.", True),
     ("ambition", "must_not", 0, "Before you downgrade it: the darkness can creep.", False),
+    # past false negatives (correct answers that earlier markers missed)
+    ("design-auto", "must", 0, "**Core idea:** Progression changes what you can understand and do on the island, not stat numbers.", True),
+    ("design-auto", "must", 0, "Progress changes what the player understands and can do, not their stats.", True),
+    ("ambition", "must", 1, "Not yet. Roblox can do this. **How the real version works**", True),
 ]
 
 bad = 0

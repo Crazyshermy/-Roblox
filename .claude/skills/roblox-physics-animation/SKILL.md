@@ -30,7 +30,7 @@ description: "Roblox physics, characters, NPC AI and animation tech: assemblies,
 - Animation LOD: stop or simplify animations of distant or offscreen NPCs.
 
 ## NPCs and enemy AI
-For enemies, monsters, companions or hordes, read `references/npc-ai.md` (server authority, tick budgets, state machines, perception, `PathfindingService` failure handling).
+For enemies, monsters, companions or hordes, read `${CLAUDE_SKILL_DIR}/references/npc-ai.md` (server authority, tick budgets, state machines, perception, `PathfindingService` failure handling).
 
 ## Verify
 Physics behavior is version- and ownership-sensitive. Playtest with Server & Clients to see what *other* players observe. Watch for jitter at ownership boundaries and with the Network Simulator's latency.

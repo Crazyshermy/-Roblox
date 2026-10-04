@@ -5,7 +5,7 @@ description: "Use for anything Roblox saves, loads, purchases or shares across s
 
 # Roblox data and cross-server services
 
-Data loss and duplication are the most damaging bugs a Roblox game can ship. Both are usually caused by **concurrency**, not by syntax. Current limits are in `roblox/references/currency.md`. The budgets changed in 2026, so don't quote old numbers.
+Data loss and duplication are the most damaging bugs a Roblox game can ship. Both are usually caused by **concurrency**, not by syntax. Current limits are in `${CLAUDE_SKILL_DIR}/../roblox/references/currency.md`. The budgets changed in 2026, so don't quote old numbers.
 
 ## Choose the store
 | Data | Store |

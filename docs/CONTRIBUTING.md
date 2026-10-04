@@ -11,10 +11,12 @@ This guide is for a person or a future Claude session improving Roblox Apex.
 - Write standing instructions ("when X, do Y"), not narration.
 
 ## Workflow
+0. First time in a fresh environment, run `tests/get_tools.sh`. It fetches `luau-compile`, `rojo`, `pwsh` and a creator-docs clone into `tests/.tools/` (gitignored).
 1. Edit skills in `.claude/skills/`.
 2. `python3 tests/validate.py`: frontmatter, names, routing coverage, references, size and description budget. Free.
 3. `python3 tests/check_api.py <creator-docs clone>`: every engine API mentioned exists and isn't deprecated. Free (clone instructions are in the script header).
-4. `python3 tests/smoke.py`: real headless sessions with skill-usage and behavior checks. About $1.
+4. `python3 tests/smoke.py`: real headless sessions with skill-usage and behavior checks (about $1). Use `--repeat 3` for trigger rates and `--model opus|haiku` for other models. If you change a marker regex, add an example to `tests/test_smoke_patterns.py` (free); past false positives are recorded there.
+4b. Installers: `tests/test_installers.sh tests/.tools/pwsh/pwsh` (free) covers `install.sh` and `install.ps1` under PowerShell 7. Windows PowerShell 5.1 isn't covered.
 5. For behavioral changes: `python3 benchmarks/run.py` (Q&A, about $3) and `python3 benchmarks/project_run.py --luau-compile <path>` (real edits in the Lighthouse fixture with the Studio simulator, about $3). Use `--only` for the affected tasks. Compare against `docs/BENCHMARKS.md`. Investigate every loss and every "incorrect" flag before changing skills, and check judge claims against the docs.
 6. Before a release: `python3 tests/install_test.py --ref <branch>`. It clones from GitHub and installs via the project and plugin methods into an isolated config, then runs fresh sessions for every command (about $1). The first time, push the branch.
 7. Bump `metadata.version` in `roblox/SKILL.md`, plus `.claude-plugin/plugin.json` and `marketplace.json`. Add a CHANGELOG entry.
@@ -33,6 +35,8 @@ Then re-check each item in `currency.md` against its listed source path, update 
 - The fixture's seeded flaws are listed in `tests/fixtures/lighthouse.FLAWS.md`, outside the fixture folder so models under test can't read it. If you add a flaw, add it there and to a project-benchmark rubric.
 
 ## The Studio simulator is not Studio
+`benchmarks/project_run.py --sim-unsynced` runs tasks with Studio *not* receiving file edits, as when Rojo or Script Sync isn't running. Use it to check that Claude detects stale code instead of claiming a playtest verified its change.
+
 `tests/studio_sim/server.py` imitates the Studio MCP *tool surface* over the fixture files. It checks syntax and a few known runtime-error patterns, and it never runs game logic. Use it to test *workflow* behavior (did Claude playtest, read the console and report honestly?). Never cite it as runtime evidence. Real Studio results come only from `tests/STUDIO-TEST.md`.
 
 ## Adding a benchmark task

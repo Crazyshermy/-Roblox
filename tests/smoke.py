@@ -46,7 +46,8 @@ CASES = [
         "prompt": "I'm making a Roblox horror game where you play a lighthouse keeper alone on an island during storms. "
                   "Suggest a progression system for it. Keep it under 400 words.",
         "expect_skills_any": ["roblox-game-design", "roblox-genres", "roblox"],
-        "must": [r"(?i)fantasy|pillar", r"(?i)why|belong|serve"],
+        # fantasy-first design shows up as fantasy/pillar language OR progression that isn't stat numbers
+        "must": [r"(?i)fantasy|pillar|not (their |your )?stats?\b|knowledge, not|rather than (stats|numbers)", r"(?i)why|belong|serve"],
         # genre defaults may appear only when explicitly rejected ("No coins, pets, rebirths...")
         # fail only if the answer RECOMMENDS a genre default (explicit rejections are expected and fine)
         "must_not": [r"(?i)\b(add|include|introduce|recommend|use|implement)\s+(a\s+|an\s+)?(rebirth|egg[- ]hatch|pet)\w*\s+(system|mechanic|loop)"],
@@ -87,7 +88,7 @@ CASES = [
         "prompt": "For my Roblox game I wanted players to rewind time for 5 seconds (enemies and projectiles move backwards), "
                   "but Roblox obviously can't do that, so I'll just make it a cooldown-reset ability instead. Good plan?",
         "expect_skills_any": ["roblox-boundary-breaker"],
-        "must": [r"(?i)snapshot|record|buffer|history", r"(?i)option|approach"],
+        "must": [r"(?i)snapshot|record|buffer|history", r"(?i)option|approach|real version|how .{0,20}works|alternative"],
         "must_not": [r"(?i)^\s*(yes|good plan|sounds good)[.!,]"],
     },
     {
@@ -143,7 +144,9 @@ def check(case, r):
     if case.get("expect_skills_any") and not (set(case["expect_skills_any"]) & inv):
         res["skills_ok"] = False
     if case.get("expect_reads_any"):
-        seen = " ".join(r["files_read"]) + " " + " ".join(r["skills_invoked"])
+        # any tool that touched the file counts (Read, Grep, Glob all show progressive disclosure)
+        seen = " ".join(r["files_read"]) + " " + " ".join(r["skills_invoked"]) + " " + \
+            " ".join(str(c.get("input", "")) for c in r.get("tool_calls", []))
         if not any(x in seen for x in case["expect_reads_any"]):
             res["skills_ok"] = False
     specialists = [s for s in r["skills_invoked"] if s and s.split(":")[-1] != "roblox"]
@@ -172,7 +175,21 @@ def main():
     ap.add_argument("--repeat", type=int, default=1, help="runs per case; a case passes if >= 2/3 of runs pass")
     ap.add_argument("--with-baseline", action="store_true", help="also run each case without Apex for contrast")
     ap.add_argument("--jobs", type=int, default=4)
+    ap.add_argument("--rescore", default="", help="re-grade saved runs in this results dir with the current checks (no model calls)")
     a = ap.parse_args()
+    if a.rescore:
+        byid = {c["id"]: c for c in CASES}
+        rates = {}
+        for f in sorted(os.listdir(a.rescore)):
+            if f.endswith(".json"):
+                cid, mode = f.split(".")[0], f.split(".")[1]
+                if cid in byid:
+                    r = json.load(open(os.path.join(a.rescore, f)))
+                    ch = check(byid[cid], r)
+                    rates.setdefault((cid, mode), []).append(ch["skills_ok"] and ch["markers_ok"])
+        for (cid, mode), v in rates.items():
+            print(f"{cid:<16} {mode:<9} {sum(v)}/{len(v)}")
+        return
     cases = [c for c in CASES if not a.only or c["id"] in a.only.split(",")]
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", f"smoke-{a.model}-{stamp}")

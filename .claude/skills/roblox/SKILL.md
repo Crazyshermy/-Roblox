@@ -61,7 +61,7 @@ If `.apex/` is absent and the work is substantial, suggest `/roblox-init` once. 
 
 ## 4. Standards (non-negotiable, all tasks)
 1. **Server authority.** The client is a request-and-presentation layer. Anything that affects other players, progression or value is decided and validated on the server. Clients may *predict* and *present*.
-2. **Currentness.** Roblox changes monthly. Prefer current APIs over tutorial-era patterns. Before relying on an unfamiliar or version-sensitive API, verify it with Studio MCP `http_get`/docs, an `execute_luau` probe, or `references/currency.md`. **Never invent members, enums or limits.** If you can't verify, say so.
+2. **Currentness.** Roblox changes monthly. Prefer current APIs over tutorial-era patterns. Before relying on an unfamiliar or version-sensitive API, verify it with Studio MCP `http_get`/docs, an `execute_luau` probe, or `${CLAUDE_SKILL_DIR}/references/currency.md`. **Never invent members, enums or limits.** If you can't verify, say so.
 3. **Evidence.** Grade important claims internally: E5 verified in Studio/runtime · E4 current official docs · E3 established Roblox practice · E2 engineering inference · E1 opinion · E0 unverified. Don't present E0–E2 as fact. Simulated or imagined player reactions never count as real-player evidence.
 4. **Creative intent.** Preserve the requested player experience. Never simplify silently. If you reduce scope, state what the player loses and why, and offer the fuller path (`roblox-boundary-breaker`).
 5. **Anti-slop.** Don't import genre-default mechanics (pets, eggs, rebirths, generic coins, rarity tiers, battle passes, daily rewards) unless they serve *this* game's fantasy. Ask: *why does this belong in this game?* If the user explicitly asks for one, build it well rather than re-arguing.
@@ -76,17 +76,17 @@ UNDERSTAND → PLAN → IMPLEMENT → VERIFY → OBSERVE → DEBUG → IMPROVE �
 - **Before** significant changes, read the relevant scripts, find their callers and dependencies, learn the current behavior, and name the risks.
 - **Close the loop when Studio is connected.** If tools ending in `start_stop_play` and `get_console_output` are available, then after your **last** code edit and **before** your final answer:
   0. if you edited **files** (Rojo/Script Sync), confirm Studio has the new code: `script_read` or `script_grep` for a line you changed. If it doesn't, say sync isn't running and **don't count** the playtest as testing your change.
-  1. start a playtest (if the game saves data and you don't know whether playtests use a test place or store, ask once first; see `references/studio-mcp.md`),
+  1. start a playtest (if the game saves data and you don't know whether playtests use a test place or store, ask once first; see `${CLAUDE_SKILL_DIR}/references/studio-mcp.md`),
   2. read the console output,
   3. if the output shows errors related to your change, fix them and repeat,
   4. stop the playtest.
   Add `execute_luau` probes for state you can't see in the console, and use multiple clients for multiplayer claims. Skip this only for pure design or advice answers that make no edits.
 - **Without Studio:** use the project's tests or linters if any exist. Otherwise say plainly that the change is untested at runtime, and give the exact playtest steps.
-- **End every answer that changes code with one line:** `Verified: <what, how> · Not verified: <what>`. Never imply a test you didn't run. Tool guidance is in `references/studio-mcp.md`.
+- **End every answer that changes code with one line:** `Verified: <what, how> · Not verified: <what>`. Never imply a test you didn't run. Tool guidance is in `${CLAUDE_SKILL_DIR}/references/studio-mcp.md`.
 
 ## 6. Definition of done (scale to size)
 "It runs" is only one dimension. For `system`+ work, check each one that applies: functionality · architecture fit · security · performance · multiplayer edge cases (join mid-action, leave mid-action, respawn, streaming) · **cross-device input** (anything bound to a key also works on touch and gamepad: `ProximityPrompt`, `ContextActionService` buttons or IAS) · UX · game feel · visual quality · design purpose · maintainability. Use `roblox-review` for the structured pass. Don't produce numeric quality scores.
 
 ## References (read only when needed)
-- `references/currency.md`: version-sensitive platform facts with verification dates. Read it before quoting limits or new-feature behavior.
-- `references/studio-mcp.md`: when and how to use Roblox Studio MCP tools, plus a fallback when Studio isn't connected.
+- `${CLAUDE_SKILL_DIR}/references/currency.md`: version-sensitive platform facts with verification dates. Read it before quoting limits or new-feature behavior.
+- `${CLAUDE_SKILL_DIR}/references/studio-mcp.md`: when and how to use Roblox Studio MCP tools, plus a fallback when Studio isn't connected.
