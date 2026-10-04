@@ -1,0 +1,46 @@
+{
+  "model": "sonnet",
+  "prompt": "/roblox-route Build a secure player trading system",
+  "user_slash_command": "roblox-route",
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [],
+  "files_read": [
+    ".claude/skills/roblox/SKILL.md"
+  ],
+  "tool_calls": [
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-game-79mz2a5x/.claude/skills/roblox/SKILL.md"
+      }
+    }
+  ],
+  "final_text": "```\nTASK: Build a secure player trading system\nClassification: type=build (secure is a requirement, not a separate task) size=system\nRoute: roblox \u2192 security \u2192 data \u2192 networking \u2192 game-design \u2192 review\n```\n\nThe mandatory bundles call for 4 specialists to implement, and the review step makes 5. That is over the system budget of 2\u20134, so see the note on review below.\n\n**Why:**\n- `roblox-security`: \"secure\" is in the task, and trading transfers value. It also fires the bundle for client\u2192server remotes that change state. The primary concerns are dupes, trade-state races, validating item ownership at confirm time, rate limits, and spoofed or malformed remote args.\n- `roblox-data`: the value-transfer bundle. Both inventories must change in one atomic commit. That means cross-player or cross-server persistence, a rollback or journal if one save fails, and BindToClose or leave-mid-trade handling.\n- `roblox-networking`: clients trigger the trade (request, add item, accept, confirm), so the bundle adds it. It also covers the multiplayer edge cases: a player leaving or respawning mid-trade, and replicating trade-window state to both clients.\n- `roblox-game-design`: the bundle for a new mechanic or system design. It covers trade rules, scam prevention as player experience, and whether trading suits this game's economy.\n- `roblox-review`: the bundle requires it after system-scale implementation, before calling the work done.\n\n**Bundles fired:**\n- Value grant/spend/transfer \u2192 security + data (+ networking, since a client triggers it).\n- Client\u2192server state-changing remote \u2192 security.\n- New mechanic or system design \u2192 game-design.\n- System-scale implementation \u2192 review (runs after the build, not at the start).\n\n**Considered but skipped:**\n- `roblox-genres`: no genre is named. I would add it if the game's genre is known.\n- `roblox-ui-ux`: the trade window is real UI, and the scam-prevention UX matters (confirm step, item-change warnings). The table has no signal for it here, so it is deferred. I would load it if UI implementation is in scope.\n- `roblox-luau`, `roblox-architecture`: general quality and placement. These are covered by default Claude ability and `.apex/` conventions, and they are not triggered by anything specific.\n- `roblox-testing`: it is worth running when Studio is connected (multi-client dupe tests), but the table doesn't require it. Review and the working loop's playtest cover the basics.\n- `roblox-debugging`, `roblox-performance`, `roblox-game-feel`, `roblox-level-design`, `roblox-visual-direction`, `roblox-physics-animation`, `roblox-assets`, `roblox-boundary-breaker`: no matching signal. Nobody has said it is impossible or asked to cut scope.\n\n**Context cost:** 5 specialist skills if you count review, 4 before the review phase (budget for system: 2\u20134). I'd treat review as a post-build load, so peak context stays at 4 until the end.\n\n**Risks the route guards against:**\n- Item duplication through concurrent trades, double-confirm, or a trade racing a drop or sale.\n- Client-spoofed items or counts, and trading items the player doesn't own or that are untradeable.\n- Partial commit (one side saved, the other failed) and a crash or leave mid-trade.\n- Scams such as swapping items after the other side accepts. This needs a lock-and-reconfirm flow.\n- Remote spam, malformed input, and trade-request harassment.\n- Cross-server trades and session-lock conflicts.\n- Item-name and chat text that isn't filtered.\n\n**Ambiguities that would change the route:**\n- If trades are same-server only, data is simpler (an in-memory atomic swap plus one save each). If cross-server, add MemoryStore or MessagingService and a harder locking design. Both stay within `roblox-data`.\n- If real-money items (Robux or developer products) are tradable, the receipt and purchase paths enter, with more security weight.\n- If the project already has an inventory or data layer, add `roblox-architecture` to fit into it.\n\n**Router feedback:**\n- The table has no row for \"trade/transfer between players\" as a signal. Only the bundle line mentions it. A row would help.\n- The review bundle pushes system tasks past the 2\u20134 budget. The budget should say whether review counts toward it.\n- There is no explicit rule for \"secure X\" phrasing. It routes to security through the bundle here, but only because trading moves value.\n- `roblox-ui-ux` should have a conditional trigger for flows where UI is a security surface, such as confirm screens that prevent scams.",
+  "cost_usd": 0.081005,
+  "turns": 2,
+  "seconds": 21.7,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n"
+}

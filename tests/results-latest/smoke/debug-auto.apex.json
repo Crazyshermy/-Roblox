@@ -1,0 +1,60 @@
+{
+  "model": "sonnet",
+  "prompt": "My Roblox LocalScript sometimes errors 'attempt to index nil with Humanoid' but only after the player respawns. It's in StarterPlayerScripts and does `local hum = player.Character.Humanoid` at the top. What's wrong?",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-debugging"
+  ],
+  "files_read": [],
+  "tool_calls": [
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox"
+      }
+    },
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-debugging"
+      }
+    }
+  ],
+  "final_text": "*Apex: debugging*\n\n**Cause (high confidence, from the error text):** `player.Character` is `nil` when that line runs. \"Attempt to index nil with 'Humanoid'\" means the thing in front of `.Humanoid` was nil. If `Humanoid` itself were missing you'd get a different message, such as \"attempt to index nil with 'Health'\" on a later line.\n\nThere are two separate problems:\n\n1. **Race at join.** A script in StarterPlayerScripts runs once per join, not once per spawn. At the top of the script the character often hasn't loaded yet, so `Character` is nil. That's why it only fails sometimes.\n2. **Stale reference after respawn.** If the line does succeed, `hum` points at the first character's Humanoid. After the player dies, that Humanoid is destroyed, so everything using `hum` is working on a dead object. The script also never re-runs to pick up the new one. If your error shows up after respawn, it is probably coming from code that reads `Character` again, or from a handler that fires while `Character` is briefly nil. I haven't seen the rest of your script, so I can't say which.\n\n**Fix:** don't cache the Humanoid at the top. Bind to `CharacterAdded` and rebuild per-character state each time:\n\n```lua\nlocal Players = game:GetService(\"Players\")\nlocal player = Players.LocalPlayer\n\nlocal function onCharacter(character: Model)\n\tlocal hum = character:WaitForChild(\"Humanoid\", 10) :: Humanoid?\n\tif not hum then return end\n\n\t-- all code that used `hum` goes here, or call into a function that takes it\n\thum.Died:Connect(function()\n\t\t-- per-character cleanup\n\tend)\nend\n\nplayer.CharacterAdded:Connect(onCharacter)\nif player.Character then\n\ttask.spawn(onCharacter, player.Character) -- character that already exists at script start\nend\n```\n\n- Connections made on the old Humanoid or character go away with it. Anything you connect on `player` or a service lives across respawns and will stack up on every spawn unless you disconnect it. Keep those outside `onCharacter`, or store them and disconnect when the character dies.\n- If other parts of the script need the current Humanoid later, keep a `currentHum` variable and update it in `onCharacter`. Don't read `player.Character` directly in those places.\n- Alternatively, set `ResetOnSpawn = false` on a ScreenGui, or move the logic into StarterCharacterScripts. A StarterCharacterScripts script re-runs on each spawn and `script.Parent` is the character. That's simpler if all the logic is per-character.\n\nVerified: nothing, since I haven't run or seen your script \u00b7 Not verified: where exactly your error is thrown. If you paste the script or the full error with line number, I can confirm whether it's the join race or a later read.",
+  "cost_usd": 0.094056,
+  "turns": 5,
+  "seconds": 23.5,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "mode": "apex",
+  "check": {
+    "skills_ok": true,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}

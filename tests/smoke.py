@@ -48,7 +48,7 @@ CASES = [
         "expect_skills_any": ["roblox-game-design", "roblox-genres", "roblox"],
         "must": [r"(?i)fantasy|pillar", r"(?i)why|belong|serve"],
         # genre defaults may appear only when explicitly rejected ("No coins, pets, rebirths...")
-        "must_not": [r"(?im)^(?!.*\b(no|avoid|skip|not|without|instead|reject|cut|drop)\b).*\b(egg hatch|rebirth)"],
+        "must_not": [r"(?im)^(?!.*\b(no|avoid|skip|not|without|instead|reject|cut|drop|remove|never)\b).*\b(egg hatch|rebirth)"],
     },
     {
         "id": "debug-auto",
