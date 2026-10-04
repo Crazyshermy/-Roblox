@@ -56,19 +56,26 @@ Then, in your game project, run `/roblox-status` (health check), then `/roblox-i
 
 Skills: see [docs/SKILL-INDEX.md](docs/SKILL-INDEX.md). Design: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Verified so far
-See [docs/BENCHMARKS.md](docs/BENCHMARKS.md) for numbers and raw results.
-- **Discovery and invocation:** real headless Claude Code sessions (v2.1.289) discover all skills in both project and plugin installs. `/roblox`, `/roblox-status` and `/roblox-route` work, and the router loads specialists through the Skill tool.
-- **Auto-routing and behavior change:** 9 smoke cases (`tests/smoke.py`) check both *which skills fired* and *behavior markers* in the answer. Examples: the current DataStore budget instead of the stale one, anti-slop reasoning, the respawn bug class, boundary-breaker on "Roblox can't".
-- **Benchmark:** in blind pairwise judging on 10 representative tasks, Apex won 9–1 in the final full run (10–0 after a targeted fix to the one loss). Rubric coverage was 0.78 → 0.97, and judge-flagged incorrect or stale claims went from 19 to 3. One sample per arm and an LLM judge, so read the limitations in BENCHMARKS.md.
-- **Installers:** the bash installer is tested (install, update, uninstall, conflict refusal). **`install.ps1` has not been executed** because no PowerShell was available in the build environment. On Windows, method C (plugin) is the safest path.
-- **Not yet verified:** behavior with a live Roblox Studio MCP connection (no Studio in the build environment), and behavior on models other than the one used in tests.
+## Verified so far (v1.1.0)
+Numbers, method and raw data are in [docs/BENCHMARKS.md](docs/BENCHMARKS.md).
+- **Fresh install from GitHub:** all checks pass for the project and plugin methods in isolated configs. Skills are discovered, `/roblox`, `/roblox-status`, `/roblox-route` and `/roblox-init` work, the CLAUDE.md block and `.apex/` memory are used, and specialists auto-route.
+- **Smoke suite:** 10/10 cases. These check which skills *actually* fired, and the behavior they caused.
+- **Q&A benchmark:** Apex beat baseline Claude 9–1 on 10 tasks in blind judging. Rubric coverage went 0.78 → 0.98.
+- **Real-project benchmark:** working on a real Rojo game with Studio-like tools, Apex won 7–0 after fixes (6–1 before). After editing, it **playtested and read the console in 5/5 tasks, vs the baseline's 0/5.**
+- **Knowledge:** every engine API named in the skills exists and isn't deprecated in Roblox's official reference (`tests/check_api.py`). Version-sensitive facts are dated, with sources.
+
+**Not verified yet:**
+- **Real Roblox Studio.** Nothing has run against live Studio. The test kit is ready: [tests/STUDIO-TEST.md](tests/STUDIO-TEST.md) plus `tests/fixtures/LighthouseKeeper.rbxl`.
+- **`install.ps1`** has not been executed. On Windows, the plugin method or Git Bash is verified.
+- **Models other than Sonnet** as the working model.
 
 ## Test it yourself
 ```bash
 python3 tests/validate.py            # structure, YAML, routing coverage, budgets (free)
 python3 tests/smoke.py               # real sessions, ~$1
-python3 benchmarks/run.py            # baseline vs Apex, ~$5
+python3 tests/install_test.py --ref main   # fresh clone + both install methods, ~$1
+python3 benchmarks/run.py            # Q&A baseline vs Apex, ~$3
+python3 benchmarks/project_run.py --luau-compile <path>   # real edits in the fixture, ~$3
 ```
 The manual procedure for an interactive session is in [tests/SMOKE-TEST.md](tests/SMOKE-TEST.md).
 

@@ -1,0 +1,90 @@
+{
+  "model": "sonnet",
+  "prompt": "Design the HUD and inventory UI for my Roblox survival game that must work great on phones as well as PC and controller.",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-ui-ux",
+    "roblox-genres"
+  ],
+  "files_read": [
+    ".claude/skills/roblox-genres/references/systems.md",
+    ".claude/skills/roblox/references/currency.md"
+  ],
+  "tool_calls": [
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox"
+      }
+    },
+    {
+      "tool": "Glob",
+      "input": {
+        "pattern": "**/*",
+        "path": "/tmp/apex-apex-xmfp04ah"
+      }
+    },
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-ui-ux"
+      }
+    },
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-genres"
+      }
+    },
+    {
+      "tool": "Glob",
+      "input": {
+        "pattern": ".apex/*",
+        "path": "/tmp/apex-apex-xmfp04ah"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-apex-xmfp04ah/.claude/skills/roblox-genres/references/systems.md"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-apex-xmfp04ah/.claude/skills/roblox/references/currency.md"
+      }
+    }
+  ],
+  "final_text": "*Apex: ui-ux \u2192 genres*\n\nI don't have your game's details yet. There's no `.apex/` memory, no code and no Studio connection in this session. This is a design spec built on stated assumptions, and nothing in it is tested. Tell me where the assumptions are wrong and I'll adjust it.\n\n**Assumptions**\n- It's a survival game with vitals (health, hunger, thirst, maybe temperature), a hotbar, a backpack and crafting.\n- It's multiplayer, and most players are on phones.\n- Items are stack-based and the server owns all inventory state.\n\n## 1. Principles\n1. **The default screen is almost empty.** Only vitals, a hotbar and context prompts show. The world is the interface.\n2. **One model, three input skins.** Every action is an `InputAction`, so touch, keyboard/mouse and gamepad all reach it. No feature is reachable on only one device.\n3. **Inventory is a verb, not a spreadsheet.** Moving items should take one tap, one click or one button press. Dragging is optional everywhere.\n4. **Survival is dangerous in real time.** Opening the inventory doesn't pause the world. The layout keeps the player's view of threats, and the screen shows vulnerability while it's open.\n5. **Mobile sets the layout.** Design the phone version first, then add density for PC and console.\n\n## 2. HUD (always on)\n\n```\nPHONE (landscape)\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 [\u2261]  compass/objective \u00b7\u00b7\u00b7\u00b7              [ping]  \u2502\n\u2502                                                  \u2502\n\u2502 \u2665 \u25ae\u25ae\u25ae\u25ae\u25ae\u25ae (vitals stack, top-left, compact)       \u2502\n\u2502 \ud83c\udf56 \u25ae\u25ae\u25ae\u25ae                                          \u2502\n\u2502 \ud83d\udca7 \u25ae\u25ae\u25ae                                           \u2502\n\u2502                                      world      \u2502\n\u2502  [thumbstick zone \u2014 leave clear]    \u27e8 prompt \u27e9   \u2502\n\u2502                                      [ACT] [USE] \u2502\n\u2502          [1][2][3][4][5] hotbar      [JUMP]      \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n```\n\n| Element | Phone | PC | Controller |\n|---|---|---|---|\n| Vitals | Top-left, thin bars plus icons | Bottom-left | Bottom-left |\n| Hotbar | 5 slots, bottom-center, \u226548 px | 8\u201310 slots, keys 1\u20130 | 4\u20136 slots; LB/RB cycles, D-pad direct |\n| Primary action | Right thumb cluster, large | Mouse | RT |\n| Context prompt | In-world `BillboardGui` plus a button | Key glyph | Button glyph |\n| Menu | Small top-corner button | Tab / I | Menu / Y |\n\n**Vitals**\n- Bars stay compact until a value drops below about 30%. Then that vital pulses, gains an icon and gets a screen-edge cue.\n- Meaning never relies on color alone. Each vital has a distinct icon, and the low state adds a shape change (a \"!\" badge).\n- Status effects (bleeding, cold) are small icons under the vitals. Tapping or hovering shows the cause and the cure.\n- Don't put numbers on bars by default. Offer an \"exact values\" accessibility toggle.\n\n**Diegetic over HUD**\n- Damage direction is a screen-edge wedge.\n- Cold shows as frost on the screen edges, and low health as desaturation. These are optional effects, and a reduced-effects setting turns off the flashing ones.\n- Resource nodes, doors and containers use world prompts. Don't build a \"press E\" widget for each one.\n- The compass shows only landmarks the player has discovered.\n\n**Hotbar**\n- The selected slot is shown with a thicker outline and a scale change, not just a color.\n- Slots show durability as a thin bar, and stack counts at a readable size.\n- On phones, tap to equip and tap the equipped item again to use it. Long-press opens a quick-action menu (drop, split, inspect).\n\n## 3. Inventory\n\n**Shared structure.** One screen has three panels: **Backpack grid**, **Equipment/hands**, and **Context panel**. The context panel shows item details, or the nearby container, or crafting, depending on what's open.\n\n```\nPC / CONSOLE                          PHONE\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510       \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Equip  \u2502 Backpack \u2502 Context \u2502       \u2502 [Pack][Equip][Craft]  \u2502  tabs\n\u2502 slots  \u2502  grid    \u2502 (item / \u2502       \u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502        \u2502          \u2502 chest / \u2502       \u2502  Backpack grid        \u2502\n\u2502        \u2502          \u2502 craft)  \u2502       \u2502  (4\u20135 cols)           \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2534\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518       \u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n                                      \u2502 Selected: details +   \u2502\n                                      \u2502 [Use][Equip][Drop][\u21c4] \u2502\n                                      \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n```\n\n**Moving items, by device**\n- **Touch:** Tap selects an item, and the bottom action bar offers contextual buttons. Tapping a destination slot moves it. A stack-split slider replaces drag-split. Dragging works but is never required.\n- **Mouse:** Drag and drop. Shift+click moves a stack between the backpack and the open container. Right-click opens a context menu. Ctrl or scroll adjusts quantity.\n- **Controller:** The cursor is the selection (`GuiService.SelectedObject` with explicit `NextSelection*` wiring). A selects, and A on the next slot moves. X splits, Y inspects, B backs out and closes. LB/RB switches tabs. Every state has a visible focus ring.\n\n**Containers and looting**\n- Opening a container shows the container panel next to the backpack.\n- **Take all** is a single large button on every device, and it's the default focus on a controller.\n- If a player is hit while looting, the UI stays open but dims slightly and shows a \"vulnerable\" cue. Don't close it on them. Do consider a short lock rule on someone else's container so there's no desync.\n\n**Crafting**\n- The list is filtered by default to what the player can craft right now, with \"show all\" as a toggle.\n- Missing ingredients appear in red and with a \"missing \u00d7N\" tag, so it works without color.\n- A tap crafts one item. A hold crafts up to the maximum. Crafting that takes time shows progress on the HUD, not only in the menu.\n\n**Clutter control**\n- Auto-stack, a \"sort\" button and category tabs on the backpack.\n- A \"quick-use\" mapping that can put any consumable on the hotbar by long-press or by the context menu.\n- Weight or slot limits must be visible *before* the player tries to pick something up.\n\n## 4. Architecture\n\nBased on the `roblox-ui-ux` principles. These are recommendations, not verified against your codebase.\n\n- **Server owns inventory.** The client sends *requests* (`MoveItem(slotA, slotB, qty)`, `UseItem(slot)`, `Craft(recipeId, count)`). The server validates slots, quantities, ownership, container proximity and the rate limit. It then replies with the new state. The client may show a predicted move and roll it back on rejection.\n- **State to view, one direction.** A single `InventoryState` store feeds a render step. Use Fusion or React-Lua if you already do, otherwise a small render function per panel. Don't let UI instances be the source of truth.\n- **Input.** Define `InputAction`s (`UseItem`, `OpenInventory`, `HotbarNext`, `HotbarPrev`, `Interact`, `Back`) with keyboard, touch and gamepad bindings through the Input Action System. I haven't verified the exact binding API in a Studio session here, so I'd probe it before coding.\n- **Glyph layer.** One module maps the last input type (`UserInputService:GetLastInputType` / `LastInputTypeChanged`) to a key or button icon set.\n- **Layout.** Scale-based sizing, `UIAspectRatioConstraint` and `UIListLayout`/`UIGridLayout`. Use `UITextSizeConstraint` and fixed text sizes rather than `TextScaled`. Respect `ScreenGui.ScreenInsets` and `SafeAreaCompatibility`.\n- **Performance.** Pool slot frames and update only changed slots. Disable (`Enabled = false`) panels that aren't open, and don't redraw on every `Heartbeat`.\n- **Text.** Item and player-written names shown to other players need filtering, such as renamed items or sign text. Leave about 30\u201340% extra room for localization.\n\n## 5. Accessibility settings (small, in the first release)\n- Reduced screen effects (shake, flashes, vignette).\n- Text size and HUD scale (a `UIScale` slider).\n- Hold-to-toggle for sprint or aim.\n- High-contrast vitals.\n- Left-handed mirroring of the phone thumb cluster.\n- Captions for audio-critical cues, such as nearby threats.\n\n## 6. Onboarding\n- The first 60 seconds are: pick up a thing, use a thing, see a vital change. Each step is a contextual prompt at the moment of need.\n- The inventory tutorial appears when the *first* item is picked up, not at spawn.\n- Every hint is dismissible and shows once.\n- Crafting and the full menu stay out of sight until the player has a reason to use them.\n\n## 7. Verification plan (not run yet)\n- Device Emulator: smallest phone, a tablet, 1080p and a console 10-ft view. Screenshot every state: empty, full, low vitals and a container open.\n- Complete these flows with touch only and then gamepad only: equip, split, loot, craft and drop.\n- Check the thumb zones against the default movement controls.\n- Run a server test with two clients for container contention and a rejected move.\n- Fuzz the inventory requests: bad slots, negative or huge quantities, and a distant container.\n\n## Open questions\nThese change the design the most:\n1. **Items:** grid (Tarkov-style shapes) or plain slots? I assumed slots, since shaped grids are hard on phones.\n2. **Death:** do players drop everything? That affects how much the inventory UI should push quick-sorting and a safe slot.\n3. **Building or base storage:** if so, I'd add a build-mode UI, which is a separate piece of work.\n4. **Existing UI code or a library** (Fusion, React-Lua)? I'd match it.\n5. **Visual direction:** is there a palette or mood I should design to? I held off on styling.\n\nIf you give me the item model and your project structure, the next step is a Luau implementation: the state store, the server-validated inventory remotes, the input actions and the slot components. I'd test it in Studio if it's connected.\n\nVerified: nothing run (design only; the repo has no game code and no Studio connection) \u00b7 Not verified: all Roblox API usage named above (IAS bindings, `ScreenInsets`/`SafeAreaCompatibility`, gamepad selection behavior), plus every layout on a real device.",
+  "cost_usd": 0.1567032,
+  "turns": 11,
+  "seconds": 44.1,
+  "stderr_tail": "",
+  "mode": "apex"
+}

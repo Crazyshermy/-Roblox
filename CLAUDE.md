@@ -9,7 +9,7 @@ When changing skills:
 - Report what was verified (and how) separately from what wasn't.
 
 ## Roblox Apex
-This is also a Roblox workspace. For Roblox, Luau or game-design work, use the `/roblox` skill system (the router loads the relevant `roblox-*` specialists).
+This is also a Roblox workspace. For any Roblox, Luau or game-design task, **first load the `roblox` skill** (the router loads the relevant `roblox-*` specialists).
 - Project memory lives in `.apex/` when present. Settled decisions override generic best practice.
 - Verify version-sensitive Roblox APIs and limits before relying on them. Separate facts from recommendations.
 - Preserve the intended player experience. Never silently simplify. Common Roblox mechanics need a reason to exist in the game.

@@ -1,0 +1,94 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Anchors progression in the specific fantasy (cooking, customers, the city) rather than generic numbers",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Progression changes what the player can do or understand, not only stat multipliers",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Does not default to pets/eggs/rebirths/generic currencies without justification (or explicitly challenges them)",
+        "A": "missed",
+        "B": "met"
+      },
+      {
+        "item": "Considers onboarding and the first minutes of play",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Considers economy sources and sinks if a currency is proposed",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Proposes how to test/validate with players rather than claiming it will be fun",
+        "A": "missed",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Three currencies, including a premium 'Neon Shards' currency sold for Robux, with no reason given for needing more than one",
+        "Prestige/rebirth reset with a +5% Cred 'Legacy' multiplier",
+        "Daily/weekly quests and daily streaks",
+        "Leaderboards for highest earnings and fastest flagship, which reward time spent",
+        "A loot/unlock roll at close-out",
+        "Equipment costs rising about 2.2\u00d7 per level, which is a generic stat-scaling sink",
+        "Selling a '2\u00d7 Cred weekend pass' while saying nothing sells a gameplay advantage, which contradicts itself"
+      ],
+      "overengineering": [
+        "Five parallel progression tracks plus cyberware loadouts, staff loyalty arcs, collections and prestige districts for an early-stage design",
+        "A fixed XP formula and hour-by-hour pacing targets given without any economy model behind them"
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "A leftover internal header ('Apex: game-design \u2192 genres') at the top of the answer"
+      ],
+      "overengineering": [
+        "Visiting other players' stands and leaving reviews is an extra social system that may be premature"
+      ]
+    },
+    "preference": "B",
+    "reason": "B keeps progression tied to new verbs, regulars and reputation, explicitly challenges genre defaults, sets out the economy's sources and sinks, and proposes concrete playtest signals, while A leans on multiple currencies, prestige, dailies and Robux-sold currency and never says how to validate the design with players."
+  },
+  "judge_cost": 0.0856812,
+  "apex_score": 0.917,
+  "base_score": 0.5,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "A leftover internal header ('Apex: game-design \u2192 genres') at the top of the answer"
+    ],
+    "overengineering": [
+      "Visiting other players' stands and leaving reviews is an extra social system that may be premature"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Three currencies, including a premium 'Neon Shards' currency sold for Robux, with no reason given for needing more than one",
+      "Prestige/rebirth reset with a +5% Cred 'Legacy' multiplier",
+      "Daily/weekly quests and daily streaks",
+      "Leaderboards for highest earnings and fastest flagship, which reward time spent",
+      "A loot/unlock roll at close-out",
+      "Equipment costs rising about 2.2\u00d7 per level, which is a generic stat-scaling sink",
+      "Selling a '2\u00d7 Cred weekend pass' while saying nothing sells a gameplay advantage, which contradicts itself"
+    ],
+    "overengineering": [
+      "Five parallel progression tracks plus cyberware loadouts, staff loyalty arcs, collections and prestige districts for an early-stage design",
+      "A fixed XP formula and hour-by-hour pacing targets given without any economy model behind them"
+    ]
+  },
+  "reason": "B keeps progression tied to new verbs, regulars and reputation, explicitly challenges genre defaults, sets out the economy's sources and sinks, and proposes concrete playtest signals, while A leans on multiple currencies, prestige, dailies and Robux-sold currency and never says how to validate the design with players."
+}

@@ -1,6 +1,6 @@
 ---
 name: roblox-architecture
-description: "Roblox code architecture: where scripts and assets live, services and controllers, module boundaries, state ownership, player and character lifecycle, CollectionService components, init order, Rojo vs Script Sync, fitting new systems into existing code."
+description: "Use when deciding where Roblox code, state or a new system should live, or when restructuring. Covers placement (server, client, shared), services and controllers, module boundaries, state ownership, player and character lifecycle, CollectionService components, init order, Rojo vs Script Sync, and fitting into existing code."
 ---
 
 # Roblox architecture

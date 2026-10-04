@@ -1,0 +1,47 @@
+{
+  "model": "sonnet",
+  "prompt": "Review this Roblox remote handler for exploitability:\n```lua\nlocal Remote = game.ReplicatedStorage.UseAbility\nRemote.OnServerEvent:Connect(function(player, abilityName, target, damage)\n  local char = player.Character\n  if target and target:FindFirstChild('Humanoid') then\n    target.Humanoid:TakeDamage(damage)\n  end\n  player.leaderstats.XP.Value += 10\nend)\n```",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox-security"
+  ],
+  "files_read": [],
+  "tool_calls": [
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-security"
+      }
+    }
+  ],
+  "final_text": "# Review: `UseAbility` remote handler\n\nVerdict: **not safe to ship**. The client decides the damage, the target and whether the ability happened at all. I read the code only; I did not run it in Studio, so everything below is reasoned from the code and not reproduced.\n\n## Findings, most severe first\n\n**1. Critical: client-controlled `damage` (modified client)**\n- **Exploit:** `Remote:FireServer(\"Any\", enemyChar, math.huge)` one-shots anyone. `damage` is never type- or range-checked.\n- **Edge cases:** `NaN`, negative, or non-number values behave unpredictably. I haven't verified what `TakeDamage` does with negative or NaN, so don't rely on it.\n- **Fix:** the server looks up damage from its own ability table.\n\n**2. Critical: client-chosen `target` with no validation (modified client)**\n- **Exploit:** the client can name any instance containing a `Humanoid`: any player across the map, NPCs, shopkeepers, or protected characters.\n- **Missing checks:** there is no range, line-of-sight, team, alive, or \"is this a character\" check.\n- **Wrong types:** a non-Instance target such as a string or number makes `FindFirstChild` error. That only kills the handler thread, but it is sloppy and should be rejected quietly.\n\n**3. High: unlimited XP (modified client)**\n- **Exploit:** `player.leaderstats.XP.Value += 10` runs on every call, with or without a valid target or ability. A loop at the engine throttle of about 500 calls/s shared across all remotes gives roughly 5,000 XP/s.\n- **Related problem:** `leaderstats` is being used as the source of truth, and this is a second write path to it. If a real progression system exists, route XP through its single writer.\n\n**4. High: `abilityName` is never used (modified client)**\n- **Exploit:** nothing checks that the player owns, unlocked or equipped the ability, and there is no cooldown. Any player can use any ability at any rate.\n\n**5. Medium: no player state checks**\n- `char` is fetched but never used. Dead or respawning players can fire the remote.\n- A missing `leaderstats` or `XP` (during load or leave) throws.\n\n**6. Low: no anomaly logging**\n- Nothing is recorded server-side, so you can't tell when someone is probing the remote.\n\n## Drop-in replacement\n\nAssumptions to confirm:\n- The `ABILITIES` table and `playerHasAbility` are placeholders for your real ability data and unlock or equip check.\n- XP is granted **only on a valid hit**. The original granted it even with no target, which is farmable. Move it up a few lines if you want XP for any valid use.\n- I added no team or PvP rules because I don't know your design.\n\n```lua\nlocal Players = game:GetService(\"Players\")\nlocal ReplicatedStorage = game:GetService(\"ReplicatedStorage\")\n\nlocal Remote = ReplicatedStorage.UseAbility\n\n-- Server-owned numbers. The client never supplies damage.\nlocal ABILITIES = {\n\tFireball = { damage = 25, range = 60, cooldown = 1.0 },\n\t-- add real abilities here\n}\nlocal RANGE_TOLERANCE = 1.15 -- slack for latency\nlocal XP_PER_HIT = 10\n\nlocal lastUse: { [Player]: { [string]: number } } = {}\n\n-- TODO: replace with the real ownership/unlock/equipped check\nlocal function playerHasAbility(player: Player, abilityName: string): boolean\n\treturn true\nend\n\nlocal function getHumanoid(model: Instance): Humanoid?\n\tlocal hum = model:FindFirstChildOfClass(\"Humanoid\")\n\tif hum and hum.Health > 0 then\n\t\treturn hum\n\tend\n\treturn nil\nend\n\nRemote.OnServerEvent:Connect(function(player: Player, abilityName: unknown, target: unknown, ...)\n\t-- 1. Shape: exactly (string, Instance), no extra args\n\tif select(\"#\", ...) ~= 0 then return end\n\tif typeof(abilityName) ~= \"string\" or #abilityName > 32 then return end\n\tif typeof(target) ~= \"Instance\" or not target:IsA(\"Model\") then return end\n\n\t-- 2. Ability must exist on the server and be owned by this player\n\tlocal def = ABILITIES[abilityName]\n\tif not def or not playerHasAbility(player, abilityName) then return end\n\n\t-- 3. Caster must be alive\n\tlocal char = player.Character\n\tlocal myHum = char and getHumanoid(char)\n\tlocal myRoot = char and char:FindFirstChild(\"HumanoidRootPart\")\n\tif not myHum or not (myRoot and myRoot:IsA(\"BasePart\")) then return end\n\n\t-- 4. Cooldown on the server clock (set before any yield, so it can't be raced)\n\tlocal now = os.clock()\n\tlocal uses = lastUse[player]\n\tif not uses then\n\t\tuses = {}\n\t\tlastUse[player] = uses\n\tend\n\tif uses[abilityName] and now - uses[abilityName] < def.cooldown then return end\n\tuses[abilityName] = now\n\n\t-- 5. Target must be a live character in range, using server positions\n\tif target == char or not target:IsDescendantOf(workspace) then return end\n\tlocal hum = getHumanoid(target)\n\tlocal root = target:FindFirstChild(\"HumanoidRootPart\")\n\tif not hum or not (root and root:IsA(\"BasePart\")) then return end\n\tif (root.Position - myRoot.Position).Magnitude > def.range * RANGE_TOLERANCE then return end\n\n\t-- 6. Server decides damage and reward\n\thum:TakeDamage(def.damage)\n\n\tlocal stats = player:FindFirstChild(\"leaderstats\")\n\tlocal xp = stats and stats:FindFirstChild(\"XP\")\n\tif xp and xp:IsA(\"IntValue\") then\n\t\txp.Value += XP_PER_HIT\n\tend\nend)\n\nPlayers.PlayerRemoving:Connect(function(player)\n\tlastUse[player] = nil\nend)\n```\n\n## Attack list to test after the fix\n\n| Call | Expected result |\n|---|---|\n| `FireServer(\"Fireball\", enemy, math.huge)` | Extra arg, silently rejected |\n| `FireServer(\"Fireball\", enemy)` from 500 studs away | Out of range, rejected |\n| `FireServer(\"Fireball\", enemy)` 100 times in 1 second | One hit lands, the rest hit the cooldown |\n| `FireServer(\"Admin_Nuke\", enemy)` | Unknown ability, rejected |\n| `FireServer(\"Fireball\", \"string\")` or `nil` | Rejected, no error |\n| `FireServer(\"Fireball\", workspace.NPCShopkeeper)` | Gets through unless you restrict targets. Decide whether NPCs are valid targets. |\n| Fire while dead | Rejected |\n\nI haven't run these. If you want, I can run them in a Studio playtest through the MCP connection and report what actually happened.\n\n## Remaining design questions\n- **Hit authority:** is this a targeted ability where the client picks a target, or should the server raycast or resolve hits itself? The latter is more robust against aimbots.\n- **Remote throttling:** add a per-player token bucket if abilities share a remote across many types.\n- **Settled decisions:** I haven't checked `.apex/decisions.md`. If it already has ability or XP rules, those override this sketch.",
+  "cost_usd": 0.09676839999999999,
+  "turns": 3,
+  "seconds": 31.2,
+  "stderr_tail": "",
+  "mode": "apex"
+}
