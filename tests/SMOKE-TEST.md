@@ -9,7 +9,7 @@ Each case runs a fresh temporary project with the skills installed, sends one pr
 
 | Case | Proves | Behavioral marker (from skill content) |
 |---|---|---|
-| `status` | `/roblox-status` works, and skills are discovered in-session | version 1.0.0, specialist names listed as discovered |
+| `status` | `/roblox-status` works, and skills are discovered in-session | the current version, specialist names listed as discovered |
 | `router-entry` | `/roblox` routes an architecture task | architecture (+ networking) loaded; route line; replicated attributes for state; late-join handling |
 | `security-auto` | auto-routing with no prefix | NaN/inf checks, yield-in-critical-section, negative amounts, rate limit, two-party confirmation |
 | `design-auto` | game-design auto-routing | fantasy and pillars, "why does it belong"; no egg-hatching or rebirth defaults |
@@ -17,9 +17,13 @@ Each case runs a fresh temporary project with the skills installed, sends one pr
 | `currency` | currentness | reads `currency.md`; states 300 + CCU×40 and 60 + players×40; the old ×10 only appears as "outdated" |
 | `trivial` | proportionality | ≤ 1 specialist, ≤ 2,500 chars |
 | `ambition` | creative ambition | boundary-breaker loaded; snapshot/record approach; options; doesn't open with "yes, good plan" |
+| `security-nomd` | auto-routing **without** a CLAUDE.md block (plugin users who skipped `/roblox-init`) | security loaded; negative and NaN amounts found |
 | `route-inspect` | `/roblox-route` explains routing | names security, data, networking, plus skipped skills |
 
 Add `--with-baseline` to run each case without Apex as a contrast.
+
+Fresh-install acceptance (clone from GitHub, isolated config, both install methods): `python3 tests/install_test.py --ref main`.
+Real Roblox Studio procedure: [STUDIO-TEST.md](STUDIO-TEST.md). **Not yet run.**
 
 ## Manual (interactive Claude Code, about 5 minutes)
 Open Claude Code in a project where Apex is installed.

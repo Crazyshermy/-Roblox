@@ -32,6 +32,9 @@ Typical standard task: about 4–5k tokens. System-scale: about 6–7k. Loading 
 
 Skills can't invoke skills directly. The router *instructs* Claude to call the Skill tool, which was verified in real sessions, in both project and plugin installs. In plugin mode the bare names resolve to `roblox-apex:<name>` automatically (verified).
 
+## Verification protocol (added in v1.1 after real-project testing)
+Abstract advice like "verify your changes" did not change behavior. In the project benchmark, neither arm playtested. The router now prescribes a concrete closing sequence whenever Studio tools exist: after the last edit, playtest → read console → fix → stop. Every code-changing answer ends with `Verified: … · Not verified: …`. After this change, Apex playtested after editing in every implementation task, and the baseline never did.
+
 ## Ownership (to avoid duplicated or contradictory rules)
 Each rule has one home, and other skills point to it:
 - Security owns validation and value integrity.

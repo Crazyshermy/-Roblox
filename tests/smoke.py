@@ -47,7 +47,8 @@ CASES = [
                   "Suggest a progression system for it. Keep it under 400 words.",
         "expect_skills_any": ["roblox-game-design", "roblox-genres", "roblox"],
         "must": [r"(?i)fantasy|pillar", r"(?i)why|belong|serve"],
-        "must_not": [r"(?i)\begg(s)?\b.*hatch", r"(?i)\brebirth"],
+        # genre defaults may appear only when explicitly rejected ("No coins, pets, rebirths...")
+        "must_not": [r"(?im)^(?!.*\b(no|avoid|skip|not|without|instead|reject|cut|drop)\b).*\b(egg hatch|rebirth)"],
     },
     {
         "id": "debug-auto",
