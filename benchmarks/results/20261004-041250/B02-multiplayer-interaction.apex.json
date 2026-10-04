@@ -1,0 +1,43 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "Design how two players can carry a heavy crate together in my Roblox co-op game (both must hold it for it to move). How should this work across client and server?",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-networking",
+    "roblox-physics-animation",
+    "roblox-security",
+    "roblox-game-design"
+  ],
+  "files_read": [],
+  "final_text": "Apex route: roblox-networking \u2192 roblox-physics-animation \u2192 roblox-security \u2192 roblox-game-design (new co-op mechanic, shared physics object, client-triggered remotes)\n\nThis is a design only. Nothing here has been built or playtested, and I didn't verify any API in Studio. There's no `.apex/` memory in this project, so I had no pillars or prior decisions to check against.\n\n## Core idea\n\nThe server owns the crate and the carry rule. Clients send intent (\"I grab slot A\", \"I let go\") and render feedback. Players keep moving their own characters as normal. The server derives the crate's target pose from where the two carriers are.\n\n## Server side (authority)\n\n**Crate setup**\n- The crate is unanchored with `SetNetworkOwner(nil)`, so the server simulates it. Call this explicitly, because the engine may otherwise auto-assign ownership to a nearby player. If a client owned it, that player could teleport the crate.\n- It has two grab slots, one on each side. Each slot has a `ProximityPrompt` that is enabled only when the slot is free.\n\n**State**\n- Server memory holds `holders[crate] = {A = player?, B = player?}` and `carrying[player] = {crate, slot}`.\n- Mirror this to attributes on the crate (`HolderA`, `HolderB` as UserIds, and `Active`). Attributes replicate to late joiners, so no remote is needed to sync state.\n\n**Grab**\n1. `ProximityPrompt.Triggered` fires on the server.\n2. The server checks that the player is alive, within range by server position, not already carrying, that the slot is free, and that they're rate-limited.\n3. It then sets the slot. The check and the set happen with no yield in between, so two players hitting the same slot in the same frame resolve to whichever the server processes first.\n\n**Both-must-hold rule**\n- `Active = HolderA ~= nil and HolderB ~= nil`.\n- When it's not active, the movers are disabled and the crate just sits there. There's no one-handed dragging, because that would break the requirement.\n- A lone holder sees \"waiting for partner\".\n\n**Movement while active**\n- Each `Heartbeat`, the server computes a target position (the midpoint of the two carriers' hand points) and a target orientation (from the vector between them).\n- An `AlignPosition` and an `AlignOrientation` pull the crate toward that target. Both have a capped `MaxVelocity` and `MaxAngularVelocity`.\n- The caps are what make it \"heavy\". Players must walk in sync, and turning needs coordination.\n- The caps also limit exploiters: a player who teleports or speeds only gets the crate to move at the capped rate.\n\n**Tether**\n- Every tick, the server checks that each holder is within a max distance of the crate and of each other.\n- If a check fails, it auto-drops with feedback. This covers desyncs, getting stuck on geometry, and exploit teleports.\n\n**Burden**\n- On grab, the server lowers the carriers' `WalkSpeed` and disables jumping.\n- Restore these on every exit path: release, tether break, death, and `PlayerRemoving`.\n\n## Client side (request and presentation only)\n\n- Release is a single no-argument `RemoteEvent`. The server already knows what the player carries, so there is nothing to spoof. Rate-limit it per player.\n- The client plays a local carry animation and shows a rope or handle visual attached to the player's own hands. This responds instantly.\n- The crate itself comes from server physics, so it trails your hands by about one round trip. That reads as weight, but test whether it feels heavy or just laggy. Client-side presentation only hides latency in the visuals, never in crate position.\n- UI reads the attributes: \"Waiting for partner\", a tether-stretch warning, and a drop cue.\n- Set the crate to `Persistent` model streaming, or handle its absence, so streaming doesn't hide it.\n\n## Edge cases to handle\n- **Leave or die mid-carry:** `PlayerRemoving` and `Humanoid.Died` clear the slot, drop the crate, and restore speed.\n- **Respawn:** rebind per `CharacterAdded`. Don't hold references to the old character or hand attachments.\n- **Third player:** both slots are full, so the prompt is disabled.\n- **Crate wedged on geometry:** the crate doesn't push players back, so the tether breaks and it drops. Add a respawn or reset for a crate that falls out of the world.\n- **Deferred signals:** don't rely on handlers running immediately after state changes.\n\n## Attack list (to verify later)\n- Spam grab or release remotes \u2192 rate limit and quiet reject.\n- Grab from across the map \u2192 the server distance check rejects it.\n- Fire release with extra arguments \u2192 ignored.\n- Teleport while carrying \u2192 tether break, and the crate speed cap holds.\n- Two simultaneous grabs on one slot \u2192 exactly one wins.\n\n## Alternatives\n\n| Option | Verdict |\n|---|---|\n| **Server-owned physics with movers (above)** | Recommended. Physical, authoritative, and simple to secure. Carriers see some lag. |\n| **Anchored crate, server sets CFrame** | Cheaper and jitter-free, but it has no physics response (it passes through things unless you raycast). Fine if the crate never needs to collide. |\n| **Server Authority mode** (prediction and rollback) | Best feel for carriers. It requires the whole game to be built on `BindToSimulation`. I haven't verified this in this session, and it's a large migration if the game isn't already on it. |\n\n## Questions that change the design\n1. **Hold or toggle?** Hold-to-carry feels cooperative, but it's awkward on mobile where the thumb is already moving. I'd recommend toggle plus auto-drop on tether break.\n2. **What does a drop cost?** An instant drop, a drop that damages the crate or contents, or a gentle lower? This sets how punishing a coordination failure is.\n3. **How should the pair coordinate?** The crate could follow both equally, or one player could be the \"leader\" who steers.\n4. **Does this fit your pillars?** If improvised cooperation is a pillar, this mechanic serves it, because both players must move together and communicate.\n\nOnce those are settled, I can write the server module and the client controller. I'd then test with Server & Clients and the Network Simulator, covering mid-carry leave, respawn, simultaneous grab, and a high-latency client. Say if you want that, and I can run `/roblox-init` to record the decisions in `.apex/decisions.md`.",
+  "cost_usd": 0.1453506,
+  "turns": 12,
+  "seconds": 45.2,
+  "stderr_tail": ""
+}

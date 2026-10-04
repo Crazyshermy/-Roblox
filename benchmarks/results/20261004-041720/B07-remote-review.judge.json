@@ -1,0 +1,80 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Flags client-supplied damage as critical",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing cooldown/rate limit (XP farming via spam)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing range / line-of-sight / target validity checks",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing type validation of abilityName/target (nil char, non-Instance target)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags that ability ownership/unlock is not checked",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Provides a corrected server-authoritative version or clear fix list",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "States Roblox has its own throttle of about 500 requests per second per remote. I know of no documented per-remote limit like this, so it reads as invented."
+      ],
+      "slop": [
+        "Meta header line 'Apex: security \u2192 networking' and the closing pitch to connect the Studio MCP"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Says Health 'may exceed MaxHealth' after a negative TakeDamage. Humanoid.Health is clamped to MaxHealth, so it cannot."
+      ],
+      "slop": [
+        "Lists stunned, ragdolled, mana and stamina checks as genre defaults the original code never mentions"
+      ],
+      "overengineering": []
+    },
+    "preference": "B",
+    "reason": "Both cover the critical issues with sound hardened code, but B explicitly flags the missing ability ownership/unlock check and avoids A's dubious per-remote throttle claim; its MaxHealth mistake is minor."
+  },
+  "judge_cost": 0.07884920000000001,
+  "apex_score": 0.917,
+  "base_score": 1.0,
+  "winner": "baseline",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "States Roblox has its own throttle of about 500 requests per second per remote. I know of no documented per-remote limit like this, so it reads as invented."
+    ],
+    "slop": [
+      "Meta header line 'Apex: security \u2192 networking' and the closing pitch to connect the Studio MCP"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Says Health 'may exceed MaxHealth' after a negative TakeDamage. Humanoid.Health is clamped to MaxHealth, so it cannot."
+    ],
+    "slop": [
+      "Lists stunned, ragdolled, mana and stamina checks as genre defaults the original code never mentions"
+    ],
+    "overengineering": []
+  },
+  "reason": "Both cover the critical issues with sound hardened code, but B explicitly flags the missing ability ownership/unlock check and avoids A's dubious per-remote throttle claim; its MaxHealth mistake is minor."
+}

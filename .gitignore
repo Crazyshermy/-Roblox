@@ -1,0 +1,4 @@
+tests/results/
+benchmarks/results/*
+!benchmarks/results/latest/
+__pycache__/

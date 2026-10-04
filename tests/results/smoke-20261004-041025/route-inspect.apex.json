@@ -1,0 +1,45 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "/roblox-route Build a secure player trading system",
+  "user_slash_command": "roblox-route",
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [],
+  "files_read": [
+    ".claude/skills/roblox/SKILL.md"
+  ],
+  "final_text": "```\nTASK: Build a secure player trading system\nClassification: type=build (with secure) size=system\nRoute: roblox \u2192 roblox-security \u2192 roblox-data \u2192 roblox-networking \u2192 roblox-game-design\nWhy:\n  roblox-security: \"secure\" in the task, plus the bundle for anything that transfers value. Trades move items or currency between players, so dupes, rate limits, validation and scam vectors apply.\n  roblox-data: Value-transfer bundle. A trade must commit atomically across two players' saved inventories. This covers session locking, UpdateAsync or a transaction pattern, rollback on failure, and shutdown or leave mid-trade.\n  roblox-networking: Bundle condition \"if a client triggers it\". Players propose, offer, accept and cancel through remotes. This covers remote design, race conditions, and a player leaving or respawning mid-trade.\n  roblox-game-design: Bundle for a new mechanic or system design. Trading touches the economy, social dynamics and scam risk. Anti-slop applies: does trading belong in this game, and with which items?\nBundles fired:\n  - Value-transfer: security + data, plus networking\n  - Client\u2192server remote that changes state: security (already included)\n  - New mechanic or system design: game-design\nConsidered but skipped:\n  roblox-genres: No genre is named. Load it if the game is a simulator, RPG or similar, because trade norms differ by genre.\n  roblox-ui-ux: The trade window is real UI, but the task centres on the secure backend. Add it when the UI is built.\n  roblox-architecture: Worth adding if the project has no clear service layout. The `.apex/` conventions may already cover this.\n  roblox-luau: General code quality. The core skills cover the risk.\n  roblox-testing: Used at the verify step rather than for design, so it is a likely late addition. The mandatory review is `roblox-review`.\n  roblox-review: Runs after implementation, per the system-scale rule, not at the start.\n  roblox-debugging, roblox-performance, roblox-game-feel, roblox-visual-direction, roblox-level-design, roblox-physics-animation, roblox-assets, roblox-boundary-breaker: No signal in the task.\nContext cost: 4 specialist skills up front (budget for system: 2\u20134). Review is added after implementation, which brings the total to 5. That is slightly over budget, but it is mandated by the router.\nRisks the route guards against:\n  - Item duplication through race conditions, double-accept or a crash between the two saves.\n  - Client-supplied item IDs or quantities that the player doesn't own.\n  - Bait-and-switch, where an offer is changed after the other player accepts. Use a version or lock on offers.\n  - Trade spam, remote flooding and malformed payloads.\n  - A player leaving, teleporting or the server shutting down mid-trade, leaving a half-committed state.\n  - Scams and economy inflation that the design never anticipated.\n  - Non-tradable items and cross-server trades.\n\nAmbiguity that would change the route:\n  - Are trades same-server only, or cross-server? Cross-server adds MessagingService, MemoryStore and TeleportService, with `roblox-data` as the heavier specialist.\n  - Do items include Robux-purchased ones? That brings in receipt and purchase rules.\n  - Is there an existing inventory or data layer? If not, `roblox-architecture` should be added first.\n\nRouter feedback:\n  - The table has no explicit signal for a trade UI flow, such as confirm screens and anti-scam UX. It only appears through `roblox-ui-ux`'s generic \"prompts\" entry.\n  - The bundles don't mention atomic multi-party transactions, which is the central data risk here. Consider adding \"multi-player atomic transfer \u2192 `roblox-data` + `roblox-security`\" to the value bundle's wording.\n  - `.apex/` memory should be read before design work, but I haven't read it because this is a dry run.",
+  "cost_usd": 0.07789,
+  "turns": 2,
+  "seconds": 19.3,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "check": {
+    "skills_ok": true,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}

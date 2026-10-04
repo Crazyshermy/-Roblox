@@ -1,0 +1,46 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "/roblox I'm starting a round-based team game (lobby -> intermission -> round -> results). Where should the round state machine, team assignment and scoring live, and how should clients learn the round state? Keep it concise.",
+  "user_slash_command": "roblox",
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox-architecture",
+    "roblox-networking"
+  ],
+  "files_read": [],
+  "final_text": "Apex route: roblox-architecture \u2192 roblox-networking (system placement plus how state replicates). There's no `.apex/` and no existing code, so this is a greenfield recommendation (E3, established practice) and nothing was run in Studio.\n\n## Where things live\n\n| Concern | Location | Why |\n|---|---|---|\n| **Round state machine** | `ServerScriptService/Services/RoundService` | The server owns the truth. It is the only writer of round state. |\n| **Team assignment** | `TeamService`, in a separate module that RoundService calls | Assignment can be rebalanced or swapped without touching the state machine. The server decides it, and the result is stored in the `Player.Team` property or a `Team` attribute. |\n| **Scoring** | `ScoreService`, server-only | The server validates every score event (kill, capture, etc.) and is the only writer of scores. Clients never send \"I scored\". |\n| **Shared** | `ReplicatedStorage/Shared`: `RoundTypes` (state enum), `Config` (durations, team count, score limits) | Pure data and constants that both sides read. Keep any exploit-sensitive tuning server-side. |\n| **Client** | `StarterPlayerScripts/Controllers/RoundController` | Presentation only: HUD, timer, team banner, results screen. |\n\n- **Bootstrap:** one server script requires the services in an explicit order. Each service has `init()` and `start()`.\n- **State machine:** use an explicit enum (`Lobby | Intermission | InRound | Results`) and a single `transition(to)` function. Give each state an `enter`/`exit` and one cleanup owner (a maid). That owner tears down per-round connections, spawns and timers.\n- **Time:** run the timers with `task.wait` loops or deadline checks on the server only.\n\n## How clients learn the round state\n\nUse replicated state, not events. Late joiners then get it for free.\n\n- **State and timing:** the server sets attributes on a shared instance, e.g. `ReplicatedStorage.RoundState` or `Workspace`:\n  - `State` (string)\n  - `StateEndsAt` (a server timestamp)\n  - `RoundId` (int, incremented per round)\n- **Timer:** the client computes the countdown locally from `StateEndsAt`. This avoids per-second replication. Use `workspace:GetServerTimeNow()` on the client so the timestamp matches the server clock.\n- **Teams and scores:**\n  - The team goes on the Player (`Team` attribute, or Roblox `Teams`).\n  - Team scores go in attributes on a `Scores` folder or on the Team objects.\n  - Per-player scores go in Player attributes or `leaderstats`.\n  - Clients bind with `GetAttributeChangedSignal`, and read the current value once at startup.\n- **One-shot events (results screen, \"round won\" stinger):** use a `RemoteEvent`. Put the payload (winner, final scores, `RoundId`) *in the remote*. Remotes aren't ordered relative to attribute replication, so don't make the client re-read attributes the server just changed. The remote should only add presentation to what the replicated state already says. A client that joins during Results should still be able to show the right screen from the attributes.\n- **Client-to-server:** only requests the server can refuse, such as \"ready\" or \"choose team\". The server validates them against the current state.\n\n## Edge cases to design in from the start\n\n- **Join mid-round:** spectate, or join on the next round. Do this by assigning teams in `PlayerAdded` and handling players who already exist. Decide this deliberately, as it's a design choice.\n- **Leave mid-round:** rebalance teams, and end the round if a team is empty. Clean up the leaver's per-player tables.\n- **Minimum players:** don't leave Lobby until the minimum is met. Reset the intermission countdown if the count drops.\n- **Respawn:** dead players respawn only per your round rules. Rebind on `CharacterAdded`.\n- **Round reset:** the round maid destroys everything the round created, then the state returns to Lobby.\n- **Shutdown:** handle `BindToClose` if you persist anything from the round.\n\n## Not decided yet\n\n- Server Authority mode is only worth its migration cost if you need predicted, competitive movement. I'd skip it until the game design says so.\n- If scores feed persistent rewards or currency, the data and security skills apply. Tell me, and I'll go through the saving and validation side.\n\nIf you give me the genre and win conditions, I can sketch the module skeleton. Want me to also record these as settled choices in `.apex/decisions.md` (I'd suggest `/roblox-init` first)?",
+  "cost_usd": 0.095532,
+  "turns": 7,
+  "seconds": 22.2,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "check": {
+    "skills_ok": true,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}

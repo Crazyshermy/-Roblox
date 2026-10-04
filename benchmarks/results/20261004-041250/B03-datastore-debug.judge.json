@@ -1,0 +1,90 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Identifies the fast server-hop race (stale data overwrite) and the need for session locking",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Identifies 'default data on failed load' as a data-wipe cause (should kick/retry instead)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Recommends UpdateAsync / proper retry with backoff instead of blind SetAsync",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Mentions BindToClose for shutdown saves",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Suggests a way to reproduce/verify (two servers / forced rejoin, test store)",
+        "A": "met",
+        "B": "missed"
+      },
+      {
+        "item": "Does not state outdated DataStore limits as current fact",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Points the user to a 'references/currency.md in the roblox skill' file, which is internal tooling the user doesn't have",
+        "PlayerRemoving and BindToClose can both save the same player, so one player can be saved twice at shutdown (minor)"
+      ],
+      "slop": [
+        "Starts with internal routing text ('Apex route: ...') and notes about the workspace that don't help the user"
+      ],
+      "overengineering": [
+        "Adds a schema version field and a migration placeholder that the problem doesn't need",
+        "Uses a strict-typed generic variadic retry helper that is more complex than this task needs"
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Says the join 'retries with backoff' when another live server holds the lock, but retry() only re-runs on errors. A cancelled UpdateAsync returns successfully with claimed=false, so on the exact fast-hop case the player is kicked immediately instead of waiting",
+        "Says old SetAsync data 'will still load fine', but claimLock reads old.data. A legacy save has no .data field, so the code hands out { coins = 0 } and the next save writes that over the player's real data, a wipe",
+        "Says SetAsync 'can fail silently or throw'. It throws on failure; it doesn't fail silently",
+        "retry() waits again after the last failed attempt, which is wasted time (minor)"
+      ],
+      "slop": [],
+      "overengineering": []
+    },
+    "preference": "A",
+    "reason": "A's lock-wait loop actually handles the fast-hop case, and it adds testing steps and version-history recovery. B's sketch kicks players when the lock is held and would wipe existing saves in the old format, even though it says they load fine."
+  },
+  "judge_cost": 0.32124,
+  "apex_score": 1.0,
+  "base_score": 0.833,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "Points the user to a 'references/currency.md in the roblox skill' file, which is internal tooling the user doesn't have",
+      "PlayerRemoving and BindToClose can both save the same player, so one player can be saved twice at shutdown (minor)"
+    ],
+    "slop": [
+      "Starts with internal routing text ('Apex route: ...') and notes about the workspace that don't help the user"
+    ],
+    "overengineering": [
+      "Adds a schema version field and a migration placeholder that the problem doesn't need",
+      "Uses a strict-typed generic variadic retry helper that is more complex than this task needs"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Says the join 'retries with backoff' when another live server holds the lock, but retry() only re-runs on errors. A cancelled UpdateAsync returns successfully with claimed=false, so on the exact fast-hop case the player is kicked immediately instead of waiting",
+      "Says old SetAsync data 'will still load fine', but claimLock reads old.data. A legacy save has no .data field, so the code hands out { coins = 0 } and the next save writes that over the player's real data, a wipe",
+      "Says SetAsync 'can fail silently or throw'. It throws on failure; it doesn't fail silently",
+      "retry() waits again after the last failed attempt, which is wasted time (minor)"
+    ],
+    "slop": [],
+    "overengineering": []
+  },
+  "reason": "A's lock-wait loop actually handles the fast-hop case, and it adds testing steps and version-history recovery. B's sketch kicks players when the lock is held and would wipe existing saves in the old format, even though it says they load fine."
+}

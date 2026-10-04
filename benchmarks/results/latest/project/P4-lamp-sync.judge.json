@@ -1,0 +1,66 @@
+{
+  "apex_score": 0.9,
+  "base_score": 0.8,
+  "winner": "apex",
+  "reason": "Both correctly move fuel to a replicated Lamp attribute with a working HUD and correct late-join handling. A adds an explicit only-on-change guard, disconnects old health connections cleanly, and fixes the trusted-client refuel exploit in the same fuel path. B relies on SetAttribute deduping same-value writes (the engine does skip unchanged values) and leaves the exploit as a recommendation.",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Header line 'Apex: networking \u2192 security' adds noise and means nothing to the user"
+    ],
+    "overengineering": [
+      "Rewrote the refuel remote contract (client payload dropped, server spends all oil) without asking. The security fix is justified but outside the networking question."
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": []
+  },
+  "raw": {
+    "items": [
+      {
+        "item": "Replaces per-second FireAllClients with replicated state (attribute on the Lamp or similar)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Client reads initial value and listens to changes (late joiners correct immediately)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Keeps the HUD working with the new mechanism",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Avoids unnecessary traffic (e.g. only write when value changes)",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Explains the trade-off concisely",
+        "A": "partial",
+        "B": "partial"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Header line 'Apex: networking \u2192 security' adds noise and means nothing to the user"
+      ],
+      "overengineering": [
+        "Rewrote the refuel remote contract (client payload dropped, server spends all oil) without asking. The security fix is justified but outside the networking question."
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": []
+    },
+    "preference": "A",
+    "reason": "Both correctly move fuel to a replicated Lamp attribute with a working HUD and correct late-join handling. A adds an explicit only-on-change guard, disconnects old health connections cleanly, and fixes the trusted-client refuel exploit in the same fuel path. B relies on SetAttribute deduping same-value writes (the engine does skip unchanged values) and leaves the exploit as a recommendation."
+  },
+  "judge_cost": 0.0854412
+}

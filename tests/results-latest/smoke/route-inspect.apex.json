@@ -1,0 +1,53 @@
+{
+  "model": "sonnet",
+  "prompt": "/roblox-route Build a secure player trading system",
+  "user_slash_command": "roblox-route",
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [],
+  "files_read": [
+    ".claude/skills/roblox/SKILL.md"
+  ],
+  "tool_calls": [
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-apex-q0gt83dd/.claude/skills/roblox/SKILL.md"
+      }
+    }
+  ],
+  "final_text": "```\nTASK: Build a secure player trading system\nClassification: type=build size=system\nRoute: roblox \u2192 security \u2192 data \u2192 networking \u2192 game-design \u2192 review (after implementation)\nWhy:\n  roblox-security: Mandatory bundle \"grants, spends, stores or transfers value\" (trades). Also the \"any client\u2192server remote that changes state\" rule, and the task says \"secure\". Primary because dupes and exploits are the main risk.\n  roblox-data: Same value-transfer bundle. A trade has to move items between two players' saved data atomically, and a crash or server shutdown mid-trade must not lose or duplicate anything. This covers session locking, UpdateAsync, and BindToClose.\n  roblox-networking: Same bundle, because clients trigger it. Covers remote design, trade-session state sync between two clients, and players leaving, rejoining or respawning mid-trade.\n  roblox-game-design: Mandatory \"new mechanic or system design\" rule. It also asks whether trading belongs in this game at all, and what it does to the economy.\n  roblox-review: Mandatory after system-scale implementation, before calling it done. It runs last, so it doesn't count against the loading-time budget.\nBundles fired:\n  - value grant/spend/store/transfer (security + data + networking)\n  - client\u2192server remote that changes state (security, already loaded)\n  - new mechanic or system design (game-design)\n  - post-implementation review for system-scale work (review)\nConsidered but skipped:\n  roblox-genres: No genre is named. Load it if the game is a simulator or RPG, since trading conventions differ by genre.\n  roblox-ui-ux: Trade windows, confirmation screens and mobile or controller layout matter. They are a likely follow-up once the server logic is settled, so I'd add it for the UI pass rather than load it now.\n  roblox-architecture: Worth loading only if the project has no clear service layout yet. Check the existing code and `.apex/project.md` first.\n  roblox-luau: General code quality is covered by the standards. Load it only if the code needs typed modules or heavy refactoring.\n  roblox-testing: Not loaded at routing time. Dupe and race tests matter a lot here, but `roblox-review` and the working loop (Studio playtest, multi-client) cover them. Promote it if there's no Studio MCP connection and tests need to be designed explicitly.\n  roblox-performance, roblox-debugging, roblox-game-feel, roblox-visual-direction, roblox-level-design, roblox-physics-animation, roblox-assets, roblox-boundary-breaker: No matching signal. The task doesn't ask to cut scope or claim anything is impossible.\nContext cost: 4 specialist skills before implementation, plus roblox-review afterward (budget for system: 2\u20134, so the 4 are within budget and the review is a mandated addition)\nRisks the route guards against:\n  - Item duplication: a trade that isn't atomic, or a crash or shutdown mid-trade that leaves the item in both inventories or in neither.\n  - Client-trusted data: the client sending item IDs, quantities or the other party's identity and the server believing them. The server must own the offer state.\n  - Bait-and-switch: a player changing their offer after the other side accepts. This needs offer locking and a confirmation that covers the final state.\n  - Race conditions: leaving, disconnecting, rejoining or cancelling mid-trade, and double-accepting or concurrent trades involving the same item.\n  - Remote abuse: spamming requests, malformed payloads, trading with oneself, and trading items the player doesn't own.\n  - Cross-server and data safety: session locking and failed writes, which become critical if trades span servers.\n  - Economy fit: the trading system undermining the game's own economy or fantasy (game-design).\n\nAmbiguities that would change the route:\n  - Cross-server or same-server only: cross-server trading would make `roblox-data` primary, with MemoryStore, MessagingService and a two-phase commit.\n  - Trading currency or Robux-purchased items: this adds purchase and receipt handling and tighter anti-laundering rules.\n  - Existing inventory code: if the inventory or data layer doesn't exist yet, add `roblox-architecture` first.\n\nRouter feedback:\n  - The table has no row for trading, escrow or atomic multi-party transactions. Trading is covered only by the value-transfer bundle, which doesn't mention two-player state machines (offer, lock, confirm, cancel, timeout). A line in the `roblox-security` or `roblox-networking` description pointing at this pattern would help.\n  - The bundle doesn't name `roblox-ui-ux` as a companion. Trade UIs are a known scam surface: swapped item icons, ambiguous confirmation text and misleading mobile layouts. Consider adding it to the bundle when a trade or purchase confirmation screen is part of the task.\n  - The bundle doesn't trigger `roblox-testing` for dupe and race tests, even though value systems are where those tests matter most. It could be added to the system-scale post-implementation step alongside `roblox-review`.",
+  "cost_usd": 0.084845,
+  "turns": 2,
+  "seconds": 23.9,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "mode": "apex",
+  "check": {
+    "skills_ok": true,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}

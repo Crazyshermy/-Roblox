@@ -1,0 +1,84 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Server owns crate state and who is holding it; clients send intent (grab/release)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Handles one player leaving, dying or respawning mid-carry",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Addresses network ownership / physics authority of the crate explicitly",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses latency so the carry still feels responsive (client presentation/prediction or Server Authority)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Handles concurrency (both grab same handle; third player)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Proposes how to test with multiple clients",
+        "A": "partial",
+        "B": "partial"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "The code is buggy. release() frees both slots whatever player is passed, the 'Carrying' player attribute is checked but never set, and release is used before it is declared. The note about that last one only partly fixes it.",
+        "Humanoid.Died is never hooked in the code. Also, PlayerRemoving is connected once per crate and calls release for every crate, even crates the leaving player isn't holding.",
+        "The AlignPosition/AlignOrientation setup and attachments are assumed but never created. AlignOrientation is never updated."
+      ],
+      "slop": [
+        "The collision-group suggestion is thrown in without explaining how it interacts with carrying the crate."
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "It says to 're-assert' SetNetworkOwner(nil) because the engine auto-assigns ownership. An explicit SetNetworkOwner call already turns off auto-assignment until SetNetworkOwnershipAuto is called, so this is a minor overstatement."
+      ],
+      "slop": [],
+      "overengineering": [
+        "The per-player token bucket and the full security attack table are more than a co-op carry design needs."
+      ]
+    },
+    "preference": "B",
+    "reason": "B covers every rubric item more thoroughly and correctly: it releases on death, leave and respawn, claims slots atomically, addresses latency, mentions Server Authority, and tests with the Network Simulator. A's skeleton code has real bugs and is missing pieces."
+  },
+  "judge_cost": 0.0844412,
+  "apex_score": 0.917,
+  "base_score": 0.667,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "It says to 're-assert' SetNetworkOwner(nil) because the engine auto-assigns ownership. An explicit SetNetworkOwner call already turns off auto-assignment until SetNetworkOwnershipAuto is called, so this is a minor overstatement."
+    ],
+    "slop": [],
+    "overengineering": [
+      "The per-player token bucket and the full security attack table are more than a co-op carry design needs."
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "The code is buggy. release() frees both slots whatever player is passed, the 'Carrying' player attribute is checked but never set, and release is used before it is declared. The note about that last one only partly fixes it.",
+      "Humanoid.Died is never hooked in the code. Also, PlayerRemoving is connected once per crate and calls release for every crate, even crates the leaving player isn't holding.",
+      "The AlignPosition/AlignOrientation setup and attachments are assumed but never created. AlignOrientation is never updated."
+    ],
+    "slop": [
+      "The collision-group suggestion is thrown in without explaining how it interacts with carrying the crate."
+    ],
+    "overengineering": []
+  },
+  "reason": "B covers every rubric item more thoroughly and correctly: it releases on death, leave and respawn, claims slots atomically, addresses latency, mentions Server Authority, and tests with the Network Simulator. A's skeleton code has real bugs and is missing pieces."
+}

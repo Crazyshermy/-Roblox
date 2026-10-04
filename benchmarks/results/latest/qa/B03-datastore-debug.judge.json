@@ -1,0 +1,84 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Identifies the fast server-hop race (stale data overwrite) and the need for session locking",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Identifies 'default data on failed load' as a data-wipe cause (should kick/retry instead)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Recommends UpdateAsync / proper retry with backoff instead of blind SetAsync",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Mentions BindToClose for shutdown saves",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Suggests a way to reproduce/verify (two servers / forced rejoin, test store)",
+        "A": "met",
+        "B": "missed"
+      },
+      {
+        "item": "Does not state outdated DataStore limits as current fact",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Lists 'the race above' as a cause of GetAsync failures; the race produces stale reads, not failed calls",
+        "Suggests testing with a Studio 'local server with 2 players', which runs a single server and so cannot reproduce a cross-server hop"
+      ],
+      "slop": [
+        "'Apex: data' header and the 'Verified: nothing was run' footer are boilerplate"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Lock is keyed on game.JobId, which is empty in Studio, so all Studio test servers share the same lock ID",
+        "The UpdateAsync transform writes sessions[player] as a side effect, which can leave state set even if the write later fails",
+        "Save on a missing record (old = old or {}) writes anyway, and a lost lock is ignored silently without kicking the player",
+        "BindToClose waits a fixed task.wait(3) instead of waiting for the saves to finish"
+      ],
+      "slop": [],
+      "overengineering": []
+    },
+    "preference": "A",
+    "reason": "Both find the core bugs, but A's code is more robust (it handles a lost lock, migrates old saves, serializes saves and waits for BindToClose saves to finish) and it gives testing and recovery guidance, which B leaves out."
+  },
+  "judge_cost": 0.08762919999999999,
+  "apex_score": 1.0,
+  "base_score": 0.833,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "Lists 'the race above' as a cause of GetAsync failures; the race produces stale reads, not failed calls",
+      "Suggests testing with a Studio 'local server with 2 players', which runs a single server and so cannot reproduce a cross-server hop"
+    ],
+    "slop": [
+      "'Apex: data' header and the 'Verified: nothing was run' footer are boilerplate"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Lock is keyed on game.JobId, which is empty in Studio, so all Studio test servers share the same lock ID",
+      "The UpdateAsync transform writes sessions[player] as a side effect, which can leave state set even if the write later fails",
+      "Save on a missing record (old = old or {}) writes anyway, and a lost lock is ignored silently without kicking the player",
+      "BindToClose waits a fixed task.wait(3) instead of waiting for the saves to finish"
+    ],
+    "slop": [],
+    "overengineering": []
+  },
+  "reason": "Both find the core bugs, but A's code is more robust (it handles a lost lock, migrates old saves, serializes saves and waits for BindToClose saves to finish) and it gives testing and recovery guidance, which B leaves out."
+}

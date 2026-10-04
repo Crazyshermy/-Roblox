@@ -1,0 +1,94 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Builds anticipation/dread before reveal (cues, telegraphs) rather than leading with a jump scare",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses that groups of friends reduce fear (separation mechanics or per-player experiences)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Has a readable threat language players can learn and counterplay",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Includes tension/release pacing and recovery after the encounter",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Considers Roblox constraints (mobile brightness/readability, client-local effects, audio)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Is specific to the hospital setting rather than generic",
+        "A": "partial",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Says to use SoundService with distance rolloff to make the squeak positional. Positional audio needs a Sound parented to a part or attachment on the monster; SoundService is non-positional.",
+        "Says it uses raycast line-of-sight checks inside 15 studs even though the monster is defined as blind, which contradicts its own perception model."
+      ],
+      "slop": [
+        "The 'restore power with fuse cards to call the elevator' objective is a generic horror default.",
+        "The flashlight with battery drain is a genre-default mechanic with no reason given for it here.",
+        "The 2/3/4 scaling table changes numbers but doesn't address groups reducing fear.",
+        "Gurney, IV stand and pager are surface hospital dressing. The core mechanics are generic sound-stealth."
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Says the monster is 'mostly blind' and 'hunts by sound and light', but also gives it a 70\u00b0 vision cone out to 40 studs. The perception model contradicts itself."
+      ],
+      "slop": [
+        "The 'Apex route' preamble and E1 evidence tags are process noise that doesn't help the user.",
+        "The fetch-the-keycard objective is generic, although the answer admits this itself."
+      ],
+      "overengineering": [
+        "The H1\u2013H3 hypothesis framing, the open-questions list and the offer to set up .apex/ add process overhead to a design request."
+      ]
+    },
+    "preference": "B",
+    "reason": "B makes the hospital setting drive the mechanics (rounds and the nurse-call board), turns co-op into fear through the exposed board operator and the escalation, and covers release (safe room) and mobile readability; A is a solid but generic sound-stealth design with a Roblox audio mistake and weak coverage of group fear and mobile."
+  },
+  "judge_cost": 0.32101599999999997,
+  "apex_score": 1.0,
+  "base_score": 0.667,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "Says the monster is 'mostly blind' and 'hunts by sound and light', but also gives it a 70\u00b0 vision cone out to 40 studs. The perception model contradicts itself."
+    ],
+    "slop": [
+      "The 'Apex route' preamble and E1 evidence tags are process noise that doesn't help the user.",
+      "The fetch-the-keycard objective is generic, although the answer admits this itself."
+    ],
+    "overengineering": [
+      "The H1\u2013H3 hypothesis framing, the open-questions list and the offer to set up .apex/ add process overhead to a design request."
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Says to use SoundService with distance rolloff to make the squeak positional. Positional audio needs a Sound parented to a part or attachment on the monster; SoundService is non-positional.",
+      "Says it uses raycast line-of-sight checks inside 15 studs even though the monster is defined as blind, which contradicts its own perception model."
+    ],
+    "slop": [
+      "The 'restore power with fuse cards to call the elevator' objective is a generic horror default.",
+      "The flashlight with battery drain is a genre-default mechanic with no reason given for it here.",
+      "The 2/3/4 scaling table changes numbers but doesn't address groups reducing fear.",
+      "Gurney, IV stand and pager are surface hospital dressing. The core mechanics are generic sound-stealth."
+    ],
+    "overengineering": []
+  },
+  "reason": "B makes the hospital setting drive the mechanics (rounds and the nurse-call board), turns co-op into fear through the exposed board operator and the escalation, and covers release (safe room) and mobile readability; A is a solid but generic sound-stealth design with a Roblox audio mistake and weak coverage of group fear and mobile."
+}

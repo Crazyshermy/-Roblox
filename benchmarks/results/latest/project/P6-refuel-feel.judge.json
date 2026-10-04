@@ -1,0 +1,67 @@
+{
+  "apex_score": 0.917,
+  "base_score": 0.417,
+  "winner": "apex",
+  "reason": "B starts its orbs on the client right away to cover latency and only plays the flare once the server confirms; it also adds touch and gamepad input, fixes the existing HUD crash and ships a complete, coherent diff. A's effects all wait for the server round trip, it has no mobile input, and its diff leaves out the OilService handler and the Config changes it relies on (Config.Sounds, LampFlarePeakBrightness, LampBaseBrightness).",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": [
+      "The token and grace-window state machine for confirming the player's own flare is somewhat elaborate, though it is justified"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": []
+  },
+  "raw": {
+    "items": [
+      {
+        "item": "Immediate client-side feedback on input (sound/VFX/animation/UI) without waiting for the server",
+        "A": "missed",
+        "B": "met"
+      },
+      {
+        "item": "Server remains authoritative for the actual fuel change; client handles rejection gracefully",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Multiple feedback channels (sound, light pulse/VFX, UI, camera) tied to the lamp fantasy",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Considers hold-to-refuel / anticipation or a satisfying interaction rather than a single keypress",
+        "A": "partial",
+        "B": "partial"
+      },
+      {
+        "item": "Considers mobile (no keyboard E) e.g. ProximityPrompt or touch button",
+        "A": "missed",
+        "B": "met"
+      },
+      {
+        "item": "Implementation compiles and is coherent with existing code",
+        "A": "partial",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": [
+        "The token and grace-window state machine for confirming the player's own flare is somewhat elaborate, though it is justified"
+      ]
+    },
+    "preference": "B",
+    "reason": "B starts its orbs on the client right away to cover latency and only plays the flare once the server confirms; it also adds touch and gamepad input, fixes the existing HUD crash and ships a complete, coherent diff. A's effects all wait for the server round trip, it has no mobile input, and its diff leaves out the OilService handler and the Config changes it relies on (Config.Sounds, LampFlarePeakBrightness, LampBaseBrightness)."
+  },
+  "judge_cost": 0.16340920000000003
+}

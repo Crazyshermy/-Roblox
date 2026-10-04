@@ -1,0 +1,45 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "My Roblox LocalScript sometimes errors 'attempt to index nil with Humanoid' but only after the player respawns. It's in StarterPlayerScripts and does `local hum = player.Character.Humanoid` at the top. What's wrong?",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox-debugging"
+  ],
+  "files_read": [],
+  "final_text": "**Root cause:** `local hum = player.Character.Humanoid` runs once, when the script first runs, and it has two problems.\n\n1. **`player.Character` can be nil.** A LocalScript in StarterPlayerScripts is not reset on respawn, and it may start before the first character exists. Your error says \"index nil with Humanoid\", so `Character` was nil when the line ran. That is most likely on the first load or in the window between death and the new character spawning.\n2. **The reference goes stale after respawn.** If `Character` was non-nil, `hum` still points at the old Humanoid, which is destroyed on death. StarterPlayerScripts doesn't re-run, so any later use of `hum` hits a dead object. That causes the \"only after respawn\" symptoms.\n\nThere is also a smaller issue. Even when `Character` exists, `.Humanoid` can be nil because the Humanoid may not have replicated yet. Use `WaitForChild` instead.\n\n**Fix:** Bind per character with `CharacterAdded`, and run the same setup for a character that already exists:\n\n```lua\nlocal Players = game:GetService(\"Players\")\nlocal player = Players.LocalPlayer\n\nlocal function onCharacterAdded(character: Model)\n\tlocal hum = character:WaitForChild(\"Humanoid\") :: Humanoid\n\n\t-- put everything that uses hum here (connections, UI hookups, etc.)\n\thum.Died:Connect(function()\n\t\t-- ...\n\tend)\nend\n\nplayer.CharacterAdded:Connect(onCharacterAdded)\nif player.Character then\n\tonCharacterAdded(player.Character)\nend\n```\n\n- Connections made to the old Humanoid die with it, so reconnecting inside `onCharacterAdded` is correct.\n- Any state you keep outside the function, such as cached `hum`, `Animator` or `HumanoidRootPart` references, must be reassigned on each spawn.\n- If you want a script that resets on respawn automatically, put it in StarterCharacterScripts instead. Then `script.Parent` is the character, and `script.Parent:WaitForChild(\"Humanoid\")` works.\n\nI haven't seen your script, and I haven't run any of this in Studio. I'm going by the symptom and the standard Roblox lifecycle. If you paste the whole script or tell me where it lives in the project, I can check for other cached character references. Those are the most common source of the same bug.",
+  "cost_usd": 0.0654204,
+  "turns": 3,
+  "seconds": 13.7,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "check": {
+    "skills_ok": true,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}

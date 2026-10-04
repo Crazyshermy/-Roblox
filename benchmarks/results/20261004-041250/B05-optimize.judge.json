@@ -1,0 +1,90 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Recommends measuring/profiling first and comparing before/after",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Replaces per-enemy scripts with one manager loop",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Replaces Humanoids with lightweight server-side movement (CFrame/position along path) and client-side rendering/interpolation",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Replaces Touched-based damage with server-side range/spatial checks",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses rendering cost on mobile (model pooling, LOD/animation reduction)",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Preserves the intended experience (doesn't just cap enemy count without discussing it)",
+        "A": "partial",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Sets CanQuery = false on enemy parts but also suggests workspace:GetPartBoundsInRadius for tower targeting; spatial queries skip parts with CanQuery off, so that combination finds nothing",
+        "Says Humanoid:MoveTo 'forces path-following logic', but MoveTo walks in a straight line and does no pathfinding"
+      ],
+      "slop": [
+        "Generic mobile checklist (StreamingEnabled, avoid PointLight/Beam/Highlight) that isn't tied to this game's problem"
+      ],
+      "overengineering": [
+        "The code moves server-side parts every frame with BulkMoveTo, then section 5 says to render on the client, so it describes two competing designs without saying which to pick"
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Says the server replicates every enemy's position 'every frame'; physics replication is throttled, so this overstates it",
+        "Says MoveTo 'does pathing work every tick', but MoveTo does no pathfinding"
+      ],
+      "slop": [
+        "An irrelevant 'Apex route' header and a note about a missing '.apex/' folder",
+        "Too much hedging ('check that the current docs still recommend this', 'profile it first') where a direct recommendation was possible"
+      ],
+      "overengineering": []
+    },
+    "preference": "B",
+    "reason": "B covers more of the rubric. It sets a profiling baseline and a target budget, gives a clear order of work, and separates authoritative server data from client rendering cleanly. It also covers projectiles and slow/stun effects and discusses trade-offs that keep the intended experience. A gives useful code but has a CanQuery/spatial-query contradiction and blurs server-side and client-side movement."
+  },
+  "judge_cost": 0.311432,
+  "apex_score": 0.917,
+  "base_score": 0.833,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "Says the server replicates every enemy's position 'every frame'; physics replication is throttled, so this overstates it",
+      "Says MoveTo 'does pathing work every tick', but MoveTo does no pathfinding"
+    ],
+    "slop": [
+      "An irrelevant 'Apex route' header and a note about a missing '.apex/' folder",
+      "Too much hedging ('check that the current docs still recommend this', 'profile it first') where a direct recommendation was possible"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Sets CanQuery = false on enemy parts but also suggests workspace:GetPartBoundsInRadius for tower targeting; spatial queries skip parts with CanQuery off, so that combination finds nothing",
+      "Says Humanoid:MoveTo 'forces path-following logic', but MoveTo walks in a straight line and does no pathfinding"
+    ],
+    "slop": [
+      "Generic mobile checklist (StreamingEnabled, avoid PointLight/Beam/Highlight) that isn't tied to this game's problem"
+    ],
+    "overengineering": [
+      "The code moves server-side parts every frame with BulkMoveTo, then section 5 says to render on the client, so it describes two competing designs without saying which to pick"
+    ]
+  },
+  "reason": "B covers more of the rubric. It sets a profiling baseline and a target budget, gives a clear order of work, and separates authoritative server data from client rendering cleanly. It also covers projectiles and slow/stun effects and discusses trade-offs that keep the intended experience. A gives useful code but has a CanQuery/spatial-query contradiction and blurs server-side and client-side movement."
+}

@@ -1,0 +1,76 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Explains remote events are not ordered relative to attribute/property replication",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Explains streaming: the door may not exist on distant clients (nil)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Recommends driving the client from replicated state (GetAttributeChangedSignal / CollectionService component) instead of the remote, or passing state in the payload",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Mentions handling stream-in (instance added later) / ModelStreamingMode or WaitForChild with timeout",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Suggests how to reproduce (distance, latency)",
+        "A": "missed",
+        "B": "met"
+      },
+      {
+        "item": "Does not invent non-existent APIs",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Recommends CollectionService:AddTag for tagging; Instance:AddTag is now the preferred API, though AddTag still works",
+        "'Use door.Parent' is a confusing, unclear suggestion for handling a door that has not streamed in"
+      ],
+      "slop": [],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "The speculative 'third cause' about the door streaming in or out mid-event is vague and not actionable",
+        "The 'animate' parameter is passed to apply() but never used, which makes the example code look unfinished"
+      ],
+      "overengineering": []
+    },
+    "preference": "B",
+    "reason": "Both answers diagnose the problem correctly and give the same attribute-driven fix, but B also explains how to reproduce and confirm the bug (distance testing, the Network Simulator, debug prints) and snaps doors that stream in to their current pose, while A plays the animation again every time a door streams in."
+  },
+  "judge_cost": 0.0626012,
+  "apex_score": 1.0,
+  "base_score": 0.833,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "The speculative 'third cause' about the door streaming in or out mid-event is vague and not actionable",
+      "The 'animate' parameter is passed to apply() but never used, which makes the example code look unfinished"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Recommends CollectionService:AddTag for tagging; Instance:AddTag is now the preferred API, though AddTag still works",
+      "'Use door.Parent' is a confusing, unclear suggestion for handling a door that has not streamed in"
+    ],
+    "slop": [],
+    "overengineering": []
+  },
+  "reason": "Both answers diagnose the problem correctly and give the same attribute-driven fix, but B also explains how to reproduce and confirm the bug (distance testing, the Network Simulator, debug prints) and snaps doors that stream in to their current pose, while A plays the animation again every time a door streams in."
+}

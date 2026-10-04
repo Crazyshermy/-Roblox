@@ -1,0 +1,90 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Recommends measuring/profiling first and comparing before/after",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Replaces per-enemy scripts with one manager loop",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Replaces Humanoids with lightweight server-side movement (CFrame/position along path) and client-side rendering/interpolation",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Replaces Touched-based damage with server-side range/spatial checks",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses rendering cost on mobile (model pooling, LOD/animation reduction)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Preserves the intended experience (doesn't just cap enemy count without discussing it)",
+        "A": "met",
+        "B": "partial"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Stray 'Apex: performance \u2192 genres' header with no meaning for the user",
+        "Calls the data approach 'the standard Roblox approach' without support"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Client positions computed from os.clock() - spawnTime: os.clock is local CPU time and not synced with the server, so workspace:GetServerTimeNow() is needed",
+        "BulkMoveTo mode advice is backwards: FireCFrameChanged is the cheaper mode, and FireAllEvents is the one to avoid",
+        "Setting Massless = true on anchored, non-physics parts does nothing for performance"
+      ],
+      "slop": [
+        "Humanoid tuning list (HumanoidRigType, RequiresNeck, SetStateEnabled for everything) is generic and contradicts its own advice to remove Humanoids",
+        "Suggests StreamingEnabled while admitting it doesn't apply to a fixed-camera TD",
+        "'Stagger spawns' changes wave design without discussing the gameplay effect"
+      ],
+      "overengineering": [
+        "Offers several targeting options at once (GetPartBoundsInRadius, squared distances against the table, a spatial grid) without picking one"
+      ]
+    },
+    "preference": "A",
+    "reason": "A is accurate throughout, profiles first and re-measures after each step, uses GetServerTimeNow correctly for client sync, and talks about keeping the gameplay intact, while B has real API mistakes (os.clock for sync, BulkMoveTo modes backwards) and some generic filler."
+  },
+  "judge_cost": 0.0789692,
+  "apex_score": 1.0,
+  "base_score": 0.833,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Stray 'Apex: performance \u2192 genres' header with no meaning for the user",
+      "Calls the data approach 'the standard Roblox approach' without support"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Client positions computed from os.clock() - spawnTime: os.clock is local CPU time and not synced with the server, so workspace:GetServerTimeNow() is needed",
+      "BulkMoveTo mode advice is backwards: FireCFrameChanged is the cheaper mode, and FireAllEvents is the one to avoid",
+      "Setting Massless = true on anchored, non-physics parts does nothing for performance"
+    ],
+    "slop": [
+      "Humanoid tuning list (HumanoidRigType, RequiresNeck, SetStateEnabled for everything) is generic and contradicts its own advice to remove Humanoids",
+      "Suggests StreamingEnabled while admitting it doesn't apply to a fixed-camera TD",
+      "'Stagger spawns' changes wave design without discussing the gameplay effect"
+    ],
+    "overengineering": [
+      "Offers several targeting options at once (GetPartBoundsInRadius, squared distances against the table, a spatial grid) without picking one"
+    ]
+  },
+  "reason": "A is accurate throughout, profiles first and re-measures after each step, uses GetServerTimeNow correctly for client sync, and talks about keeping the gameplay intact, while B has real API mistakes (os.clock for sync, BulkMoveTo modes backwards) and some generic filler."
+}

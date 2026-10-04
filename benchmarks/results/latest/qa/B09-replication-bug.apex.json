@@ -1,0 +1,47 @@
+{
+  "model": "sonnet",
+  "prompt": "In my Roblox game, the server sets a door's Open attribute to true and immediately fires a RemoteEvent DoorOpened to all clients. The client handler reads door:GetAttribute('Open') and plays an animation if true. Sometimes the animation doesn't play, and players far away get an error that the door is nil. StreamingEnabled is on. Why?",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox-debugging"
+  ],
+  "files_read": [],
+  "tool_calls": [
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-debugging"
+      }
+    }
+  ],
+  "final_text": "There are two separate problems here. Both come from the same assumption: that the door exists on every client and that the attribute has already arrived. I haven't run your code or checked the project files, so this is diagnosis from the symptoms you described, not something I reproduced.\n\n## 1. \"Door is nil\" for far-away players: streaming\n\nWith StreamingEnabled, a client only has the parts near its character. The door doesn't exist on the client for players outside the streaming radius. `FireAllClients` sends to everyone, so those clients receive the event, but anything that refers to the door can't resolve to it. If you pass the door as an Instance argument, it arrives as `nil` on clients that haven't streamed it in. If you look it up by path, `FindFirstChild` or `WaitForChild` fails or times out. This accounts for the error on distant players.\n\n## 2. \"Sometimes no animation\": remotes and attributes aren't ordered\n\nSetting an attribute and firing a remote go through separate replication paths. Roblox doesn't guarantee that the attribute change reaches the client before the remote does. The handler can run, read `GetAttribute(\"Open\")`, and still see the old value (`false` or `nil`), so it skips the animation. It's intermittent because it depends on timing and latency. It's less likely to show up in Studio, where there's no real network round-trip.\n\nA third cause is possible for players near the door. If the door streams in or out around the moment the event fires, the handler may read it before it is fully there. I'd check this only after fixing the first two.\n\n## Fix: drive the client from replicated state, not the remote\n\nRemove the `DoorOpened` remote. The attribute already replicates, and it only replicates to clients that have the door streamed in.\n\n```lua\n-- Client\nlocal CollectionService = game:GetService(\"CollectionService\")\n\nlocal function bindDoor(door: Model)\n\tlocal function apply(animate: boolean)\n\t\tif door:GetAttribute(\"Open\") then\n\t\t\t-- play open animation (or snap to final pose if not animate)\n\t\telse\n\t\t\t-- play close animation\n\t\tend\n\tend\n\n\tapply(false) -- snap to the current state when the door streams in\n\tdoor:GetAttributeChangedSignal(\"Open\"):Connect(function()\n\t\tapply(true)\n\tend)\nend\n\nfor _, door in CollectionService:GetTagged(\"Door\") do\n\ttask.spawn(bindDoor, door)\nend\nCollectionService:GetInstanceAddedSignal(\"Door\"):Connect(bindDoor)\n```\n\nThis is the usual pattern for streaming-safe code. Tag the doors with CollectionService. `GetInstanceAddedSignal` fires when a door streams in. Reading the attribute at that moment gives a late joiner or a player who walks up to the door the correct open or closed pose. Players far away do nothing, and no error occurs. The animation always matches the value that was actually set.\n\nIf you need a one-shot event, such as a sound or a particle effect, keep the remote but change it:\n- Don't pass the Instance. Send the new state and a stable ID, for example a `DoorId` attribute, and look it up with a timeout.\n- Fire only to nearby players, using `FireClient` per player in range, instead of `FireAllClients`.\n- Don't read the attribute in the handler. Use the value from the payload.\n\n## How to confirm before changing anything\n\nAdd temporary prints tagged `[DBG-door]` in the client handler:\n- **Attribute race:** print `door ~= nil` and `door:GetAttribute(\"Open\")` when the event arrives. If the door exists but the attribute is stale, that confirms the ordering problem.\n- **Streaming:** print the distance to the door, and test with a second client placed far away. If the nil cases only happen far away, that confirms streaming.\n- **Latency:** use the Network Simulator in Studio. The ordering problem should show up much more often there.\n\n## Other places this may occur\n\nSearch for other server code that sets an attribute and then fires a remote with an Instance argument. Those spots probably have the same bug.\n\nI can look through the repo for the door scripts and make this change if you'd like. I'd need to know how your doors are tagged or organized first.",
+  "cost_usd": 0.07183800000000001,
+  "turns": 3,
+  "seconds": 16.0,
+  "stderr_tail": "",
+  "mode": "apex"
+}

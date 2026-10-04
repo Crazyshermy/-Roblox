@@ -1,0 +1,68 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Explains remote events are not ordered relative to attribute/property replication",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Explains streaming: the door may not exist on distant clients (nil)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Recommends driving the client from replicated state (GetAttributeChangedSignal / CollectionService component) instead of the remote, or passing state in the payload",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Mentions handling stream-in (instance added later) / ModelStreamingMode or WaitForChild with timeout",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Suggests how to reproduce (distance, latency)",
+        "A": "missed",
+        "B": "met"
+      },
+      {
+        "item": "Does not invent non-existent APIs",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Suggests WaitForChild with a timeout for a door that may be streaming in, but when the door is passed as a remote argument it arrives as nil, so there is nothing to call WaitForChild on. That advice only works with a path or name lookup."
+      ],
+      "slop": [],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": []
+    },
+    "preference": "B",
+    "reason": "Both diagnose the problem correctly and give the same state-driven fix, but B also explains how to reproduce it (Network Simulator, a far-away client, debug prints) and adds the snap-vs-animate rule on stream-in, while A skips reproduction and its WaitForChild tip doesn't fit the nil-argument case."
+  },
+  "judge_cost": 0.287384,
+  "apex_score": 1.0,
+  "base_score": 0.833,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Suggests WaitForChild with a timeout for a door that may be streaming in, but when the door is passed as a remote argument it arrives as nil, so there is nothing to call WaitForChild on. That advice only works with a path or name lookup."
+    ],
+    "slop": [],
+    "overengineering": []
+  },
+  "reason": "Both diagnose the problem correctly and give the same state-driven fix, but B also explains how to reproduce it (Network Simulator, a far-away client, debug prints) and adds the snap-vs-animate rule on stream-in, while A skips reproduction and its WaitForChild tip doesn't fit the nil-argument case."
+}

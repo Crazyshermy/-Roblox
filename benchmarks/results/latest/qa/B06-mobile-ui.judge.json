@@ -1,0 +1,90 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Minimal HUD with clear information hierarchy (critical vs on-demand)",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Touch targets sized for thumbs, placed away from default jump/thumbstick, safe areas/notches",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Controller navigation of inventory (selection/focus, back closes)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Responsive layout approach (scale, aspect ratio constraints, UIScale) rather than pixel-absolute",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Accessibility (not color-only, readable text size)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Server does not trust UI/inventory state from client",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Recommends UITextSizeConstraint 'rather than TextScaled', but UITextSizeConstraint only has an effect when TextScaled is on, so the advice contradicts itself"
+      ],
+      "slop": [
+        "Generic onboarding advice ('first 60 seconds', 'hints dismissible and shown once') that isn't specific to this HUD or inventory",
+        "Diegetic frost and desaturation effects added as genre-default flavor"
+      ],
+      "overengineering": [
+        "Client-side predicted moves with rollback, and a Fusion/React-Lua state store, are heavy for a design-stage answer",
+        "Six accessibility toggles and an onboarding section go beyond what the task asked for"
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Unrequested visual direction (dark green palette, condensed industrial font)",
+        "Opens with tooling complaints about the prototype it couldn't publish"
+      ],
+      "overengineering": [
+        "Keeps three separate per-mode Offset pixel tables when scale-based sizing would do"
+      ]
+    },
+    "preference": "A",
+    "reason": "A covers every rubric point more thoroughly, with a clear critical-vs-on-demand hierarchy, scale-based responsive layout and a server-validation and fuzzing plan, while B relies on per-mode Offset pixel sizes and says less about HUD hierarchy."
+  },
+  "judge_cost": 0.09158920000000001,
+  "apex_score": 1.0,
+  "base_score": 0.833,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "Recommends UITextSizeConstraint 'rather than TextScaled', but UITextSizeConstraint only has an effect when TextScaled is on, so the advice contradicts itself"
+    ],
+    "slop": [
+      "Generic onboarding advice ('first 60 seconds', 'hints dismissible and shown once') that isn't specific to this HUD or inventory",
+      "Diegetic frost and desaturation effects added as genre-default flavor"
+    ],
+    "overengineering": [
+      "Client-side predicted moves with rollback, and a Fusion/React-Lua state store, are heavy for a design-stage answer",
+      "Six accessibility toggles and an onboarding section go beyond what the task asked for"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Unrequested visual direction (dark green palette, condensed industrial font)",
+      "Opens with tooling complaints about the prototype it couldn't publish"
+    ],
+    "overengineering": [
+      "Keeps three separate per-mode Offset pixel tables when scale-based sizing would do"
+    ]
+  },
+  "reason": "A covers every rubric point more thoroughly, with a clear critical-vs-on-demand hierarchy, scale-based responsive layout and a server-validation and fuzzing plan, while B relies on per-mode Offset pixel sizes and says less about HUD hierarchy."
+}

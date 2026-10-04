@@ -1,0 +1,47 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "/roblox What is the DataStore request budget per minute for GetAsync and SetAsync right now? Short answer.",
+  "user_slash_command": "roblox",
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [],
+  "files_read": [
+    ".claude/skills/roblox/references/currency.md"
+  ],
+  "final_text": "Per minute, from the project's currency notes (matches official docs as of the 2026-10-02 snapshot). I didn't re-check live docs or Studio.\n\n- **GetAsync (read):** 60 + players \u00d7 40 per server by default, and 300 + CCU \u00d7 40 for the whole experience.\n- **SetAsync (write):** 60 + players \u00d7 40 per server by default, and 300 + CCU \u00d7 20 for the whole experience.\n\n- **UpdateAsync:** it counts against both the read and the write budget.\n- **Server limits:** you can change them with `DataStoreService:SetRateLimitForRequestType()`. Check the live value with `GetRequestBudgetForRequestType()`.\n- **Throttling:** throttled requests queue, up to 30 per queue. A full queue fails with error codes 301\u2013306.\n\nThe old \"60 + players \u00d7 10\" figure is outdated.",
+  "cost_usd": 0.090376,
+  "turns": 4,
+  "seconds": 12.8,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "check": {
+    "skills_ok": false,
+    "markers_ok": false,
+    "missing": [],
+    "forbidden": [
+      "(?i)numPlayers\\s*[\u00d7x\\*]\\s*10\\b|players\\s*[\u00d7x\\*]\\s*10\\b|\\+\\s*10\\s*[\u00d7x\\*]"
+    ]
+  }
+}

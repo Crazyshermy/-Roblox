@@ -1,0 +1,96 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Flags client-supplied damage as critical",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing cooldown/rate limit (XP farming via spam)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing range / line-of-sight / target validity checks",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing type validation of abilityName/target (nil char, non-Instance target)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags that ability ownership/unlock is not checked",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Provides a corrected server-authoritative version or clear fix list",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "States as fact that NaN damage corrupts Health and that negative damage heals, without checking how TakeDamage actually behaves",
+        "Says handler errors 'can be used to probe it', which is weak and unsupported"
+      ],
+      "slop": [
+        "Generic 'consider logging or kicking' advice"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Invented figure for the remote throttle rate ('about 500/s')",
+        "Lists dead players as meaningful targets, though TakeDamage on a dead Humanoid does nothing",
+        "Says --!strict is used, but indexing the untyped ABILITIES table with a refined unknown would likely produce type warnings"
+      ],
+      "slop": [
+        "Irrelevant meta text about '.apex/ memory' and Studio playtests not being run",
+        "A 'Modified client' attacker column that repeats the same value on every row",
+        "Defers XP to a hypothetical Progression module that doesn't exist"
+      ],
+      "overengineering": [
+        "Strict-mode type annotations and casts add noise for a review answer",
+        "Removes XP awarding from the fixed code and tells the reader to build a separate progression module"
+      ]
+    },
+    "preference": "A",
+    "reason": "Both answers cover every rubric item, but A's fixed code is complete and still grants XP correctly, while B adds meta filler, invents a throttle number and leaves XP to a module that doesn't exist (B's attack-list test plan is a small plus)."
+  },
+  "judge_cost": 0.313484,
+  "apex_score": 1.0,
+  "base_score": 1.0,
+  "winner": "baseline",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "Invented figure for the remote throttle rate ('about 500/s')",
+      "Lists dead players as meaningful targets, though TakeDamage on a dead Humanoid does nothing",
+      "Says --!strict is used, but indexing the untyped ABILITIES table with a refined unknown would likely produce type warnings"
+    ],
+    "slop": [
+      "Irrelevant meta text about '.apex/ memory' and Studio playtests not being run",
+      "A 'Modified client' attacker column that repeats the same value on every row",
+      "Defers XP to a hypothetical Progression module that doesn't exist"
+    ],
+    "overengineering": [
+      "Strict-mode type annotations and casts add noise for a review answer",
+      "Removes XP awarding from the fixed code and tells the reader to build a separate progression module"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "States as fact that NaN damage corrupts Health and that negative damage heals, without checking how TakeDamage actually behaves",
+      "Says handler errors 'can be used to probe it', which is weak and unsupported"
+    ],
+    "slop": [
+      "Generic 'consider logging or kicking' advice"
+    ],
+    "overengineering": []
+  },
+  "reason": "Both answers cover every rubric item, but A's fixed code is complete and still grants XP correctly, while B adds meta filler, invents a throttle number and leaves XP to a module that doesn't exist (B's attack-list test plan is a small plus)."
+}

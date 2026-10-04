@@ -1,0 +1,76 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Server is the only writer of Gold; client never sends amounts or prices",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Validates remote arguments (types, NaN/inf, bounds) and rate-limits shop requests",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Avoids yields between balance check and deduction (atomic spend)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Persistence handled safely (UpdateAsync or session-locked profile; load-before-play; BindToClose)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Does not treat leaderstats as source of truth",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Kill rewards awarded by server-side kill attribution, not a client 'I killed X' remote",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Calls ProfileStore 'loadstring-free', a label that adds nothing"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Says Roblox has a built-in remote throttle of 'about 500 requests/s'; this is unverified and likely wrong"
+      ],
+      "slop": [
+        "Header '*Apex: security \u2192 data \u2192 networking*' is noise"
+      ],
+      "overengineering": []
+    },
+    "preference": "tie",
+    "reason": "Both are equally secure and use the same architecture (session-locked ProfileStore, a single Gold writer, atomic TrySpend, server-derived rewards). A also supports stackable items, while B gives clearer kill-attribution caveats and test steps, so neither is clearly better."
+  },
+  "judge_cost": 0.1055132,
+  "apex_score": 1.0,
+  "base_score": 1.0,
+  "winner": "tie",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "Says Roblox has a built-in remote throttle of 'about 500 requests/s'; this is unverified and likely wrong"
+    ],
+    "slop": [
+      "Header '*Apex: security \u2192 data \u2192 networking*' is noise"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Calls ProfileStore 'loadstring-free', a label that adds nothing"
+    ],
+    "overengineering": []
+  },
+  "reason": "Both are equally secure and use the same architecture (session-locked ProfileStore, a single Gold writer, atomic TrySpend, server-derived rewards). A also supports stackable items, while B gives clearer kill-attribution caveats and test steps, so neither is clearly better."
+}

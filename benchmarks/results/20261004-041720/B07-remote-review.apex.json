@@ -1,0 +1,41 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "Review this Roblox remote handler for exploitability:\n```lua\nlocal Remote = game.ReplicatedStorage.UseAbility\nRemote.OnServerEvent:Connect(function(player, abilityName, target, damage)\n  local char = player.Character\n  if target and target:FindFirstChild('Humanoid') then\n    target.Humanoid:TakeDamage(damage)\n  end\n  player.leaderstats.XP.Value += 10\nend)\n```",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-security",
+    "roblox-networking"
+  ],
+  "files_read": [],
+  "final_text": "*Apex: security \u2192 networking*\n\nThis handler is exploitable, and a normal player can do most of it with a modified client. I read it statically. I haven't run it in Studio and haven't fired the remote with bad arguments, so everything below is from reasoning, not reproduction.\n\n## Findings, most severe first\n\n**1. Client-supplied `damage` (critical, modified client)**\n- **Exploit:** `UseAbility:FireServer(\"Fireball\", victim, 1e9)` one-shots anyone. The client picks the damage, so there is no balance.\n- **Edge values:** `math.huge`, `NaN` and negative numbers are also accepted. A negative `TakeDamage` may heal, and `NaN` could corrupt `Health`. I haven't tested either.\n- **Cause:** the client reports what happened instead of asking to do something. The server should look up the damage from `abilityName`.\n\n**2. Unvalidated `target` (critical, modified client)**\n- **Exploit:** `target` is any Instance the client names, with no checks on type, distance, line of sight or whether it's alive. An attacker can hit anyone on the map, or any NPC or dummy that has a `Humanoid`.\n- **Crash risk:** non-Instance values (string, number, table) make `FindFirstChild` throw. That's noisy but not dangerous.\n- **Missing checks:** there is no check that the player is alive, or that the target isn't themselves or a teammate.\n\n**3. Unlimited XP (high, modified client)**\n- **Exploit:** `player.leaderstats.XP.Value += 10` runs on every fire, even when the target is nil or invalid, and there's no rate limit. A loop of `FireServer()` gives unlimited XP.\n- **Related risks:** `abilityName` is never checked, so non-existent abilities earn XP too. Treat `leaderstats` as display only, not as the source of truth. A second write path for XP elsewhere would be a duplication risk.\n\n**4. No ability rules at all (high, modified client)**\n- **Missing checks:** `abilityName` is never read. There is no ability whitelist, cooldown, range or per-player rate limit.\n- **Dead code:** `char` is unused, so the alive check never happened.\n- **Cause:** Roblox's own throttle of about 500 requests per second per remote isn't a game-logic rate limit.\n\n**5. Fragility (low)**\n- If `leaderstats` or `XP` doesn't exist yet, such as right after join, the handler throws.\n- Bad input causes errors instead of being quietly rejected.\n\n## Drop-in replacement\n\nIt keeps the +10 XP, but only for a hit that passed validation. The `ABILITIES` numbers are placeholders for you to set. The `DamageService` and `XPService` named at the end don't exist in your project, so I haven't added them here.\n\n```lua\nlocal Players = game:GetService(\"Players\")\n\nlocal Remote = game.ReplicatedStorage.UseAbility\n\n-- Server-owned ability definitions. The client only ever names one.\nlocal ABILITIES = {\n\tFireball = { Damage = 25, Range = 60, Cooldown = 1.5 },\n\t-- add the rest of your abilities here\n}\nlocal RANGE_TOLERANCE = 8 -- studs of slack for latency\nlocal XP_PER_HIT = 10\n\nlocal lastUse: { [Player]: { [string]: number } } = {}\n\nlocal function getHumanoid(model: Instance?): Humanoid?\n\tif typeof(model) ~= \"Instance\" or not model:IsA(\"Model\") then return nil end\n\tif not model:IsDescendantOf(workspace) then return nil end\n\treturn model:FindFirstChildOfClass(\"Humanoid\")\nend\n\nPlayers.PlayerRemoving:Connect(function(player)\n\tlastUse[player] = nil\nend)\n\nRemote.OnServerEvent:Connect(function(player: Player, abilityName: unknown, target: unknown)\n\t-- shape: ignore any client-sent damage entirely\n\tif typeof(abilityName) ~= \"string\" then return end\n\tlocal ability = ABILITIES[abilityName]\n\tif not ability then return end\n\n\t-- cooldown (server clock); also acts as the rate limit\n\tlocal uses = lastUse[player]\n\tif not uses then\n\t\tuses = {}\n\t\tlastUse[player] = uses\n\tend\n\tlocal now = os.clock()\n\tif uses[abilityName] and now - uses[abilityName] < ability.Cooldown then return end\n\n\t-- caster must be alive\n\tlocal char = player.Character\n\tlocal myHum = getHumanoid(char)\n\tlocal myRoot = char and char:FindFirstChild(\"HumanoidRootPart\")\n\tif not (myHum and myRoot and myRoot:IsA(\"BasePart\")) or myHum.Health <= 0 then return end\n\n\t-- target must be a live, in-range humanoid that isn't the caster\n\tlocal targetModel = target :: Instance?\n\tlocal hum = getHumanoid(targetModel)\n\tif not hum or targetModel == char or hum.Health <= 0 then return end\n\tlocal root = (targetModel :: Model):FindFirstChild(\"HumanoidRootPart\")\n\tif not (root and root:IsA(\"BasePart\")) then return end\n\tif (root.Position - myRoot.Position).Magnitude > ability.Range + RANGE_TOLERANCE then return end\n\n\t-- all checks passed: commit (no yields between check and write)\n\tuses[abilityName] = now\n\thum:TakeDamage(ability.Damage)\n\n\tlocal stats = player:FindFirstChild(\"leaderstats\")\n\tlocal xp = stats and stats:FindFirstChild(\"XP\")\n\tif xp and xp:IsA(\"IntValue\") then\n\t\txp.Value += XP_PER_HIT\n\tend\nend)\n```\n\n## Still open (your design decisions)\n- **Team and PvP rules:** I didn't add any. If friendly fire should be blocked, or some zones are safe, add that check before `TakeDamage`.\n- **Line of sight:** range alone lets a player hit through walls. For ranged abilities, add a server raycast from the caster to the target.\n- **XP farming:** XP per hit can still be farmed on a dummy or an alt account. Pay XP for kills, or cap it per target and per time window.\n- **XP ownership:** put XP and damage behind one server module that owns the value. Then `leaderstats` is just a display mirror, and other grants can't bypass these rules.\n\n## Attack list to run once Studio is connected\n1. `FireServer(\"Fireball\", victim, math.huge)`: the damage argument should be ignored.\n2. `FireServer(\"Fireball\", farAwayPlayerChar)`: should be rejected as out of range.\n3. `FireServer(\"Nope\", victim)`: should be rejected with no XP.\n4. `FireServer(\"Fireball\", \"x\")` and `FireServer(\"Fireball\", nil)`: should be rejected quietly, with no error and no XP.\n5. 100 rapid `FireServer(\"Fireball\", validTarget)` calls: only about one should land per cooldown period.\n6. Fire while dead, then after respawn: the dead fire should be rejected, and the player should work again after respawn.\n\nI can run these in a Server and Clients playtest if you connect the Studio MCP.",
+  "cost_usd": 0.12394459999999999,
+  "turns": 7,
+  "seconds": 34.0,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n"
+}

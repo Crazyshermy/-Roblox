@@ -1,0 +1,43 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "My Roblox LocalScript sometimes errors 'attempt to index nil with Humanoid' but only after the player respawns. It's in StarterPlayerScripts and does `local hum = player.Character.Humanoid` at the top. What's wrong?",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [],
+  "files_read": [],
+  "final_text": "`player.Character` is `nil` when that line runs, so indexing `.Humanoid` on it fails. Two things cause this.\n\n1. **The script runs once, and the character may not exist yet.** Scripts in `StarterPlayerScripts` run once when the player joins, not on each respawn. `player.Character` is often still `nil` at that moment. If the line is at the top, you hit the error on first load.\n2. **Your reference goes stale after a respawn.** Each respawn creates a new Character model and a new Humanoid, and the old ones are destroyed. A `hum` captured once at the top points to a dead Humanoid. If you re-read `player.Character.Humanoid` inside an event handler, loop or input callback, it can run in the gap where `Character` is `nil` or the new Humanoid hasn't replicated yet. That produces the error only after a respawn.\n\nI haven't seen your script, so I can't say which of the two you're hitting. The fix below covers both.\n\n**Fix: rebind on every `CharacterAdded`, and use `WaitForChild`.**\n\n```lua\nlocal Players = game:GetService(\"Players\")\nlocal player = Players.LocalPlayer\n\nlocal hum: Humanoid? = nil\n\nlocal function onCharacter(character: Model)\n\thum = character:WaitForChild(\"Humanoid\") :: Humanoid\n\n\thum.Died:Once(function()\n\t\thum = nil\n\tend)\n\n\t-- (re)connect anything that depends on the humanoid here\nend\n\nplayer.CharacterAdded:Connect(onCharacter)\nif player.Character then\n\tonCharacter(player.Character) -- character already spawned before this script ran\nend\n```\n\n- **Handle the existing character.** `CharacterAdded` only fires for future spawns, so you need the `if player.Character` call for the character that already exists.\n- **Use `WaitForChild`.** On the client, the Humanoid can arrive slightly after the Character model does.\n- **Guard other callbacks.** Anywhere else you use `hum`, such as input handlers or `RenderStepped`, check `if not hum then return end` first.\n- **Clean up connections.** If you connect events to the Humanoid or Character, reconnect them inside `onCharacter`. Connections on the old, destroyed instances are dead.\n\nAlternatively, if the logic is purely per-character, move the script to `StarterCharacterScripts`. It is re-cloned into each new character, so `script.Parent:WaitForChild(\"Humanoid\")` is always fresh and you need no rebinding. The catch is that any state you want to keep across lives has to live elsewhere.\n\nIf you paste the script, I can point to the exact line that's hitting the `nil`.",
+  "cost_usd": 0.055927199999999996,
+  "turns": 1,
+  "seconds": 17.5,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "check": {
+    "skills_ok": false,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}

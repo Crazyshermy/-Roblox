@@ -1,0 +1,61 @@
+{
+  "model": "sonnet",
+  "prompt": "Players in my Roblox game sometimes lose progress, especially when they leave one server and quickly join another. My save code: PlayerRemoving -> DataStore:SetAsync(userId, data); on join: GetAsync and if it fails I give them default data. What's going on and how do I fix it?",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-data"
+  ],
+  "files_read": [],
+  "tool_calls": [
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox"
+      }
+    },
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-data"
+      }
+    },
+    {
+      "tool": "Grep",
+      "input": {
+        "pattern": "SetAsync|GetAsync|UpdateAsync|PlayerRemoving|BindToClose",
+        "output_mode": "files_with_matches"
+      }
+    }
+  ],
+  "final_text": "*Apex: data*\n\nI couldn't find your save scripts in this repo, so this diagnosis comes from your description alone, and the fix below is untested.\n\n## What's going on\n\nThere are two separate bugs, and your symptom likely involves both.\n\n**1. No session locking (the fast-hop rollback).**\n- When a player leaves server A and joins server B, `PlayerRemoving` on A starts its `SetAsync`.\n- Server B runs `GetAsync` at about the same moment, so it can read the old data before A's write lands.\n- B then plays the session on stale data and later saves it over A's newer data. `SetAsync` overwrites blindly, so nothing detects this.\n- If A's save is slow or throttled, B can instead start on defaults and overwrite the real profile.\n\n**2. Giving defaults when `GetAsync` fails (the full wipe).**\n- `GetAsync` fails fairly often because of throttling, outages, or the race above.\n- The player then plays on fresh defaults, and the next autosave or leave-save permanently replaces their real data with those defaults.\n- This is the most common way Roblox games wipe saves.\n\nOther gaps I'm guessing at from your description:\n- Without `game:BindToClose`, players still in a server when it shuts down lose their progress.\n- There's no retry on a failed save.\n- Nothing serializes a leave-save behind an in-flight autosave.\n\n## The fix\n\n- Each profile gets a lock that names the owning server and expires after a time limit. `UpdateAsync` is the only way it's written.\n- A joining server waits while another server holds the lock, instead of loading stale data.\n- If the data can't be loaded, the player is kicked with a message, and defaults are never written.\n- Saves use `UpdateAsync`, retry with backoff, and are skipped if this server no longer owns the lock.\n- The leave-save releases the lock. `BindToClose` saves everyone in parallel.\n\nIf you'd rather use a library, ProfileStore does all of this already. The code below is a drop-in version with no dependencies:\n\n```lua\nlocal DataStoreService = game:GetService(\"DataStoreService\")\nlocal HttpService = game:GetService(\"HttpService\")\nlocal Players = game:GetService(\"Players\")\n\nlocal store = DataStoreService:GetDataStore(\"PlayerData\") -- keep your existing store name/keys\nlocal SERVER_ID = HttpService:GenerateGUID(false)        -- game.JobId is empty in Studio\nlocal LOCK_TTL = 120      -- seconds; must be well above AUTOSAVE\nlocal AUTOSAVE = 60\nlocal LOAD_ATTEMPTS = 10  -- while another server still holds the lock\nlocal LOAD_RETRY_WAIT = 3\n\nlocal DEFAULT_DATA = { Coins = 0 } -- your defaults\n\nlocal sessions = {} -- [Player] = { data = table, saving = boolean, lost = boolean }\n\nlocal function deepCopy(t)\n\tlocal c = {}\n\tfor k, v in t do\n\t\tc[k] = type(v) == \"table\" and deepCopy(v) or v\n\tend\n\treturn c\nend\n\nlocal function retry(attempts, fn)\n\tlocal ok, result\n\tlocal delay = 1\n\tfor i = 1, attempts do\n\t\tok, result = pcall(fn)\n\t\tif ok then return true, result end\n\t\tif i < attempts then\n\t\t\ttask.wait(delay)\n\t\t\tdelay = math.min(delay * 2, 16)\n\t\tend\n\tend\n\treturn false, result\nend\n\n-- Returns \"ok\", data | \"locked\" | \"error\"\nlocal function acquire(key)\n\tlocal status, data\n\tlocal ok = retry(3, function()\n\t\treturn store:UpdateAsync(key, function(old)\n\t\t\tstatus, data = nil, nil -- transform can run more than once\n\t\t\tlocal now = os.time()\n\t\t\tif old and old.Lock and old.Lock.ServerId ~= SERVER_ID and old.Lock.Expires > now then\n\t\t\t\tstatus = \"locked\"\n\t\t\t\treturn nil -- cancel\n\t\t\tend\n\t\t\tlocal record = old\n\t\t\tif record == nil then\n\t\t\t\trecord = { Data = deepCopy(DEFAULT_DATA) }\n\t\t\telseif record.Data == nil and record.Lock == nil then\n\t\t\t\trecord = { Data = old } -- legacy: profile was stored as the raw data table\n\t\t\tend\n\t\t\trecord.Lock = { ServerId = SERVER_ID, Expires = now + LOCK_TTL }\n\t\t\tstatus, data = \"ok\", record.Data\n\t\t\treturn record\n\t\tend)\n\tend)\n\tif not ok then return \"error\" end\n\treturn status, data\nend\n\nlocal function save(player, release)\n\tlocal s = sessions[player]\n\tif not s then return end\n\twhile s.saving do task.wait() end -- final save always runs after an in-flight one\n\tif s.lost then return end\n\ts.saving = true\n\tlocal lost = false\n\tlocal ok = retry(5, function()\n\t\treturn store:UpdateAsync(tostring(player.UserId), function(old)\n\t\t\tlost = false\n\t\t\tif not old or not old.Lock or old.Lock.ServerId ~= SERVER_ID then\n\t\t\t\tlost = true -- another server owns it now; do NOT write\n\t\t\t\treturn nil\n\t\t\tend\n\t\t\told.Data = s.data\n\t\t\told.Lock = if release then nil else { ServerId = SERVER_ID, Expires = os.time() + LOCK_TTL }\n\t\t\treturn old\n\t\tend)\n\tend)\n\ts.saving = false\n\tif lost then\n\t\ts.lost = true\n\t\twarn(`Lost session lock for {player.Name}`)\n\t\tif player.Parent then player:Kick(\"Your data was opened on another server. Please rejoin.\") end\n\telseif not ok then\n\t\twarn(`Save failed for {player.Name}`)\n\tend\nend\n\nlocal function onPlayerAdded(player)\n\tlocal key = tostring(player.UserId)\n\tlocal status, data\n\tfor _ = 1, LOAD_ATTEMPTS do\n\t\tstatus, data = acquire(key)\n\t\tif status ~= \"locked\" then break end\n\t\ttask.wait(LOAD_RETRY_WAIT) -- old server is usually releasing within seconds\n\tend\n\n\tif status ~= \"ok\" then\n\t\t-- Never fall back to defaults: they would overwrite the real profile.\n\t\tplayer:Kick(\"We couldn't load your data. Your progress is safe, please rejoin.\")\n\t\treturn\n\tend\n\tif player.Parent == nil then\n\t\t-- left while loading: release the lock\n\t\tsessions[player] = { data = data, saving = false, lost = false }\n\t\tsave(player, true)\n\t\tsessions[player] = nil\n\t\treturn\n\tend\n\n\tsessions[player] = { data = data, saving = false, lost = false }\n\t-- Your \"player is ready\" logic goes here, AFTER data exists.\nend\n\nlocal function onPlayerRemoving(player)\n\tsave(player, true)\n\tsessions[player] = nil\nend\n\nPlayers.PlayerAdded:Connect(onPlayerAdded)\nPlayers.PlayerRemoving:Connect(onPlayerRemoving)\nfor _, p in Players:GetPlayers() do task.spawn(onPlayerAdded, p) end\n\ntask.spawn(function()\n\twhile true do\n\t\ttask.wait(AUTOSAVE)\n\t\tfor player, s in sessions do\n\t\t\tif not s.saving then task.spawn(save, player, false) end\n\t\tend\n\tend\nend)\n\ngame:BindToClose(function()\n\tlocal pending = 0\n\tfor player in sessions do\n\t\tpending += 1\n\t\ttask.spawn(function()\n\t\t\tsave(player, true)\n\t\t\tpending -= 1\n\t\tend)\n\tend\n\twhile pending > 0 do task.wait() end\nend)\n\n-- Other scripts read/write through this; nil means \"not loaded yet\".\nlocal DataService = {}\nfunction DataService.Get(player) local s = sessions[player]; return s and s.data end\nreturn DataService\n```\n\nNotes on using it:\n- **Order of operations:** don't let players earn, spend or interact until `DataService.Get(player)` returns data. This gate is what prevents the default-data wipe.\n- **Existing profiles:** the code wraps a raw legacy table into `{Data, Lock}` on first load, so current saves keep working. That check assumes your real data has no top-level `Data` and `Lock` keys. If it does, tell me and I'll adjust it.\n- **Lock timing:** `LOCK_TTL` has to stay comfortably above `AUTOSAVE`. If a server crashes, its lock expires after 2 minutes. A hopping player normally waits only a few seconds, because the leaving server releases the lock on its final save.\n- **Studio:** with API access enabled, playtests hit your live DataStore. Use a separate test place or store name when you test.\n- **Already-wiped players:** check the DataStore Manager or `ListVersionsAsync` for earlier versions of their keys. Roblox keeps old versions for a limited time, so check the current retention window in the docs.\n\nTo test it, run a local server with 2 players, then join, leave, and rejoin quickly while one server's save is delayed. I'd also force a `GetAsync` failure to confirm the player is kicked and not given defaults.\n\nVerified: nothing was run. Studio wasn't connected and I couldn't see your code \u00b7 Not verified: the code above at runtime, your actual data shape, and the current DataStore budgets and version-retention limits.",
+  "cost_usd": 0.1312856,
+  "turns": 6,
+  "seconds": 49.2,
+  "stderr_tail": "",
+  "mode": "apex"
+}
