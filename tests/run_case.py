@@ -34,16 +34,20 @@ def make_project(mode: str, fixture: str | None) -> str:
     return d
 
 
-def run(prompt: str, mode: str, model: str, fixture: str | None, max_turns: int, timeout: int) -> dict:
-    proj = make_project(mode, fixture)
+READ_ONLY = ("Skill Read Glob Grep", "Bash Edit Write WebFetch WebSearch Agent")
+
+
+def run_in(proj: str, prompt: str, model: str, max_turns: int = 12, timeout: int = 600,
+           allowed: str = READ_ONLY[0], disallowed: str = READ_ONLY[1],
+           extra_args: list | None = None, env: dict | None = None) -> dict:
+    """Run one headless session in an existing project dir and parse the event stream."""
     cmd = ["claude", "-p", prompt, "--output-format", "stream-json", "--verbose",
            "--model", model, "--max-turns", str(max_turns),
-           # read-only exploration + skills; no edits so runs are comparable and safe
-           "--allowedTools", "Skill Read Glob Grep",
-           "--disallowedTools", "Bash Edit Write WebFetch WebSearch Agent"]
+           "--allowedTools", allowed, "--disallowedTools", disallowed] + (extra_args or [])
     t0 = time.time()
-    p = subprocess.run(cmd, cwd=proj, capture_output=True, text=True, timeout=timeout)
-    skills, reads, text, cost, turns, available = [], [], "", None, None, None
+    p = subprocess.run(cmd, cwd=proj, capture_output=True, text=True, timeout=timeout,
+                       env={**os.environ, **(env or {})})
+    skills, reads, calls, text, cost, turns, available = [], [], [], "", None, None, None
     for line in p.stdout.splitlines():
         try:
             ev = json.loads(line)
@@ -53,21 +57,34 @@ def run(prompt: str, mode: str, model: str, fixture: str | None, max_turns: int,
             available = sorted(s for s in ev.get("skills", []) if "roblox" in s)
         if ev.get("type") == "assistant":
             for c in ev.get("message", {}).get("content", []):
-                if c.get("type") == "tool_use" and c.get("name") == "Skill":
-                    skills.append(c["input"].get("skill") or c["input"].get("command"))
-                if c.get("type") == "tool_use" and c.get("name") == "Read":
-                    reads.append(os.path.relpath(c["input"].get("file_path", ""), proj))
+                if c.get("type") != "tool_use":
+                    continue
+                inp = c.get("input", {})
+                calls.append({"tool": c["name"], "input": {k: (v[:200] if isinstance(v, str) else v) for k, v in inp.items()}})
+                if c["name"] == "Skill":
+                    skills.append(inp.get("skill") or inp.get("command"))
+                if c["name"] == "Read":
+                    reads.append(os.path.relpath(inp.get("file_path", ""), proj))
         if ev.get("type") == "result":
             text = ev.get("result", "")
             cost = ev.get("total_cost_usd")
             turns = ev.get("num_turns")
     # A slash-command invocation by the user is expanded by the harness, not a Skill tool call.
     user_slash = prompt.strip().split()[0][1:] if prompt.strip().startswith("/") else None
-    shutil.rmtree(proj, ignore_errors=True)
-    return {"mode": mode, "model": model, "prompt": prompt, "user_slash_command": user_slash,
+    return {"model": model, "prompt": prompt, "user_slash_command": user_slash,
             "skills_available": available, "skills_invoked": skills, "files_read": reads,
-            "final_text": text, "cost_usd": cost, "turns": turns,
+            "tool_calls": calls, "final_text": text, "cost_usd": cost, "turns": turns,
             "seconds": round(time.time() - t0, 1), "stderr_tail": p.stderr[-500:]}
+
+
+def run(prompt: str, mode: str, model: str, fixture: str | None, max_turns: int, timeout: int) -> dict:
+    proj = make_project(mode, fixture)
+    try:
+        r = run_in(proj, prompt, model, max_turns, timeout)
+    finally:
+        shutil.rmtree(proj, ignore_errors=True)
+    r["mode"] = mode
+    return r
 
 
 if __name__ == "__main__":

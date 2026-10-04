@@ -1,0 +1,39 @@
+{
+  "name": "LighthouseKeeper",
+  "tree": {
+    "$className": "DataModel",
+    "ServerScriptService": {
+      "Server": { "$path": "src/server" }
+    },
+    "ReplicatedStorage": {
+      "Shared": { "$path": "src/shared" },
+      "Remotes": {
+        "$className": "Folder",
+        "RefuelLamp": { "$className": "RemoteEvent" },
+        "LampChanged": { "$className": "RemoteEvent" }
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Client": { "$path": "src/client" }
+      }
+    },
+    "Workspace": {
+      "Baseplate": {
+        "$className": "Part",
+        "$properties": { "Anchored": true, "Size": [512, 4, 512], "Position": [0, -2, 0] }
+      },
+      "Lamp": {
+        "$className": "Part",
+        "$properties": { "Anchored": true, "Size": [6, 6, 6], "Position": [0, 30, 0], "Material": "Neon" },
+        "Light": { "$className": "PointLight", "$properties": { "Range": 60, "Brightness": 3 } }
+      },
+      "OilCans": {
+        "$className": "Folder",
+        "Can1": { "$className": "Part", "$properties": { "Anchored": true, "Size": [2, 3, 2], "Position": [40, 1.5, 10] } },
+        "Can2": { "$className": "Part", "$properties": { "Anchored": true, "Size": [2, 3, 2], "Position": [-35, 1.5, -20] } },
+        "Can3": { "$className": "Part", "$properties": { "Anchored": true, "Size": [2, 3, 2], "Position": [15, 1.5, -45] } }
+      }
+    }
+  }
+}
