@@ -17,7 +17,7 @@ CASES = [
         "why": "/roblox-status works and the session really discovers the skills",
         "prompt": "/roblox-status",
         "expect_skills_any": [],  # user slash command: expanded by harness, not a Skill tool call
-        "must": [r"\b1\.\d+\.\d+\b", r"roblox-security", r"roblox-game-design", r"(not connected|Studio MCP)"],
+        "must": [r"\b1\.\d+\.\d+\b", r"roblox-security", r"roblox-game-design", r"(?i)inventory: complete", r"(not connected|Studio MCP)"],
         "must_not": [],
     },
     {

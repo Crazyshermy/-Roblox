@@ -40,6 +40,9 @@ Classify each finding by required capability:
 - **Text:** user-authored text shown to others (signs, names, pet names, notes) must be filtered via `TextService:FilterStringAsync`. Filter per recipient context where required. `TextChatService` filters chat itself.
 - Never put secrets in replicated locations or client scripts. Use `HttpService:GetSecret` on the server.
 
+## Hardening or fixing
+When asked to harden, secure or fix a handler, **implement every applicable contract item** (shape, identity, authority, preconditions including range, rate and atomicity) in the code. Don't leave contract items as suggestions. Scope discipline applies to unrelated systems, not to the contract.
+
 ## Reviewing existing code
 Report findings **ranked by severity** (critical → low). For each, give the exploit in one line (which call, which args, what the attacker gains) and the capability class (UI-reachable, modified client, or theoretical). Then give a corrected handler that is a drop-in replacement for the user's code and keeps its intended behavior.
 

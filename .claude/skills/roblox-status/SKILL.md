@@ -15,13 +15,13 @@ Produce a compact status report. Use only real observations. Don't assume anythi
 5. **Project integration:** does `.apex/project.md` exist, and is it filled in or still a template? Do `.apex/decisions.md` and `.apex/debt.md` exist? Does `CLAUDE.md` contain the `Roblox Apex` block?
 6. **Studio:** do any Roblox Studio MCP tools appear in your toolset (`list_roblox_studios`, `execute_luau`, …)? If yes, say "connected (tools present)". Don't call them unless the user asks. If no, say "not connected" and give the setup pointer from `${CLAUDE_SKILL_DIR}/../roblox/references/studio-mcp.md`.
 
-**Expected inventory:** 22 skills in total, made up of the router `roblox`, 18 specialists and 3 user-only commands. That is 19 model-invocable. Build each count by **listing the names first**, then counting the list. Plugin installs show names prefixed with `roblox-apex:`, which is normal. Any difference from the expected inventory is an issue to report.
+**Expected inventory (v1.1):** `roblox` · `roblox-architecture` `roblox-assets` `roblox-boundary-breaker` `roblox-data` `roblox-debugging` `roblox-game-design` `roblox-game-feel` `roblox-genres` `roblox-level-design` `roblox-luau` `roblox-networking` `roblox-performance` `roblox-physics-animation` `roblox-review` `roblox-security` `roblox-testing` `roblox-ui-ux` `roblox-visual-direction` · user-only `roblox-status` `roblox-route` `roblox-init`. Check each **name** against what you found. Don't count; mark each name. A plugin install prefixes names with `roblox-apex:`, which is normal.
 
 Output format:
 ```
 Roblox Apex <version>
-Skills: <n> on disk · <n> model-invocable discovered · user-only: roblox-status, roblox-route, roblox-init
-  <list, with ✓ discovered / ✗ missing>
+Inventory: <complete | missing: names>   (install: project | user | plugin)
+  <each expected name: disk ✓/✗, discovered ✓/✗/user-only>
 Router: ok | problem: …
 Knowledge snapshot: <date> (<fresh|stale>)
 Project memory: .apex/ <present/filled | template | absent → run /roblox-init>
