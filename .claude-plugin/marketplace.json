@@ -1,0 +1,13 @@
+{
+  "name": "roblox-apex",
+  "owner": { "name": "crazyshermy" },
+  "metadata": { "description": "Roblox Apex skill layer for Claude Code" },
+  "plugins": [
+    {
+      "name": "roblox-apex",
+      "source": "./",
+      "description": "Roblox development intelligence layer: /roblox router plus specialist skills.",
+      "version": "1.0.0"
+    }
+  ]
+}

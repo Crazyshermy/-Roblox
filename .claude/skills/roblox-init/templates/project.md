@@ -23,3 +23,6 @@
 
 ## Current priorities
 - ?
+
+## Apex settings
+- apex_route_line: on   # set to off to hide the one-line route header

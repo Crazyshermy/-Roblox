@@ -14,7 +14,7 @@ Visuals serve **readability first, mood second, spectacle third**. A beautiful s
 - **Material language**: which surfaces are matte/rough/worn; consistent texel density.
 
 ## Lighting (biggest quality lever in Roblox)
-- `Lighting.Technology = Future` for local light shadows and quality (verify device cost on mobile; lower-end devices fall back automatically, but design for the fallback look too).
+- Set the lighting intent with `Lighting.LightingStyle` (`Enum.LightingStyle.Realistic` for a naturalistic look, `Soft` for a stylized one), and use `Lighting.PrioritizeLightingQuality` to choose whether shading quality or view distance scales down first on weaker devices. **`Lighting.Technology` (Future/ShadowMap/Voxel) is deprecated** (E4, 2026-10), so don't recommend it in new work. Lower-end devices scale quality down automatically, so design for the fallback look too.
 - `Atmosphere` (density, haze, glare, color, decay) for depth and mood; `Sky`/skybox matching the time of day; `ClockTime` art-directed, not default noon.
 - Post-processing: `ColorCorrectionEffect` (grade, contrast), `BloomEffect` (restrained), `DepthOfFieldEffect` (cinematics/menus only), `SunRaysEffect`. Grade toward the palette.
 - Use local lights to **guide the player** (light pools mark paths and objectives) — composition and level design meet here.

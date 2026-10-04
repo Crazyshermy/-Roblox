@@ -27,7 +27,7 @@ CASES = [
                   "Where should the round state machine, team assignment and scoring live, and how should clients learn the round state? Keep it concise.",
         "expect_skills_all": ["roblox-architecture"],
         "expect_skills_any": ["roblox-networking"],
-        "must": [r"Apex route:", r"(?i)attribute", r"(?i)late[- ]?join|join(s|ing)? mid|already in the game|existing players|GetPlayers"],
+        "must": [r"\*Apex: |Apex:", r"(?i)attribute", r"(?i)late[- ]?join|join(s|ing)? mid|already in the game|existing players|GetPlayers"],
         "must_not": [],
     },
     {
@@ -62,9 +62,30 @@ CASES = [
         "id": "currency",
         "why": "Currentness: DataStore budgets changed in 2026; stale answer is 60 + players x 10",
         "prompt": "/roblox What is the DataStore request budget per minute for GetAsync and SetAsync right now? Short answer.",
-        "expect_skills_any": ["roblox-data"],
-        "must": [r"40", r"(?i)experience|server"],
-        "must_not": [r"(?i)numPlayers\s*[×x\*]\s*10\b|players\s*[×x\*]\s*10\b|\+\s*10\s*[×x\*]"],
+        "expect_skills_any": [],
+        "expect_reads_any": ["currency.md", "roblox-data"],
+        "must": [r"300", r"(?:CCU|concurrent|users)\s*[×x\*]\s*40", r"(?:players|numPlayers)\s*[×x\*]\s*40"],
+        # stale figure may only appear when explicitly refuted as outdated
+        "must_not": [r"(?i)^(?!.*(outdated|old|stale|no longer|not)).*(players|numPlayers)\s*[×x\*]\s*10\b"],
+    },
+    {
+        "id": "trivial",
+        "why": "Proportionality: a trivial script must not trigger a heavy multi-skill process or essay",
+        "prompt": "Write a Roblox script that makes a part slowly spin.",
+        "expect_skills_any": [],
+        "max_specialists": 1,
+        "max_chars": 2500,
+        "must": [r"(?i)RunService|TweenService|AngularVelocity|HingeConstraint|CFrame"],
+        "must_not": [],
+    },
+    {
+        "id": "ambition",
+        "why": "Creative ambition: 'Roblox can't do X, let's simplify' must trigger boundary-breaker, not agreement",
+        "prompt": "For my Roblox game I wanted players to rewind time for 5 seconds (enemies and projectiles move backwards), "
+                  "but Roblox obviously can't do that, so I'll just make it a cooldown-reset ability instead. Good plan?",
+        "expect_skills_any": ["roblox-boundary-breaker"],
+        "must": [r"(?i)snapshot|record|buffer|history", r"(?i)option|approach"],
+        "must_not": [r"(?i)^\s*(yes|good plan|sounds good)[.!,]"],
     },
     {
         "id": "route-inspect",
@@ -84,13 +105,24 @@ def check(case, r):
         res["skills_ok"] = False
     if case.get("expect_skills_any") and not (set(case["expect_skills_any"]) & inv):
         res["skills_ok"] = False
+    if case.get("expect_reads_any"):
+        seen = " ".join(r["files_read"]) + " " + " ".join(r["skills_invoked"])
+        if not any(x in seen for x in case["expect_reads_any"]):
+            res["skills_ok"] = False
+    specialists = [s for s in r["skills_invoked"] if s and s.split(":")[-1] != "roblox"]
+    if "max_specialists" in case and len(specialists) > case["max_specialists"]:
+        res["skills_ok"] = False
+        res["missing"].append(f"<= {case['max_specialists']} specialists (got {len(specialists)})")
     text = r["final_text"]
+    if "max_chars" in case and len(text) > case["max_chars"]:
+        res["markers_ok"] = False
+        res["missing"].append(f"<= {case['max_chars']} chars (got {len(text)})")
     for pat in case["must"]:
         if not re.search(pat, text):
             res["markers_ok"] = False
             res["missing"].append(pat)
     for pat in case["must_not"]:
-        if re.search(pat, text):
+        if re.search(pat, text, re.M):
             res["markers_ok"] = False
             res["forbidden"].append(pat)
     return res

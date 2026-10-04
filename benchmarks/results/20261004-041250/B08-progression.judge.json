@@ -1,0 +1,98 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Anchors progression in the specific fantasy (cooking, customers, the city) rather than generic numbers",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Progression changes what the player can do or understand, not only stat multipliers",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Does not default to pets/eggs/rebirths/generic currencies without justification (or explicitly challenges them)",
+        "A": "met",
+        "B": "missed"
+      },
+      {
+        "item": "Considers onboarding and the first minutes of play",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Considers economy sources and sinks if a currency is proposed",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Proposes how to test/validate with players rather than claiming it will be fun",
+        "A": "met",
+        "B": "missed"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "The 'Apex route' header and skill-routing text at the start add noise for the user"
+      ],
+      "overengineering": [
+        "The co-op role design and visitor-as-customer ideas come before solo/co-op is decided, though they are flagged as an open question"
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "It recommends ProfileService, which is effectively superseded by ProfileStore; this is dated advice",
+        "A 2x offline earnings game pass doesn't fit a hands-on, active cooking game that has no idle loop defined"
+      ],
+      "slop": [
+        "A Prestige/'Franchise' rebirth that gives permanent Legacy Point bonuses, with no justification beyond resetting the grind",
+        "A daily-login streak with a currency multiplier",
+        "Daily orders and weekly 2x-Cred events taken as genre defaults",
+        "Recipe-fragment drops (collect 3) as a gacha-like collection mechanic",
+        "Five-tier upgrade tracks that are mostly speed, capacity and passive boosts",
+        "A combo meter and patience bars from the generic cooking-game template",
+        "Generic multi-currency stacking (Credits, Parts, Legacy Points, Cred) where Parts has no clear source"
+      ],
+      "overengineering": [
+        "Layering Prestige and Legacy Points on top of three progression layers before the core loop has been validated"
+      ]
+    },
+    "preference": "A",
+    "reason": "A ties progression to the ramen-stand fantasy through new cooking verbs, authored regulars and layout trade-offs, and B does not. A also challenges rebirth, daily-login and gacha defaults, defines sources and sinks for each resource, and gives testable hypotheses, while B mostly falls back on stat-upgrade tiers, prestige and streak hooks and never says how to test with players."
+  },
+  "judge_cost": 0.316908,
+  "apex_score": 1.0,
+  "base_score": 0.333,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "The 'Apex route' header and skill-routing text at the start add noise for the user"
+    ],
+    "overengineering": [
+      "The co-op role design and visitor-as-customer ideas come before solo/co-op is decided, though they are flagged as an open question"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "It recommends ProfileService, which is effectively superseded by ProfileStore; this is dated advice",
+      "A 2x offline earnings game pass doesn't fit a hands-on, active cooking game that has no idle loop defined"
+    ],
+    "slop": [
+      "A Prestige/'Franchise' rebirth that gives permanent Legacy Point bonuses, with no justification beyond resetting the grind",
+      "A daily-login streak with a currency multiplier",
+      "Daily orders and weekly 2x-Cred events taken as genre defaults",
+      "Recipe-fragment drops (collect 3) as a gacha-like collection mechanic",
+      "Five-tier upgrade tracks that are mostly speed, capacity and passive boosts",
+      "A combo meter and patience bars from the generic cooking-game template",
+      "Generic multi-currency stacking (Credits, Parts, Legacy Points, Cred) where Parts has no clear source"
+    ],
+    "overengineering": [
+      "Layering Prestige and Legacy Points on top of three progression layers before the core loop has been validated"
+    ]
+  },
+  "reason": "A ties progression to the ramen-stand fantasy through new cooking verbs, authored regulars and layout trade-offs, and B does not. A also challenges rebirth, daily-login and gacha defaults, defines sources and sinks for each resource, and gives testable hypotheses, while B mostly falls back on stat-upgrade tiers, prestige and streak hooks and never says how to test with players."
+}

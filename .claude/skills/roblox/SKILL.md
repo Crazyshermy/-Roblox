@@ -1,6 +1,6 @@
 ---
 name: roblox
-description: "Roblox Apex router and the entry point for ANY Roblox, Roblox Studio, Luau or Rojo task (code, systems, multiplayer, data, security, performance, testing, debugging, game design, feel, art, levels, UI). It loads only the relevant roblox-* specialists, applies .apex/ project memory, and enforces Apex standards."
+description: "Use for ANY Roblox, Roblox Studio, Luau or Rojo task, including quick questions, bugs, code, systems, multiplayer, data, security, performance, testing, game design, feel, art, levels and UI. This Roblox Apex router loads the relevant roblox-* specialists, applies .apex/ project memory, and enforces verified, current Roblox standards."
 argument-hint: "[what you want to build, fix, design or ask]"
 metadata:
   version: 1.0.0
@@ -50,8 +50,7 @@ Load only what the task needs: **trivial → none**, **standard → 1–2**, **s
 - **A request to cut scope, or a claim that something is impossible** → `roblox-boundary-breaker` before you agree.
 - After **system-scale implementation** → run `roblox-review` before calling it done.
 
-**Routing transparency.** Start every non-trivial response with one line:
-`Apex route: <skills loaded, in order> (<one-clause reason>)`. Trivial answers skip it. If the user asks why a skill was or wasn't chosen, explain from the table above.
+**Routing transparency.** Start every non-trivial response with exactly one short line in the form `*Apex: networking → security*`, which names the loaded specialists in order. Say nothing else about the skill system unless asked. Omit the line if `.apex/project.md` contains `apex_route_line: off`. If asked why a skill was chosen, explain from the table above (or suggest `/roblox-route`).
 
 ## 3. Project memory (`.apex/`)
 If `.apex/` exists in the project root:
@@ -66,7 +65,11 @@ If `.apex/` is absent and the work is substantial, suggest `/roblox-init` once. 
 3. **Evidence.** Grade important claims internally: E5 verified in Studio/runtime · E4 current official docs · E3 established Roblox practice · E2 engineering inference · E1 opinion · E0 unverified. Don't present E0–E2 as fact. Label recommendations as recommendations. Simulated or imagined player reactions never count as real-player evidence.
 4. **Creative intent.** Preserve the requested player experience. Never simplify silently. If you reduce scope, state what the player loses and why, and offer the fuller path (`roblox-boundary-breaker`).
 5. **Anti-slop.** Don't import genre-default mechanics (pets, eggs, rebirths, generic coins, rarity tiers, battle passes, daily rewards) unless they serve *this* game's fantasy. Ask: *why does this belong in this game?*
-6. **Proportionality.** Match rigor to stakes. A one-off prop script doesn't need an architecture review, and a trading system does.
+6. **Proportionality.** Match rigor to stakes, and **respect the requested scope and length**. A one-off prop script doesn't need an architecture review, and a trading system does. If the user asks for something concise, deliver the essentials and list important extras as one-line follow-ups rather than extra code.
+7. **Drop-in code.** Fixed or new code must work with what the user showed: match their style (typing strictness, naming, structure), and don't depend on modules that don't exist unless you include them. Keep behavior they had (e.g. still award XP) unless removing it is the point and you say so.
+
+## Communication
+Write for a Roblox developer, not about this skill system. Don't mention `.apex/` being absent, skill names ("see the data skill"), internal reference file names or E-grades in normal answers. Name the *topic* instead ("see the session-locking section above"). Express certainty in plain words: "per current Roblox docs (Oct 2026)", "verified in Studio", "untested", "my recommendation". Separate *facts* from *recommendations*, and mention what you didn't verify, briefly, once.
 
 ## 5. Working loop
 UNDERSTAND → PLAN → IMPLEMENT → VERIFY → OBSERVE → DEBUG → IMPROVE → RETEST

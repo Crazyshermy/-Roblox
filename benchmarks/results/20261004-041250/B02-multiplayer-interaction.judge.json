@@ -1,0 +1,96 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Server owns crate state and who is holding it; clients send intent (grab/release)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Handles one player leaving, dying or respawning mid-carry",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Addresses network ownership / physics authority of the crate explicitly",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses latency so the carry still feels responsive (client presentation/prediction or Server Authority)",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Handles concurrency (both grab same handle; third player)",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Proposes how to test with multiple clients",
+        "A": "met",
+        "B": "missed"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "The claim that Server Authority mode requires the whole game to be built on BindToSimulation is unverified, though the answer flags it as unverified"
+      ],
+      "slop": [
+        "Meta noise unrelated to the design: the 'Apex route' header, the .apex/ memory remarks and the /roblox-init offer",
+        "The 'Does this fit your pillars?' question is generic design-process filler"
+      ],
+      "overengineering": [
+        "Rate-limiting ProximityPrompt grabs is of limited value, because the engine already gates prompt triggers"
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "It gives network ownership of the crate to one carrier, which lets that client teleport or move the crate freely; after-the-fact plausibility checks only partly reduce this, and it contradicts the stated 'server controls physics' rule",
+        "It says to 'explicitly set it back to the server first' when the network owner leaves, but PlayerRemoving fires after ownership is already in flux, so the advice is misleading",
+        "The skeleton handles ProximityPrompt.Triggered on the client and then fires a separate grab remote with client-supplied crate and slot; Triggered already fires on the server, so this adds a spoofable surface for no benefit",
+        "The state enum comment ('Idle | Held | Carrying') does not match the state machine ('Waiting'), so the answer is internally inconsistent",
+        "Respawn and stale character references after CharacterAdded are not addressed"
+      ],
+      "slop": [
+        "Scaling the walk-speed penalty by crate mass and disabling sprint are genre-default additions with no justification",
+        "The 'Weaken their strength so the two pulls average out' advice is vague and gives no concrete parameters"
+      ],
+      "overengineering": []
+    },
+    "preference": "A",
+    "reason": "A keeps crate physics fully authoritative on the server and is honest about the latency trade-off, and it covers respawn, a third player and multi-client testing (Server & Clients plus the Network Simulator). B gives a client ownership of the crate, which opens an exploit, and it omits testing and some edge cases."
+  },
+  "judge_cost": 0.319976,
+  "apex_score": 1.0,
+  "base_score": 0.583,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "The claim that Server Authority mode requires the whole game to be built on BindToSimulation is unverified, though the answer flags it as unverified"
+    ],
+    "slop": [
+      "Meta noise unrelated to the design: the 'Apex route' header, the .apex/ memory remarks and the /roblox-init offer",
+      "The 'Does this fit your pillars?' question is generic design-process filler"
+    ],
+    "overengineering": [
+      "Rate-limiting ProximityPrompt grabs is of limited value, because the engine already gates prompt triggers"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "It gives network ownership of the crate to one carrier, which lets that client teleport or move the crate freely; after-the-fact plausibility checks only partly reduce this, and it contradicts the stated 'server controls physics' rule",
+      "It says to 'explicitly set it back to the server first' when the network owner leaves, but PlayerRemoving fires after ownership is already in flux, so the advice is misleading",
+      "The skeleton handles ProximityPrompt.Triggered on the client and then fires a separate grab remote with client-supplied crate and slot; Triggered already fires on the server, so this adds a spoofable surface for no benefit",
+      "The state enum comment ('Idle | Held | Carrying') does not match the state machine ('Waiting'), so the answer is internally inconsistent",
+      "Respawn and stale character references after CharacterAdded are not addressed"
+    ],
+    "slop": [
+      "Scaling the walk-speed penalty by crate mass and disabling sprint are genre-default additions with no justification",
+      "The 'Weaken their strength so the two pulls average out' advice is vague and gives no concrete parameters"
+    ],
+    "overengineering": []
+  },
+  "reason": "A keeps crate physics fully authoritative on the server and is honest about the latency trade-off, and it covers respawn, a third player and multi-client testing (Server & Clients plus the Network Simulator). B gives a client ownership of the crate, which opens an exploit, and it omits testing and some edge cases."
+}

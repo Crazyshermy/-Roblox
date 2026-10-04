@@ -1,0 +1,43 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "Design the HUD and inventory UI for my Roblox survival game that must work great on phones as well as PC and controller.",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-ui-ux",
+    "roblox-genres"
+  ],
+  "files_read": [
+    ".claude/skills/roblox-genres/references/systems.md"
+  ],
+  "final_text": "Apex route: roblox-ui-ux \u2192 roblox-genres (HUD/inventory UI for a survival game)\n\nI couldn't save a design doc because file writing is disabled in this session, so the design is below. It is a proposal only. The project is empty (no `.apex/` memory, no code, no Studio connection), so nothing is built or tested. I've assumed a generic multiplayer survival game and listed the questions that would change it at the end.\n\n## Principles\n1. **One interaction model.** Everything is select, then act. Tap, click and the controller A button do the same thing. Drag is a shortcut on PC and touch and is never the only route.\n2. **The world stays visible.** Survival is real-time, so the inventory is a side panel and never pauses the game. A threat indicator stays on top of it.\n3. **Glance, don't read.** Vitals use icon, shape and fill. Numbers show only when critical or when inspected.\n4. **Thumb-safe.** Bottom-left is for the thumbstick and bottom-right is for actions.\n5. **Never use color alone.** Every warning state also changes an icon or shape.\n\n## HUD\n\nAnchor everything to the safe area (`ScreenGui.ScreenInsets = CoreUISafeInsets`).\n\n| Element | PC / console | Phone (landscape) |\n|---|---|---|\n| **Vitals** (health, hunger, thirst, stamina) | Bottom-left stacked bars | Top-left compact row below the Roblox menu, so the thumb zone stays free |\n| **Hotbar** | 6 slots bottom-center, keys 1\u20136 | 4 slots (48 px or larger) plus a Bag button |\n| **Actions** | Mouse and keys | Bottom-right cluster showing only what the equipped item can do |\n| **Interact prompt** | Custom `ProximityPrompt` | Same, tappable at 48 px or larger |\n| **Damage direction** | Arc ring around center | Same, thinner |\n| **Status effects** | Small icons by the vitals | Same, 3 shown plus \"+N\" |\n| **Pickups** | Right-center stack, max 4, merged by item | Same, one line each |\n\n- **Vital states:** Normal, Low (under 30%: filled alert icon plus a notch on the bar) and Critical (under 10%: icon pulse plus edge vignette). The Reduced Motion setting replaces the pulse and vignette with a static border.\n- **Fade:** vitals dim to about 40% when all are above 70% and return on any change. The hotbar never fades.\n- **Left out by default:** minimap, XP bar and currency, because none of them changes a decision.\n- **Glyphs:** switch between key and controller button glyphs through `UserInputService.LastInputTypeChanged`.\n- **Settings:** HUD scale (80\u2013130%) and hotbar position are required on phones.\n\n## Inventory\n\nIt opens as a right-side panel, about 55\u201360% of the width on phone and 40% on PC. It has four parts:\n- **Filter chips:** All, Tools, Food, Mats and so on. LB/RB switch them on controller.\n- **Slot grid:** slots are 56 px or larger on phone, each showing an icon, stack count and durability sliver.\n- **Detail strip:** this replaces tooltips, which don't exist on touch or controller. PC hover previews into the same strip.\n- **Action bar:** one row of large buttons showing only the actions valid for the selected item (Equip, Drop, Split, Move).\n\nCrafting lives inside the inventory, not in a separate menu. \"Craftable now\" is listed first, then \"almost\" recipes that show exactly what is missing. Containers add a second grid. Tapping an item quick-transfers it, and there is a \"Take all\" button.\n\n| Task | Touch | PC | Controller |\n|---|---|---|---|\n| Open / close | Bag button, or tap outside | Tab / I | Y; B always closes |\n| Select | Tap | Click | D-pad with a visible focus ring |\n| Equip / use | Tap again | Double-click | A |\n| Quick-transfer / drop | Action bar | Shift+click | X |\n| Split stack | +/\u2212 stepper with Half and All presets | Ctrl+click | Stepper on triggers |\n| Hotbar assign | Tap a hotbar slot while an item is selected | Drag, or press 1\u20136 | Hold a bumper and press a D-pad direction |\n| Rearrange | Long-press and drag (optional) | Drag | \"Move\" mode: A picks up, D-pad moves, A places |\n\nFor controllers, use `GuiService.SelectedObject` with an explicit selection graph so focus never lands on hidden elements. Restore focus to the last slot when the panel reopens. Route actions through the Input Action System so all three devices bind to one action.\n\n**Capacity:** I recommend slots with per-item stack limits, because they are easier to read on a phone than weight. This is your call.\n\n## Server authority and data flow\n- The server owns the inventory: `slot \u2192 {itemId, count, durability?}` plus a `version` number.\n- The client sends intents only: `Move`, `Split`, `Drop`, `Equip`, `Transfer`, `Craft`. It sends slot indexes and ids, never item data.\n- The server checks slot range, integer counts within the stack, container reach and rate limits. It replies with a delta tagged with the version.\n- The UI updates optimistically so moves feel instant. On rejection it rolls back with a short shake, and a version mismatch triggers a full resync.\n- Inventory replicates to its owner only.\n- Shared containers lock a slot server-side while another player has it in flight.\n- Because this moves value, it needs a security and data pass (dupe-proofing, shutdown saves) before it ships.\n\n## Client structure\n- **Modules:** `InputRouter`, `InventoryStore` (client mirror plus pending ops) and `HudController`.\n- **Components:** `Slot`, `Button`, `Stepper`, `FilterChips` and `FocusRing`, with state flowing one way from store to view.\n- **Performance:** pool the fixed set of slot frames, update only the changed slots, set `Enabled = false` on the closed panel and cap notifications.\n- **Layout:** scale-based sizing, `UIAspectRatioConstraint` on slots, `UIGridLayout` for the grid and `UIScale` for HUD scale. Avoid `TextScaled`.\n\n## Accessibility\n- Icons and shapes carry warnings, not color alone.\n- Reduced Motion setting for pulse, shake and vignette.\n- No flashing faster than 3 Hz.\n- Text on a scrim at 4.5:1 contrast or better.\n- 30\u201340% text expansion room for localization.\n\n## Verification plan (not run)\n1. **Device Emulator:** smallest phone, notched phone, tablet, 1080p desktop and console 10-ft view. Screenshot each with the inventory open and closed.\n2. **Touch only:** equip, split, assign to hotbar, craft and loot a container, with no drag.\n3. **Controller only:** the same flows, with focus never trapped.\n4. **Real phone:** check that thumbs don't cover anything needed.\n5. **Latency:** add 300 ms of lag and check that rollback is clean.\n6. **Exploits:** send invalid slots, negative or huge counts, a container out of range, and spam. The server must reject all of them.\n7. **Lifecycle:** join mid-session, respawn and die, and confirm the state returns correctly.\n\n## Not verified\nI had no Studio or docs access, so check these before building:\n- The current status and API of the Input Action System.\n- `CoreUISafeInsets` behavior on notched devices.\n- `ProximityPrompt` custom-style limits on mobile.\n- Gamepad selection behavior on console.\n\n## Questions that would change the design\n1. Is it PvE only, or PvP with raiding? PvP means opening the bag exposes you, so the rules get stricter.\n2. What happens to items on death: full loot, partial or none?\n3. Slots or weight?\n4. Which vitals exist, and how many recipes will there be?\n5. Do you have an art direction? This is structure only, and style is a separate pass.\n6. Is console a real target?\n\nIf you answer those, I can write this into `docs/` and `.apex/decisions.md`. I can also build the Luau for the HUD and inventory (store, slot pool, input router and the server validators), and I can publish this as a shareable page.",
+  "cost_usd": 0.21410960000000004,
+  "turns": 12,
+  "seconds": 73.6,
+  "stderr_tail": ""
+}

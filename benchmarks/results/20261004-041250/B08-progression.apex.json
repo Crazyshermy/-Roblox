@@ -1,0 +1,45 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "Design a progression system for my Roblox game about running a small night-shift ramen stand in a cyberpunk city.",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-game-design",
+    "roblox-genres"
+  ],
+  "files_read": [
+    ".claude/skills/roblox-game-design/references/anti-slop.md",
+    ".claude/skills/roblox-game-design/references/economy.md",
+    ".claude/skills/roblox-genres/references/systems.md"
+  ],
+  "final_text": "Apex route: roblox-game-design \u2192 roblox-genres (new progression system; the game is part tycoon, part simulation)\n\nI found no `.apex/` memory in this repo, so I assumed a core fantasy and pillars below. Please correct them if they're off. This is a design proposal, not a tested one, and nothing in it is verified against real players.\n\n## Assumed fantasy and pillars\n**Fantasy:** \"I run a tiny ramen stand that strangers in a neon city stumble into at 3 a.m., and over time it becomes *my* place.\"\n1. **Craft under pressure.** Cooking is a skill, not a timer.\n2. **The city comes to the counter.** Customers are people with stories, not a stream of NPCs.\n3. **The stand is mine.** Choices show up physically on the stand.\n\n## Core idea: progress in what you can do and who you know, not in multipliers\nThree tracks advance independently. None is a stat ladder.\n\n**1. Craft (new verbs).** Mastery unlocks techniques, not +10% speed.\n- Hand-pulled noodles: a timing minigame that rewards texture.\n- Broth layering: you manage a simmer you can't leave unattended.\n- Searing and flamb\u00e9: risky, high-reward.\n- Fermenting, which takes real nights to mature. This gives players a reason to come back tomorrow.\n\n**2. Regulars (relationships).** About 8\u201312 named, authored regulars, each with a taste, a habit and a story, such as a burnt-out courier, a corp auditor in disguise, or a street-doc.\n- Serving them well builds Standing, which isn't spendable.\n- Standing unlocks their story beats, their secret recipes, favors (a shortcut, a tip-off, a discount from their supplier) and eventually their effect on the stand's fate.\n- Nothing grants Standing automatically. You earn it by remembering what they like.\n\n**3. The stand (space).** A modular cart that grows into a stall and then a small shopfront.\n- Slots are limited and trade off against each other: a second burner, a fermentation cabinet, a bar stool row, a neon sign that draws a certain crowd.\n- You can't have everything, so your layout becomes your identity.\n\n## Structure\n- **Night = session** (about 6\u20138 real minutes, compressed 10pm\u2192dawn). Each night ends with a ledger scene recapping who came, what went wrong and what the city said about you. This is the screenshot moment.\n- **Districts = zones.** A new district is a new pitch: a different clientele, different ingredient prices and different hazards (rain, gang turf, corp inspection). It's gated by Standing and reputation, so progression is horizontal as well as upward.\n- **Onboarding:** the first customer arrives in under 10 seconds and you cook one bowl. Nights 1\u20133 introduce one verb each. Menus come later.\n\n## Currency and economy\nThree resources, each with a distinct decision:\n| | Purpose | Sources | Sinks |\n|---|---|---|---|\n| **Scrip** | Money for upgrades and risk | Bowls sold, tips | Pitch fee each night, upgrades, restocking |\n| **Stock** | Perishable ingredients | Pre-shift market run (a small choice: cheap and bland vs. pricey and special) | Spoils overnight, so it's a built-in repeatable sink |\n| **Standing** | Per-regular relationship | Serving their order well | Not spent; it gates content |\n\n- **Day-30 sink:** the nightly pitch fee scales with district, and rare or black-market ingredients, shopfront upgrades and cosmetic signage are the long-term goals. Slots are limited, so wealth buys *choices* rather than a longer list of owned things.\n- **Black-market ingredients differ in kind, not rarity.** For example, synthetic spice might make a customer talk too much or turn the corp auditor suspicious. There are no rarity tiers.\n- Prices and rates belong in config. Every faucet and sink should emit analytics events so you can see the real flow.\n- I haven't simulated hour-1 / day-1 / day-7 / day-30 numbers. That needs a pass with real values once the menu is defined.\n\n## Failure and recovery\nA bad night costs some scrip and stock plus a Standing dip with the regulars you failed. It never wipes progress, and you can't fall below a district's floor. Failure is informative: the ledger names the cause, such as a boiled-over broth or a walked-out regular. Burnt bowls and bad nights also feed story beats (the auditor laughs).\n\n## Multiplayer\n- Friends co-staff the same stand in roles: cook, noodle-puller, runner, front-of-house. Customer flow scales with staff count so a solo player works too.\n- A visitor can sit as a customer at a friend's stand and leave a tip or review.\n- Guard against one player carrying the stand while others idle. Give each role its own skill expression.\n\n## Anti-slop verdicts\n- **Rebirth:** removed. A new district is the \"reset\", and it brings new rules and customers.\n- **Daily login rewards:** removed. Rotating night events (blackout, corp gala, storm) are content players want to be there for, not a streak that punishes absence.\n- **Gacha and eggs:** removed. Choice and sourcing replace randomness.\n- **Generic coins and gems:** transformed into scrip, stock and Standing (above).\n- **Pets:** open. A stray cat or drone that reacts to spoiled stock or approaching trouble would be justified because its *behavior* is the gameplay. Otherwise cut.\n- **Battle pass:** not recommended unless you can sustain content cadence.\n- **Monetization (if any):** cosmetic stand skins, signs and avatar items. No paid random items and no paid skipping of fermentation.\n\n## Hypotheses to test with real players\n- *If* cooking is skill-based, players should replay nights to improve a bowl, not just grind scrip. If they optimize one dominant recipe, add regular preferences that punish repetition.\n- *If* regulars are memorable, players will name them in feedback. If they don't, the stories are too thin.\n- *If* slot trade-offs work, layouts will diverge across players. If everyone builds the same stand, one option is dominant.\n- *If* fermentation drives return visits, day-2 return should be higher than for players without it. Compare against a control.\n\n## Risks\n- Authored regulars are expensive to produce. Start with 3 and prove the pattern.\n- Cooking verbs on mobile need touch-friendly inputs and careful tuning.\n- Co-op needs role design that keeps solo play from feeling empty.\n\n## Implementation flags\nScrip, stock and Standing are value, so server authority, validation and data saves apply (`roblox-security` and `roblox-data`). I'd save compact IDs and relationship flags rather than instances.\n\n## Questions that would change the design\n1. Is it solo-first or co-op-first?\n2. How long should one night run?\n3. Is the tone cozy, noir or dystopian-satirical?\n4. Any monetization plans?\n\nI can write this up as a shareable page or record the settled parts in `.apex/decisions.md`. Say which, and I'll do it once you've answered the questions above. `/roblox-init` would create the project memory.",
+  "cost_usd": 0.14089999999999997,
+  "turns": 11,
+  "seconds": 42.2,
+  "stderr_tail": ""
+}

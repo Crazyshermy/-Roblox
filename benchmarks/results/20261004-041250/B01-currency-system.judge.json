@@ -1,0 +1,96 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Server is the only writer of Gold; client never sends amounts or prices",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Validates remote arguments (types, NaN/inf, bounds) and rate-limits shop requests",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Avoids yields between balance check and deduction (atomic spend)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Persistence handled safely (UpdateAsync or session-locked profile; load-before-play; BindToClose)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Does not treat leaderstats as source of truth",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Kill rewards awarded by server-side kill attribution, not a client 'I killed X' remote",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "BindToClose spawns the saves and then waits a fixed 3 seconds instead of waiting for them to finish, while retry backoff can run past 15 seconds, so shutdown saves can be lost",
+        "A held session lock cancels the load right away and kicks the player, with no wait for the lock to clear, so a normal quick rejoin or server hop gets kicked",
+        "If the player leaves while the load is still yielding, sessions[player] is set afterwards and the lock is never released (it only expires when stale)",
+        "There is no itemId length cap (a minor gap)"
+      ],
+      "slop": [
+        "'Add an anomaly check' (flag players earning more than X gold per minute) is generic advice"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Decision 7 says removing the session first means a late reward 'can't be lost mid-save', but it actually means late rewards are rejected and dropped",
+        "It cites 'references/currency.md' and 'E2' evidence levels that do not exist for the user"
+      ],
+      "slop": [
+        "An internal 'Apex route' preamble and '.apex/ memory' meta-commentary that mean nothing to the user",
+        "'Not covered' has generic advice like a faucet/sink table and anti-farm rules"
+      ],
+      "overengineering": [
+        "A token-bucket rate limiter, schema versioning, sanitize and a changed BindableEvent add bulk to an answer that was asked to be concise",
+        "Remotes are created at runtime and there are two RemoteEvents (BuyRequest and BuyResult) where one RemoteFunction would do"
+      ]
+    },
+    "preference": "B",
+    "reason": "Both answers meet the core security rubric, but B's persistence is clearly sturdier: it waits for a held lock to clear on rejoin, its BindToClose waits for saves to finish, it sanitizes loaded data and it handles the player leaving mid-load, which outweighs B's meta-noise and extra length compared with A's concise but flawed shutdown and lock handling."
+  },
+  "judge_cost": 0.37605999999999995,
+  "apex_score": 1.0,
+  "base_score": 0.917,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "Decision 7 says removing the session first means a late reward 'can't be lost mid-save', but it actually means late rewards are rejected and dropped",
+      "It cites 'references/currency.md' and 'E2' evidence levels that do not exist for the user"
+    ],
+    "slop": [
+      "An internal 'Apex route' preamble and '.apex/ memory' meta-commentary that mean nothing to the user",
+      "'Not covered' has generic advice like a faucet/sink table and anti-farm rules"
+    ],
+    "overengineering": [
+      "A token-bucket rate limiter, schema versioning, sanitize and a changed BindableEvent add bulk to an answer that was asked to be concise",
+      "Remotes are created at runtime and there are two RemoteEvents (BuyRequest and BuyResult) where one RemoteFunction would do"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "BindToClose spawns the saves and then waits a fixed 3 seconds instead of waiting for them to finish, while retry backoff can run past 15 seconds, so shutdown saves can be lost",
+      "A held session lock cancels the load right away and kicks the player, with no wait for the lock to clear, so a normal quick rejoin or server hop gets kicked",
+      "If the player leaves while the load is still yielding, sessions[player] is set afterwards and the lock is never released (it only expires when stale)",
+      "There is no itemId length cap (a minor gap)"
+    ],
+    "slop": [
+      "'Add an anomaly check' (flag players earning more than X gold per minute) is generic advice"
+    ],
+    "overengineering": []
+  },
+  "reason": "Both answers meet the core security rubric, but B's persistence is clearly sturdier: it waits for a held lock to clear on rejoin, its BindToClose waits for saves to finish, it sanitizes loaded data and it handles the player leaving mid-load, which outweighs B's meta-noise and extra length compared with A's concise but flawed shutdown and lock handling."
+}

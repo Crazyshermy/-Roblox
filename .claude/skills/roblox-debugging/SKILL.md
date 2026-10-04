@@ -1,6 +1,6 @@
 ---
 name: roblox-debugging
-description: "Systematic Roblox debugging: reproduce, read Output, separate client and server, test competing hypotheses, and the common bug classes (replication timing, streaming nil, stale respawn refs, deferred signals, races, DataStore throttling, ownership, works-in-Studio-not-live)."
+description: "Use for ANY Roblox or Luau error message, bug, crash or unexpected behavior (\"attempt to index nil\", works in Studio but not live, only sometimes, after respawn). Systematic diagnosis with competing hypotheses, plus the common bug classes: replication timing, streaming nil, stale respawn refs, deferred signals, races, DataStore throttling, ownership."
 ---
 
 # Roblox debugging

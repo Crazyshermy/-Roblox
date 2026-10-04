@@ -21,8 +21,9 @@ description: "Game feel and juice: input response, anticipation, impact, hitstop
 Timing values are **conventions (E3), not laws**: tune by feel and playtest, and record chosen values in config.
 
 ## Latency hiding (server authority without mush)
-- Start all *presentation* locally on input; send intent; server validates and applies; on confirm, play **confirmation** feedback (damage number, kill effect); on reject, gracefully cancel (fade, not pop).
-- Put the network delay in the **anticipation** (wind-up, fuse), not in the impact.
+- **Predict presentation, confirm consequences.** On input, the client immediately plays the swing (animation, whoosh, camera). When the *client's own* hit check (same rules as the server: range, arc, timing marker) sees a hit, it plays the **impact layer locally right away**: hitstop, impact sound, sparks and the target's flinch. Only **consequences** wait for the server: damage numbers, health change, kill feed, loot. If the server rejects, soften it (no damage number, quick fade) and don't pop anything back.
+- **Don't double-play animations.** An animation the client plays on its *own* character's Animator replicates to other clients automatically. Don't have the server tell other clients to play it as well. Broadcast only effects that don't replicate (custom VFX and sounds), and skip the attacker, who already played them.
+- Put unavoidable network delay into the **anticipation** (wind-up, fuse), never between the hit and the impact feedback.
 - With Server Authority mode: effects read simulated state in `RenderStepped` and must undo mispredictions (see `roblox-networking`).
 
 ## Channel coverage check

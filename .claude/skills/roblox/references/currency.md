@@ -8,6 +8,7 @@ Verified against `Roblox/creator-docs` (snapshot 2026-10-02) unless marked other
 3. The Input Action System is fully released and default player scripts are migrating to it (§Input).
 4. `wait()`, `spawn()` and `delay()` are legacy. Use the `task` library.
 5. Legacy chat (`Chatted` and the Lua chat system) has been superseded by `TextChatService`.
+6. `Lighting.Technology` (Future/ShadowMap/Voxel) is **deprecated**. Use `Lighting.LightingStyle` (Realistic/Soft) plus `Lighting.PrioritizeLightingQuality` (E4, `Lighting.yaml`).
 
 ## Networking and authority
 - **Server Authority model** (E4, `projects/server-authority/index.md`): `Workspace.AuthorityMode = Enum.AuthorityMode.Server`. Setting it auto-sets `NextGenerationReplication`, `PlayerScriptsUseInputActionSystem`, `SignalBehavior = Deferred`, `UseFixedSimulation` and `StreamingEnabled`.
@@ -19,7 +20,7 @@ Verified against `Roblox/creator-docs` (snapshot 2026-10-02) unless marked other
   - `RunService:SetPredictionMode()` controls per-instance prediction. Instance "stitching" lets `Instance.new`, `Clone` and `fromExisting` run inside bound functions to create instances predictively.
   - Debugging: the Server Authority visualizer (Ctrl/⌘+Shift+F6) shows prediction success rate, input accept rate and input drop reasons.
   - It is a new system with active DevForum bug reports (2026-H2). Treat edge-case behavior as E2 until probed.
-- **RemoteEvent throttle** (E4, `RemoteEvent.yaml`): about **500 requests/s per client**, shared across all remotes of the same type. A throttled `RemoteEvent` delays (queues) excess calls in order.
+- **RemoteEvent throttle** (E4, `RemoteEvent.yaml`): about **500 requests/s per client**, shared across **all** remotes of the same type. It is not per remote. A throttled `RemoteEvent` delays (queues) excess calls in order.
 - **UnreliableRemoteEvent** (E4): payloads over **1,000 bytes** are dropped. No delivery or ordering guarantee, and no ordering relative to RemoteEvents. Excess calls are dropped, not queued. Messages arriving with no handler connected are discarded.
 - RemoteEvents queue messages when no handler is connected. The queue is bounded, and overflow logs a `Remote event invocation` error.
 - Remote events are **not** guaranteed to be ordered against property and attribute replication.

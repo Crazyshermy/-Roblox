@@ -16,8 +16,8 @@ Classify each finding by required capability:
 1. **Shape:** check `typeof` for every argument. Reject extra or missing args, `NaN` (`x ~= x`), `±inf` (`math.abs(x) == math.huge`), non-integers where integers are expected, absurd string lengths, and tables when you expected scalars. If you do accept tables, bound their depth and size and validate every key. Non-string keys and mixed tables don't survive remote serialization intact.
 2. **Identity:** the first parameter (`player`) is the only trusted identity. Never accept a player, userId or "owner" argument from the client as authority.
 3. **Authority:** re-derive everything from server state. The client says *what it wants to do*, never *what happened*. "Buy item X" is fine, and the server decides price, affordability and grant. "I hit Y for 50 damage" is not fine, and the server decides the hit and the damage.
-4. **Preconditions:** check that the player is alive, in range (server positions, with tolerance for latency), off cooldown (server clock), owns the item, is in the right game state and round, and that the target exists and is valid (`IsDescendantOf(workspace)`, not destroyed, not another player's private object).
-5. **Rate:** apply a per-player, per-action budget (token bucket). Remember that the engine throttle (~500/s per client per remote type) is *not* a game-logic rate limit.
+4. **Preconditions:** check that the player **owns, unlocked or equipped** the ability, tool or item named, and that they are alive, in range (server positions, with tolerance for latency), off cooldown (server clock), owns the item, is in the right game state and round, and that the target exists and is valid (`IsDescendantOf(workspace)`, not destroyed, not another player's private object).
+5. **Rate:** apply a per-player, per-action budget (token bucket). The engine throttle is about 500 calls/s **per client, shared across all RemoteEvents together** (not per remote; E4). It is a network safeguard, not a game-logic rate limit.
 6. **Atomicity:** do check-and-mutate without yielding between the check and the write. A yield (DataStore call, `task.wait`, `WaitForChild`) between "has 100 gold" and "subtract 100" is a duplication window. Use a per-player lock or busy flag for multi-step operations.
 7. **Failure:** reject quietly, never error on bad input, and log anomalies server-side (a counter, not output spam). Don't kick on the first anomaly, because lag produces false positives.
 8. **RemoteFunctions:** never `InvokeClient` without a timeout or a design that tolerates a client that never returns, because a client can hang the server thread forever. Prefer RemoteEvents in both directions.
@@ -26,7 +26,7 @@ Classify each finding by required capability:
 - **One writer.** A single server module owns each value type, and all grants and spends go through it. Grep for any other write path. Flag every `leaderstats` value written from multiple places, and never treat a `leaderstats` value as the source of truth.
 - **Duplication vectors to check:** a yield between check and write; rejoining or server-hopping during an unsaved trade; two servers holding the same profile (no session lock → see `roblox-data`); replaying a reward remote; claiming the same quest twice in the same frame; dropping an item and leaving before the drop is saved; trading while a purchase is pending.
 - **Trades:** lock both inventories, take server-side snapshots, have both parties confirm the *final* offer (any change resets confirmation), re-validate ownership at commit, commit atomically, and keep an audit log. Cross-server trades need a durable intermediary (see `roblox-data`).
-- **Purchases:** `MarketplaceService.ProcessReceipt` is idempotent on `PurchaseId`. Return `PurchaseGranted` **only after** the grant is durably saved, otherwise return `NotProcessedYet`. Record processed IDs in the player's data. Paid random items must respect `PolicyService` (`ArePaidRandomItemsRestricted`).
+- **Purchases:** `MarketplaceService.ProcessReceipt` is idempotent on `PurchaseId`. Return `PurchaseGranted` **only after** the grant is durably saved, otherwise return `NotProcessedYet`. Record processed IDs in the player's data. Paid random items must respect `PolicyService:GetPolicyInfoForPlayerAsync()` (`ArePaidRandomItemsRestricted`).
 - **Economy abuse beyond exploits:** look for farmable AFK loops, alt-account funneling, arbitrage between shops, reward stacking, and negative-price or overflow edges. A design that pays for repetition invites bots.
 
 ## Movement and physics
@@ -38,6 +38,9 @@ Classify each finding by required capability:
 - **Free models and Creator Store assets:** before insertion, scan for scripts, `require(<number>)`, `getfenv`/`setfenv`, `loadstring`, string-obfuscated code (`\x`, long `string.char` chains, `string.reverse` tricks), `MarketplaceService:PromptPurchase` calls, `HttpService`, and hidden `Script`s nested in meshes or parts. Insert into an empty place first. Script capabilities (`Sandboxed`, experimental) can contain untrusted models.
 - **Text:** user-authored text shown to others (signs, names, pet names, notes) must be filtered via `TextService:FilterStringAsync`. Filter per recipient context where required. `TextChatService` filters chat itself.
 - Never put secrets in replicated locations or client scripts. Use `HttpService:GetSecret` on the server.
+
+## Reviewing existing code
+Report findings **ranked by severity** (critical → low). For each, give the exploit in one line (which call, which args, what the attacker gains) and the capability class (UI-reachable, modified client, or theoretical). Then give a corrected handler that is a drop-in replacement for the user's code and keeps its intended behavior.
 
 ## Verify
 - Write the **attack list** for the feature: for each remote, give 3–6 malicious calls and the expected server response. Use `references/fuzz-checklist.md`.

@@ -1,0 +1,74 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Flags client-supplied damage as critical",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing cooldown/rate limit (XP farming via spam)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing range / line-of-sight / target validity checks",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing type validation of abilityName/target (nil char, non-Instance target)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags that ability ownership/unlock is not checked",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Provides a corrected server-authoritative version or clear fix list",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "'*Apex: security \u2192 networking*' header is unexplained noise",
+        "Item 2 calls negative damage 'the same bug as friendly-fire healing and self-heal', which is a confusing comparison"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "'Log or kick players who repeatedly send invalid arguments' is generic advice"
+      ],
+      "overengineering": []
+    },
+    "preference": "B",
+    "reason": "Both find the core flaws and give similar hardened code, but B ranks issues by severity and flags the missing ability ownership/unlock check, while A mentions it only in passing and has a bit more padding."
+  },
+  "judge_cost": 0.0781332,
+  "apex_score": 0.917,
+  "base_score": 1.0,
+  "winner": "baseline",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "'*Apex: security \u2192 networking*' header is unexplained noise",
+      "Item 2 calls negative damage 'the same bug as friendly-fire healing and self-heal', which is a confusing comparison"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "'Log or kick players who repeatedly send invalid arguments' is generic advice"
+    ],
+    "overengineering": []
+  },
+  "reason": "Both find the core flaws and give similar hardened code, but B ranks issues by severity and flags the missing ability ownership/unlock check, while A mentions it only in passing and has a bit more padding."
+}

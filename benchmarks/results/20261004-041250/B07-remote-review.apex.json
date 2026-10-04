@@ -1,0 +1,39 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "Review this Roblox remote handler for exploitability:\n```lua\nlocal Remote = game.ReplicatedStorage.UseAbility\nRemote.OnServerEvent:Connect(function(player, abilityName, target, damage)\n  local char = player.Character\n  if target and target:FindFirstChild('Humanoid') then\n    target.Humanoid:TakeDamage(damage)\n  end\n  player.leaderstats.XP.Value += 10\nend)\n```",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox-security"
+  ],
+  "files_read": [],
+  "final_text": "# Exploitability review: `UseAbility` handler\n\n**Verdict: critically exploitable.** The server treats the client's claim of what happened as fact. No Studio playtest was run and no `.apex/` memory exists in this repo, so every finding below comes from reading the code. The exact behavior of `TakeDamage` with negative, NaN or infinite values is not verified. Check it in Studio before relying on my description of it.\n\n## Findings\n\n| # | Severity | Issue | Attacker capability |\n|---|---|---|---|\n| 1 | **Critical** | **Client-chosen damage.** `damage` is passed straight to `TakeDamage`, with no `typeof` check and no `NaN`, `inf` or range check. An exploiter can fire `UseAbility:FireServer(\"x\", victim, math.huge)` to one-shot anyone. Negative, NaN and huge values may also heal or corrupt `Health`. | Modified client |\n| 2 | **Critical** | **Unlimited XP.** `+= 10` runs on every call, even when nothing was hit, and `abilityName` is ignored. A loop of `FireServer()` calls farms XP at the engine throttle rate (about 500/s). | Modified client |\n| 3 | **High** | **Unvalidated target.** `target` can be any replicated Instance with a `Humanoid` child. That includes NPCs, bosses, shop dummies, dead players and the caller. There is no range, line-of-sight, team or alive check, so a player can kill anyone from across the map. | Modified client |\n| 4 | **High** | **No ability authority.** The server never checks that `abilityName` exists, that the player owns or unlocked it, or that it is off cooldown. It also never checks that the player is alive (`char` is read and never used) or in a valid game state. | Modified client |\n| 5 | **Medium** | **No `typeof` checks.** If `target` is a string or number, `target:FindFirstChild` throws and the handler aborts. That is noisy but not exploitable. A table or `nil` `abilityName` slips through because nothing reads it. | Modified client |\n| 6 | **Medium** | **`leaderstats` as source of truth.** `player.leaderstats.XP` errors if the folder isn't there yet, for example on an early fire or mid-respawn. Writing progression straight into `leaderstats` also makes it hard to keep one writer. | Modified client |\n| 7 | **Low** | **No rate limit and no anomaly logging.** This amplifies #1 and #2. | Modified client |\n\n## Root cause\nThe client sends *outcomes* (`target`, `damage`) when it should send only an *intent* (`abilityName`, and at most an aim hint). The server should decide whether the hit lands, how much damage it does and whether XP is earned.\n\n## Attack list (what the server should do for each)\n1. `FireServer(\"Fireball\", victim, math.huge)` \u2192 reject. Damage must come from a server ability table.\n2. `FireServer(\"Fireball\", victim, -1e9)` \u2192 ignore the client value entirely.\n3. `FireServer(\"Fireball\", victim, 0/0)` \u2192 reject on shape.\n4. `FireServer(\"Fireball\", farAwayNpc, 10)` \u2192 reject on range.\n5. `FireServer()` repeated 500 times a second \u2192 rate-limit and give no XP.\n6. `FireServer(\"Nonexistent\", {}, \"x\")` \u2192 reject on shape, with no error.\n7. Fire it while dead or on cooldown \u2192 reject.\n\n## Hardened version\n\n```lua\n--!strict\nlocal Players = game:GetService(\"Players\")\nlocal Remote = game.ReplicatedStorage.UseAbility\n\n-- Server-owned definitions: the client never supplies damage.\nlocal ABILITIES = {\n\tFireball = { damage = 20, range = 60, cooldown = 1.5 },\n}\n\nlocal lastUse: { [Player]: { [string]: number } } = {}\nPlayers.PlayerRemoving:Connect(function(p) lastUse[p] = nil end)\n\nlocal function isValidTarget(attackerChar: Model, targetChar: Instance, range: number): Humanoid?\n\tif not targetChar:IsA(\"Model\") or not targetChar:IsDescendantOf(workspace) then return nil end\n\tlocal hum = targetChar:FindFirstChildOfClass(\"Humanoid\")\n\tlocal hrp = targetChar:FindFirstChild(\"HumanoidRootPart\")\n\tlocal myHrp = attackerChar:FindFirstChild(\"HumanoidRootPart\")\n\tif not (hum and hrp and myHrp) or hum.Health <= 0 or targetChar == attackerChar then return nil end\n\t-- Add latency tolerance; also add team/PvP rules and a line-of-sight raycast per game design.\n\tif ((hrp :: BasePart).Position - (myHrp :: BasePart).Position).Magnitude > range + 8 then return nil end\n\treturn hum\nend\n\nRemote.OnServerEvent:Connect(function(player: Player, abilityName: unknown, target: unknown)\n\tif typeof(abilityName) ~= \"string\" or typeof(target) ~= \"Instance\" then return end\n\tlocal def = ABILITIES[abilityName]\n\tif not def then return end\n\n\tlocal char = player.Character\n\tlocal myHum = char and char:FindFirstChildOfClass(\"Humanoid\")\n\tif not (char and myHum) or myHum.Health <= 0 then return end\n\n\tlocal now = os.clock()\n\tlocal uses = lastUse[player] or {}\n\tlastUse[player] = uses\n\tif now - (uses[abilityName] or 0) < def.cooldown then return end\n\tuses[abilityName] = now\n\n\tlocal hum = isValidTarget(char, target, def.range)\n\tif not hum then return end\n\n\thum:TakeDamage(def.damage)\n\t-- Award XP via a single server-side progression module, only for a real hit,\n\t-- e.g. Progression.AddXP(player, 10). Don't write leaderstats from here.\nend)\n```\n\n## Remaining design decisions\n- **XP:** award it for kills or valid hits through one progression module, and treat `leaderstats` as a display mirror only. Cap or diminish XP from farmable sources such as repeatedly hitting the same dummy.\n- **Hit validation:** the range check above is the minimum. Fast or precise combat may need a server raycast or hitbox. This depends on the game's combat design, which isn't in the repo.\n- **PvP rules:** add team, safe-zone and friendly-fire checks as the game requires.\n- **Testing:** once Studio is connected, run the attack list above in a playtest from the client context. Then confirm there is no health change and no XP change on each rejected call.",
+  "cost_usd": 0.090839,
+  "turns": 4,
+  "seconds": 27.2,
+  "stderr_tail": ""
+}
