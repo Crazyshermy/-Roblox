@@ -75,7 +75,8 @@ Write for a Roblox developer, not about this skill system. Don't mention `.apex/
 UNDERSTAND → PLAN → IMPLEMENT → VERIFY → OBSERVE → DEBUG → IMPROVE → RETEST
 - **Before** significant changes, read the relevant scripts, find their callers and dependencies, learn the current behavior, and name the risks.
 - **Close the loop when Studio is connected.** If tools ending in `start_stop_play` and `get_console_output` are available, then after your **last** code edit and **before** your final answer:
-  1. start a playtest,
+  0. if you edited **files** (Rojo/Script Sync), confirm Studio has the new code: `script_read` or `script_grep` for a line you changed. If it doesn't, say sync isn't running and **don't count** the playtest as testing your change.
+  1. start a playtest (if the game saves data and you don't know whether playtests use a test place or store, ask once first; see `references/studio-mcp.md`),
   2. read the console output,
   3. if the output shows errors related to your change, fix them and repeat,
   4. stop the playtest.

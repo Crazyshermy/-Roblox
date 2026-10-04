@@ -11,13 +11,24 @@ Playtest console output is derived from:
   2. a small set of known runtime-error patterns (e.g. top-level `.Character.Humanoid` in a client script).
 `execute_luau` and `screen_capture` honestly report that they are not supported.
 
-Env: STUDIO_SIM_ROOT (project dir with default.project.json), LUAU_COMPILE (optional path).
+Env: STUDIO_SIM_ROOT (project dir with default.project.json), LUAU_COMPILE (optional path),
+     STUDIO_SIM_UNSYNCED=1: Studio keeps the code it had at startup (simulates Rojo/Script Sync NOT
+     running), so file edits never reach "Studio". Used to test that the agent notices stale code.
 """
-import json, os, re, subprocess, sys
+import json, os, re, subprocess, sys, tempfile
 
 ROOT = os.environ.get("STUDIO_SIM_ROOT", os.getcwd())
 LUAU_COMPILE = os.environ.get("LUAU_COMPILE")
 STATE = {"mode": "Edit", "console": [], "plays": 0}
+UNSYNCED = os.environ.get("STUDIO_SIM_UNSYNCED") == "1"
+SNAPSHOT = {}  # file path -> source at startup (only used when UNSYNCED)
+
+
+def source(fp):
+    """What Studio currently has for this script."""
+    if UNSYNCED and fp in SNAPSHOT:
+        return SNAPSHOT[fp]
+    return open(fp, encoding="utf-8").read()
 SID = "sim-studio-1"
 
 TOOLS = [
@@ -80,9 +91,12 @@ def tree_lines(query=""):
 def playtest_console():
     out = ["[Studio] Playtest started (1 player: Player1)."]
     for dm, (fp, cls) in scripts().items():
-        src = open(fp, encoding="utf-8").read()
+        src = source(fp)
         if LUAU_COMPILE:
-            r = subprocess.run([LUAU_COMPILE, fp], capture_output=True, text=True)
+            with tempfile.NamedTemporaryFile("w", suffix=".luau", delete=False) as tf:
+                tf.write(src)
+            r = subprocess.run([LUAU_COMPILE, tf.name], capture_output=True, text=True)
+            os.unlink(tf.name)
             if r.returncode != 0:
                 m = re.search(r"\((\d+),\d+\): (SyntaxError: .*)", r.stdout + r.stderr)
                 out.append(f"[Error] {dm}:{m.group(1) if m else '?'}: {m.group(2) if m else 'syntax error'}")
@@ -113,11 +127,11 @@ def call(name, args):
         hit = s.get(p) or next((v for k, v in s.items() if k.endswith(p) or v[0].endswith(p)), None)
         if not hit:
             return f"Script not found: {p}"
-        return f"-- {p} ({hit[1]}), synced from {os.path.relpath(hit[0], ROOT)}\n" + open(hit[0], encoding="utf-8").read()
+        return f"-- {p} ({hit[1]}) as currently loaded in Studio (Rojo file: {os.path.relpath(hit[0], ROOT)})\n" + source(hit[0])
     if name == "script_grep":
         pat, res = args.get("pattern", ""), []
         for dm, (fp, _) in scripts().items():
-            for i, line in enumerate(open(fp, encoding="utf-8").read().splitlines(), 1):
+            for i, line in enumerate(source(fp).splitlines(), 1):
                 if re.search(pat, line) or pat in line:
                     res.append(f"{dm}:{i}: {line.strip()}")
         return "\n".join(res[:50]) or "(no matches)"
@@ -140,6 +154,9 @@ def call(name, args):
 
 
 def main():
+    if UNSYNCED:
+        for _, (fp, _) in scripts().items():
+            SNAPSHOT[fp] = open(fp, encoding="utf-8").read()
     for line in sys.stdin:
         try:
             msg = json.loads(line)

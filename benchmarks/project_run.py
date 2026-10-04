@@ -112,11 +112,12 @@ def process_metrics(calls, proj, luau_compile):
     return m
 
 
-def run_arm(task, arm, model, luau_compile):
+def run_arm(task, arm, model, luau_compile, unsynced=False):
     proj = make_project(arm)
     cfg = tempfile.mkdtemp(prefix="apex-cfg-")
     mcp = {"mcpServers": {"roblox_studio": {"command": "python3", "args": [SIM],
-                                            "env": {"STUDIO_SIM_ROOT": proj, "LUAU_COMPILE": luau_compile}}}}
+                                            "env": {"STUDIO_SIM_ROOT": proj, "LUAU_COMPILE": luau_compile,
+                                                    "STUDIO_SIM_UNSYNCED": "1" if unsynced else "0"}}}}
     r = run_in(proj, task["prompt"], model, 40, 1500, allowed=EDIT[0], disallowed=EDIT[1],
                extra_args=["--mcp-config", json.dumps(mcp), "--strict-mcp-config"], env={"CLAUDE_CONFIG_DIR": cfg})
     r["diff"] = subprocess.run(["git", "-C", proj, "diff", "--", "src", "default.project.json"], capture_output=True, text=True).stdout
@@ -159,13 +160,14 @@ def main():
     ap.add_argument("--judge-model", default="opus")
     ap.add_argument("--only", default="")
     ap.add_argument("--jobs", type=int, default=8)
+    ap.add_argument("--sim-unsynced", action="store_true", help="Studio never receives file edits (Rojo/Script Sync not running)")
     a = ap.parse_args()
     tasks = [t for t in TASKS if not a.only or any(t["id"].startswith(x) for x in a.only.split(","))]
-    out = os.path.join(HERE, "results", "project-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+    out = os.path.join(HERE, "results", ("project-unsynced-" if a.sim_unsynced else "project-") + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
     os.makedirs(out, exist_ok=True)
     runs = {}
     with cf.ThreadPoolExecutor(a.jobs) as ex:
-        fut = {ex.submit(run_arm, t, arm, a.model, a.luau_compile): (t["id"], arm) for t in tasks for arm in ("baseline", "apex")}
+        fut = {ex.submit(run_arm, t, arm, a.model, a.luau_compile, a.sim_unsynced): (t["id"], arm) for t in tasks for arm in ("baseline", "apex")}
         for f in cf.as_completed(fut):
             k = fut[f]
             runs[k] = f.result()
