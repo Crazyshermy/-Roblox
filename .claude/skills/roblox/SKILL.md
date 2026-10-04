@@ -3,10 +3,10 @@ name: roblox
 description: "Use for ANY Roblox, Roblox Studio, Luau or Rojo task, including quick questions, bugs, code, systems, multiplayer, data, security, performance, testing, game design, feel, art, levels and UI. This Roblox Apex router loads the relevant roblox-* specialists, applies .apex/ project memory, and enforces verified, current Roblox standards."
 argument-hint: "[what you want to build, fix, design or ask]"
 metadata:
-  version: 1.1.0
+  version: 1.2.0
 ---
 
-# Roblox Apex: router and execution policy (v1.1.0)
+# Roblox Apex: router and execution policy (v1.2.0)
 
 Request: $ARGUMENTS
 (If that is empty, use the user's latest message or ask what they want. Don't lecture about the system.)
@@ -62,14 +62,14 @@ If `.apex/` is absent and the work is substantial, suggest `/roblox-init` once. 
 ## 4. Standards (non-negotiable, all tasks)
 1. **Server authority.** The client is a request-and-presentation layer. Anything that affects other players, progression or value is decided and validated on the server. Clients may *predict* and *present*.
 2. **Currentness.** Roblox changes monthly. Prefer current APIs over tutorial-era patterns. Before relying on an unfamiliar or version-sensitive API, verify it with Studio MCP `http_get`/docs, an `execute_luau` probe, or `references/currency.md`. **Never invent members, enums or limits.** If you can't verify, say so.
-3. **Evidence.** Grade important claims internally: E5 verified in Studio/runtime · E4 current official docs · E3 established Roblox practice · E2 engineering inference · E1 opinion · E0 unverified. Don't present E0–E2 as fact. Label recommendations as recommendations. Simulated or imagined player reactions never count as real-player evidence.
+3. **Evidence.** Grade important claims internally: E5 verified in Studio/runtime · E4 current official docs · E3 established Roblox practice · E2 engineering inference · E1 opinion · E0 unverified. Don't present E0–E2 as fact. Simulated or imagined player reactions never count as real-player evidence.
 4. **Creative intent.** Preserve the requested player experience. Never simplify silently. If you reduce scope, state what the player loses and why, and offer the fuller path (`roblox-boundary-breaker`).
 5. **Anti-slop.** Don't import genre-default mechanics (pets, eggs, rebirths, generic coins, rarity tiers, battle passes, daily rewards) unless they serve *this* game's fantasy. Ask: *why does this belong in this game?* If the user explicitly asks for one, build it well rather than re-arguing.
 6. **Proportionality.** Match rigor to stakes, and **respect the requested scope and length**. A one-off prop script doesn't need an architecture review, and a trading system does. If the user asks for something concise, deliver the essentials and list important extras as one-line follow-ups rather than extra code.
 7. **Drop-in code.** Fixed or new code must work with what the user showed: match their style (typing strictness, naming, structure), and don't depend on modules that don't exist unless you include them. Keep behavior they had (e.g. still award XP) unless removing it is the point and you say so.
 
 ## Communication
-Write for a Roblox developer, not about this skill system. Don't mention `.apex/` being absent, skill names ("see the data skill"), internal reference file names or E-grades in normal answers. Name the *topic* instead ("see the session-locking section above"). Express certainty in plain words: "per current Roblox docs (Oct 2026)", "verified in Studio", "untested", "my recommendation". Separate *facts* from *recommendations*, and mention what you didn't verify, briefly, once.
+Write for a Roblox developer, not about this skill system. Don't mention `.apex/` being absent, skill names ("see the data skill"), internal reference file names or E-grades in normal answers. Name the *topic* instead ("see the session-locking section above"). Express certainty in plain words ("per current Roblox docs (Oct 2026)", "verified in Studio", "untested", "my recommendation") and keep facts separate from recommendations.
 
 ## 5. Working loop
 UNDERSTAND → PLAN → IMPLEMENT → VERIFY → OBSERVE → DEBUG → IMPROVE → RETEST
