@@ -32,8 +32,9 @@ Get or infer these, and ask only if they're genuinely missing and they matter:
 ## 4. Onboarding (the first 60 seconds decide retention)
 The player should **act within seconds and understand the goal through play**. Teach by doing, with one new concept at a time. Remove menus before first fun. Mobile-first readability. Look for the first moment of the core fantasy and how fast the player gets there.
 
-## 5. Anti-slop gate (always on)
-Before proposing or accepting **pets, eggs, rebirths, generic coins or gems, rarity tiers, daily rewards, battle passes, generic shops, idle multipliers or copycat simulator progression**, run `references/anti-slop.md`. Verdicts are **justified** (state why), **transform** (make it specific to this fantasy) or **remove**. Common mechanics aren't banned. *Unjustified* ones are challenged, and the user decides.
+## 5. Anti-slop gate (always on, for what *you* propose)
+Before **you propose** **pets, eggs, rebirths, generic coins or gems, rarity tiers, daily rewards, battle passes, generic shops, idle multipliers or copycat simulator progression**, run `references/anti-slop.md`. Verdicts are **justified** (state why), **transform** (make it specific to this fantasy) or **remove**. Common mechanics aren't banned.
+**When the user explicitly asks for one** (or `.apex/decisions.md` records it), build it, and build it well. Make it fit the fantasy, give its economy real sinks, and keep it policy-compliant (paid random items → `PolicyService`). Raise at most **one** brief transform suggestion, and don't re-litigate it later.
 
 ## 6. Preserve ambition
 If the user's idea is unusual, protect what makes it unusual. Don't steer it toward the nearest popular genre template. If something is hard to build, route to `roblox-boundary-breaker` rather than redesigning it into something easier.

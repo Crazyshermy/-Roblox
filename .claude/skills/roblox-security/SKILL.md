@@ -22,6 +22,8 @@ Classify each finding by required capability:
 7. **Failure:** reject quietly, never error on bad input, and log anomalies server-side (a counter, not output spam). Don't kick on the first anomaly, because lag produces false positives.
 8. **RemoteFunctions:** client→server `InvokeServer` is fine for requests, as long as the handler validates like any remote. Server→client `InvokeClient` is the danger: a client can hang the server thread forever, or error it. Use a RemoteEvent for server→client, or wrap the invoke in a timeout design.
 
+**Not just remotes:** `ProximityPrompt.Triggered`, `ClickDetector.MouseClick` and `Touched` also fire on the server because of a client. Re-check distance (server positions), state, cooldown and ownership in those handlers too, especially when they grant value.
+
 ## Value systems (currency, items, trades, rewards, purchases)
 - **Round against the player** whenever converting or scaling value (charge with `math.ceil`, grant with `math.floor`, clamp to the balance). Rounding in the player's favor, repeated, is a free-resource exploit.
 - **One writer.** A single server module owns each value type, and all grants and spends go through it. Grep for any other write path. Flag every `leaderstats` value written from multiple places, and never treat a `leaderstats` value as the source of truth.

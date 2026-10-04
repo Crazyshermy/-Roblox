@@ -14,7 +14,7 @@ description: "Game feel and juice: input response, anticipation, impact, hitstop
 | Input | Does something happen **on the same frame** locally, on **every device**? | client-side response first (animation, sound, camera). Bind through `ContextActionService`/IAS or a `ProximityPrompt` (with hold duration for anticipation), so touch and gamepad work too. A keyboard-only key is a mobile bug. Never wait on the server to start presentation. |
 | Anticipation | Is the action telegraphed (for the player's own readability, and opponents' counterplay)? | wind-up animation (`AnimationTrack` + `GetMarkerReachedSignal`), sound swell, slight camera pull |
 | Action | Is the active moment clear and fast? | fast animation segment, trails (`Trail`, `Beam`), whoosh sound |
-| Impact | Does the hit *land*? | **hitstop** (freeze both attacker and target anims ~40–100 ms by `AdjustSpeed(0)`), impact VFX at contact point (`ParticleEmitter:Emit(n)`), impact sound layered (transient + body + tail), target reaction anim/knockback |
+| Impact | Does the hit *land*? | **hitstop** (freeze anims ~40–100 ms with `AdjustSpeed(0)`. On *another* player's character this is a local-only visual (E2), so the attacker's client applies it to its own view), impact VFX at contact point (`ParticleEmitter:Emit(n)`), impact sound layered (transient + body + tail), target reaction anim/knockback |
 | Feedback | Does the player understand the result? | damage numbers, hit marker, health bar flash, camera shake scaled to magnitude, controller rumble (`HapticService`), UI punch (scale tween) |
 | Recovery | Is there a cost and rhythm? | recovery frames, return-to-idle blend, cooldown readability |
 
@@ -36,7 +36,7 @@ For each key action, list which channels fire: animation · sound · VFX · came
 - Custom camera work (over-shoulder, lock-on, spring arm) is often the single biggest jump away from "default Roblox". See `roblox-physics-animation` for rigs.
 
 ## Sound
-Layer and vary: randomize pitch (±5–10%) and alternate samples to avoid machine-gun repetition; use `SoundGroup`s for mixing and ducking; positional audio for world events. Silence before a big moment amplifies it.
+For the mixing graph and wired Audio API, see the audio notes in `roblox-assets`. Layer and vary: randomize pitch (±5–10%) and alternate samples to avoid machine-gun repetition; use `SoundGroup`s for mixing and ducking; positional audio for world events. Silence before a big moment amplifies it.
 
 ## Movement feel
 Acceleration/deceleration curves, coyote time, jump buffering, landing recovery, turn responsiveness. The default controller is tuned for generality; custom tuning (or a custom controller) is how platformers, action games and racers get identity.
