@@ -1,0 +1,74 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Identifies the fast server-hop race (stale data overwrite) and the need for session locking",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Identifies 'default data on failed load' as a data-wipe cause (should kick/retry instead)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Recommends UpdateAsync / proper retry with backoff instead of blind SetAsync",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Mentions BindToClose for shutdown saves",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Suggests a way to reproduce/verify (two servers / forced rejoin, test store)",
+        "A": "met",
+        "B": "missed"
+      },
+      {
+        "item": "Does not state outdated DataStore limits as current fact",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "The answer says the new server keeps retrying until the old server releases the lock. In the code it does not: when the lock is held, the transform returns nil, UpdateAsync does not error, so retry() counts it as a success and the player is kicked straight away.",
+        "The answer does not handle existing raw data saved with SetAsync. For those players, old.data is nil, so sessions[player] becomes nil. Their gameplay data is missing and they never save again."
+      ],
+      "slop": [
+        "The fixed task.wait(5) in BindToClose does not guarantee the saves have finished."
+      ],
+      "overengineering": []
+    },
+    "preference": "A",
+    "reason": "A's code really does wait for the lock with backoff, migrates existing data, and waits for every save in BindToClose, and it explains how to test the fix; B's lock-wait does not work as described, it breaks existing saves, and it gives no testing advice."
+  },
+  "judge_cost": 0.0821852,
+  "apex_score": 1.0,
+  "base_score": 0.75,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "The answer says the new server keeps retrying until the old server releases the lock. In the code it does not: when the lock is held, the transform returns nil, UpdateAsync does not error, so retry() counts it as a success and the player is kicked straight away.",
+      "The answer does not handle existing raw data saved with SetAsync. For those players, old.data is nil, so sessions[player] becomes nil. Their gameplay data is missing and they never save again."
+    ],
+    "slop": [
+      "The fixed task.wait(5) in BindToClose does not guarantee the saves have finished."
+    ],
+    "overengineering": []
+  },
+  "reason": "A's code really does wait for the lock with backoff, migrates existing data, and waits for every save in BindToClose, and it explains how to test the fix; B's lock-wait does not work as described, it breaks existing saves, and it gives no testing advice."
+}

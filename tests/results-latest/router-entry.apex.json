@@ -1,0 +1,46 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "/roblox I'm starting a round-based team game (lobby -> intermission -> round -> results). Where should the round state machine, team assignment and scoring live, and how should clients learn the round state? Keep it concise.",
+  "user_slash_command": "roblox",
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox-architecture",
+    "roblox-networking"
+  ],
+  "files_read": [],
+  "final_text": "*Apex: architecture \u2192 networking*\n\nNo `.apex/` memory or existing code to fit, so this is a from-scratch recommendation. I haven't tested any of it in Studio.\n\n## Where things live\n\n**Server (`ServerScriptService`), single writer of all match state:**\n- **`RoundService`** owns the state machine: `Lobby \u2192 Intermission \u2192 Round \u2192 Results \u2192 Intermission\u2026`. Use an enum plus one `transition(to)` function. Only this service advances state.\n- **`TeamService`** owns team assignment. `RoundService` calls it at the `Intermission \u2192 Round` transition, with the final player list for that round. It balances, then sets `Player.Team` (use real `Team` instances so the leaderboard and chat colors come for free).\n- **`ScoreService`** owns scores. Other systems report events (`ScoreService:Award(player, reason, amount)`), and it applies the rules. It resets when a round starts.\n\n**Shared (`ReplicatedStorage`):** a `RoundTypes`/`Config` module with the state enum, durations, team definitions and score values. These are pure data and types with no secrets.\n\n**Client (`StarterPlayerScripts`):** a `RoundController` that only reads state and drives HUD, music and camera. It never decides anything.\n\nUse one server bootstrap that calls `init()` then `start()` on each service in explicit order. Round-scoped things like spawned maps, connections and timers should hang off a per-round trove or maid, so a round reset destroys them all.\n\n## How clients learn the state\n\nUse replicated state, not events. Late joiners then get the current state automatically.\n\n- Set attributes on a replicated instance. `ReplicatedStorage` or a `Folder` in `Workspace` both work. Example: `RoundState` (string), `RoundEndsAt` (number), `RoundNumber`.\n- Send the timer as an **end timestamp**, not a per-second countdown. Use `workspace:GetServerTimeNow()` on the server and have clients render `RoundEndsAt - workspace:GetServerTimeNow()` locally. This costs no bandwidth and has no tick drift.\n- Replicate teams through `Player.Team`.\n- Replicate scores through attributes on each player, or on each team for team scores. A `leaderstats` folder is fine if you want the default leaderboard.\n- Clients react with `GetAttributeChangedSignal(\"RoundState\")`. Read the current value once on startup, because they may join mid-round.\n- Use one `RemoteEvent` only for discrete moments that need a flourish, such as a \"round ended, winner X\" results payload. Put the results data in the payload.\n\nRemotes aren't ordered relative to attribute replication. Don't make the client depend on an attribute having already changed when the remote arrives. Put what it needs in the payload.\n\n## Edge cases to cover\n\n- **Join mid-round:** put them on Lobby or spectate until the next intermission. Assign a team only at round start.\n- **Leave mid-round:** `PlayerRemoving` should update team counts, and `RoundService` should end the round early if a team is empty or the player count drops below the minimum.\n- **Lobby gating:** a minimum player count to leave Lobby, and a round timer that survives a server with 1 player.\n- **Respawn:** respawn in a team spawn during Round, and in the lobby otherwise. Rebind on `CharacterAdded`.\n- **Shutdown:** the `BindToClose` handler should not start a new round.\n\n## Follow-ups worth a look\n- Whether a round-based game needs persistent stats. If so, `ScoreService` should feed a data layer, not own the saving itself.\n- Mid-round team swaps or rebalancing, if players leave unevenly.\n\nI can sketch the `RoundService` state machine in Luau if you want to see the code.",
+  "cost_usd": 0.0936486,
+  "turns": 6,
+  "seconds": 17.1,
+  "stderr_tail": "",
+  "check": {
+    "skills_ok": true,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}

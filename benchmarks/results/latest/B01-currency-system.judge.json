@@ -1,0 +1,82 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Server is the only writer of Gold; client never sends amounts or prices",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Validates remote arguments (types, NaN/inf, bounds) and rate-limits shop requests",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Avoids yields between balance check and deduction (atomic spend)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Persistence handled safely (UpdateAsync or session-locked profile; load-before-play; BindToClose)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Does not treat leaderstats as source of truth",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Kill rewards awarded by server-side kill attribution, not a client 'I killed X' remote",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "save() reports success when the UpdateAsync transform returns nil because the lock was lost, so a skipped write looks like a successful save",
+        "With a 180s stale-lock window and only about 18s of load retries, a player who rejoins after a server crash gets kicked repeatedly until the lock expires",
+        "DataService does not handle players who joined before the PlayerAdded connection was made (no loop over Players:GetPlayers())"
+      ],
+      "slop": [],
+      "overengineering": [
+        "The hand-rolled session lock (about 100 lines) reimplements what ProfileStore already provides, and the answer itself recommends ProfileStore for production"
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "The stray '*Apex: security \u2192 data \u2192 networking*' header line",
+        "The 'Follow-ups' list is generic boilerplate (anomaly logging, ProcessReceipt, migrations)"
+      ],
+      "overengineering": []
+    },
+    "preference": "B",
+    "reason": "Both answers handle authority, validation and atomic spends correctly, but B delegates session locking to ProfileStore and avoids the subtle problems in A's hand-rolled lock, while staying more concise and adding a concrete exploit test list."
+  },
+  "judge_cost": 0.12070120000000001,
+  "apex_score": 1.0,
+  "base_score": 0.917,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "The stray '*Apex: security \u2192 data \u2192 networking*' header line",
+      "The 'Follow-ups' list is generic boilerplate (anomaly logging, ProcessReceipt, migrations)"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "save() reports success when the UpdateAsync transform returns nil because the lock was lost, so a skipped write looks like a successful save",
+      "With a 180s stale-lock window and only about 18s of load retries, a player who rejoins after a server crash gets kicked repeatedly until the lock expires",
+      "DataService does not handle players who joined before the PlayerAdded connection was made (no loop over Players:GetPlayers())"
+    ],
+    "slop": [],
+    "overengineering": [
+      "The hand-rolled session lock (about 100 lines) reimplements what ProfileStore already provides, and the answer itself recommends ProfileStore for production"
+    ]
+  },
+  "reason": "Both answers handle authority, validation and atomic spends correctly, but B delegates session locking to ProfileStore and avoids the subtle problems in A's hand-rolled lock, while staying more concise and adding a concrete exploit test list."
+}

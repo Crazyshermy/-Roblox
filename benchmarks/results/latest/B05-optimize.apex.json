@@ -1,0 +1,41 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "My Roblox tower defense lags on mobile when there are 300 enemies. Each enemy is a Humanoid R15 rig with a Script inside that does a while true do task.wait() loop calling MoveTo toward the next waypoint and checks Touched for damage. How should I optimize this?",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-performance",
+    "roblox-genres"
+  ],
+  "files_read": [],
+  "final_text": "*Apex: performance \u2192 genres*\n\nI haven't profiled your game, and there's no code in this working directory, so what follows is engineering judgment and not measured results. Before changing anything, open the MicroProfiler (Ctrl+F6) on a phone, or on Studio with the device emulator, with 300 enemies out. Check whether the long frame is in rendering, animation, physics or scripts. Lag that only shows up on mobile usually means client cost (rendering, animation, physics), not server scripts. Your design has a problem in each of those areas, so the fixes below go roughly in order of payoff.\n\n## 1. Remove the per-enemy script and loop\n300 scripts each running `while true do task.wait()` means 300 separate thread resumes. Replace them with one manager that holds a list of enemy data and updates all of them in a single `RunService.Heartbeat` connection. Enemies stop being scripted objects and become entries in a table.\n\n## 2. Stop using `Touched` for damage\nIn a tower defense, enemies only hurt you at the end of the path. Check \"reached final waypoint\" in the manager, which costs nothing. If enemies also attack towers, do a range check at about 5 to 10 Hz, or use `workspace:GetPartBoundsInRadius`. Don't use `Touched` for this. It relies on physics contact events, and it fires unpredictably on moving rigs.\n\n## 3. Move enemies along the path by math, not `Humanoid:MoveTo`\nWaypoints are fixed, so each enemy only needs a distance value along the path. Each tick, add `speed * dt` to it and place the model from that distance (`PivotTo`, or `workspace:BulkMoveTo` for batches). That skips the Humanoid state machine, pathing and physics for every enemy. If you need the enemies to stay on a path the player can't change, you lose nothing.\n\n## 4. Drop the Humanoid, or keep it only for the visuals\nPer enemy, the Humanoid means a state machine, physics simulation and an R15 rig (15 parts, Motor6Ds, an Animator). That is the likely cost on a phone. In order of preference, these are my recommendations:\n- **Best:** use a simple rig, such as a single mesh or a few parts with an `AnimationController` and Animator. Don't use a Humanoid. Anchor all parts.\n- **If you must keep R15 for the look:** anchor it, disable the Humanoid states you don't use, and run animations only on enemies near the camera. Far ones can freeze on a pose.\n- **Fidelity trade-off:** if the enemies need to look like detailed characters, tell me. I'd rather find a cheaper way to keep the look than flatten it.\n\n## 5. Consider a client/server split\nThe server only needs to know each enemy's distance along the path, health and status effects. If the client is told \"enemy X spawned at time T with speed S on path P\", it can work out the position itself. That means no per-frame position replication at all, and the client can use lighter visuals. The server stays authoritative for health, kills and rewards. Clients only predict and render. Speed changes, such as slows, are sent as events.\n\n## 6. Rendering budget for mobile\n- Anchor everything, set `CanCollide`, `CanTouch` and `CanQuery` to false on enemy parts, and turn `CastShadow` off.\n- Use identical meshes and materials across enemy types so they can be instanced.\n- Cap particles and health-bar UI. Hundreds of live BillboardGuis are a classic mobile cost. Show health bars only on damaged or targeted enemies, and pool them.\n\n## 7. Tower targeting\nDon't let every tower scan every enemy every frame. Each tower can tick at 5 to 10 Hz, and you can pick targets from the manager's array by path distance (first, last, strongest) without any spatial query.\n\n## Order I'd do it in\n1. Profile and confirm the bottleneck.\n2. Do steps 1 to 3, which are mostly a rewrite of the movement code. They remove the scripts, `Touched` and `MoveTo` in one go.\n3. Re-profile. If the mobile frame is still slow, do the Humanoid replacement (step 4) and the rendering trims (step 6).\n4. Do the client/server split only if network or server cost shows up in the profile.\n\nIf you paste the enemy script and tell me how the waypoints are stored, I can write the manager loop and the path-follow math in the style of your code. Tell me too whether enemies ever leave the path, for example to chase towers or get knocked back, because that changes step 3.",
+  "cost_usd": 0.10652600000000001,
+  "turns": 8,
+  "seconds": 26.8,
+  "stderr_tail": ""
+}

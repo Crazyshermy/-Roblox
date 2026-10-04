@@ -1,0 +1,96 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Server owns crate state and who is holding it; clients send intent (grab/release)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Handles one player leaving, dying or respawning mid-carry",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Addresses network ownership / physics authority of the crate explicitly",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses latency so the carry still feels responsive (client presentation/prediction or Server Authority)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Handles concurrency (both grab same handle; third player)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Proposes how to test with multiple clients",
+        "A": "partial",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "The crate is anchored while it waits and is set to server network ownership when carried. SetNetworkOwner errors on anchored parts, so the call order matters, and the answer does not say this.",
+        "In the code sketch, if one root is missing only HolderA is released, so the other holder's slot and WalkSpeed can be left stuck.",
+        "It hooks Died, but never handles rebinding on respawn or CharacterAdded."
+      ],
+      "slop": [
+        "Generic 'reset crate' option after no progress, without saying how it should work"
+      ],
+      "overengineering": [
+        "Optional network-ownership-to-holder alternative that adds exploit surface for little gain"
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "'Apex' header line and the closing aside about design pillars",
+        "Several generic hedges such as 'from memory' and 'untested'"
+      ],
+      "overengineering": [
+        "Per-player token-bucket rate limiting on a grip remote",
+        "IKControl hands plus an optional client-side proxy crate",
+        "Data-driven N-carrier generalization",
+        "Grace-window state on top of the leash"
+      ]
+    },
+    "preference": "B",
+    "reason": "B covers every rubric item more fully: respawn rebinding, client-side grab prediction for responsiveness, explicit concurrency rules, and concrete multi-client testing with Server & Clients and the Network Simulator; it is more elaborate, but A is thinner on latency and testing and has a release bug in its code."
+  },
+  "judge_cost": 0.0892212,
+  "apex_score": 1.0,
+  "base_score": 0.667,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "'Apex' header line and the closing aside about design pillars",
+      "Several generic hedges such as 'from memory' and 'untested'"
+    ],
+    "overengineering": [
+      "Per-player token-bucket rate limiting on a grip remote",
+      "IKControl hands plus an optional client-side proxy crate",
+      "Data-driven N-carrier generalization",
+      "Grace-window state on top of the leash"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "The crate is anchored while it waits and is set to server network ownership when carried. SetNetworkOwner errors on anchored parts, so the call order matters, and the answer does not say this.",
+      "In the code sketch, if one root is missing only HolderA is released, so the other holder's slot and WalkSpeed can be left stuck.",
+      "It hooks Died, but never handles rebinding on respawn or CharacterAdded."
+    ],
+    "slop": [
+      "Generic 'reset crate' option after no progress, without saying how it should work"
+    ],
+    "overengineering": [
+      "Optional network-ownership-to-holder alternative that adds exploit surface for little gain"
+    ]
+  },
+  "reason": "B covers every rubric item more fully: respawn rebinding, client-side grab prediction for responsiveness, explicit concurrency rules, and concrete multi-client testing with Server & Clients and the Network Simulator; it is more elaborate, but A is thinner on latency and testing and has a release bug in its code."
+}

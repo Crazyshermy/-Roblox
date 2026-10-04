@@ -1,0 +1,76 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Flags client-supplied damage as critical",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing cooldown/rate limit (XP farming via spam)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing range / line-of-sight / target validity checks",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing type validation of abilityName/target (nil char, non-Instance target)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags that ability ownership/unlock is not checked",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Provides a corrected server-authoritative version or clear fix list",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Calls re-reading target.Humanoid after FindFirstChild a 'minor race'. Nothing yields between the two calls, so the child cannot be removed in between."
+      ],
+      "slop": [],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Gives a specific '~500 calls/s' engine remote throttle and derives '5,000 XP/s' from it. Roblox does not document a per-call limit like this, so the figure is likely invented."
+      ],
+      "slop": [
+        "The 'Apex: security \u2192 networking' header line is noise."
+      ],
+      "overengineering": []
+    },
+    "preference": "B",
+    "reason": "Both answers cover every rubric item with similar server-authoritative fixes. B is slightly stronger: its code also checks that the target is in workspace, it lists what it did not cover (ownership, XP farming against respawning targets, raycast hit validation), and it hedges unverified engine behaviour instead of asserting it, which outweighs its dubious throttle figure."
+  },
+  "judge_cost": 0.0769692,
+  "apex_score": 1.0,
+  "base_score": 1.0,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "Gives a specific '~500 calls/s' engine remote throttle and derives '5,000 XP/s' from it. Roblox does not document a per-call limit like this, so the figure is likely invented."
+    ],
+    "slop": [
+      "The 'Apex: security \u2192 networking' header line is noise."
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Calls re-reading target.Humanoid after FindFirstChild a 'minor race'. Nothing yields between the two calls, so the child cannot be removed in between."
+    ],
+    "slop": [],
+    "overengineering": []
+  },
+  "reason": "Both answers cover every rubric item with similar server-authoritative fixes. B is slightly stronger: its code also checks that the target is in workspace, it lists what it did not cover (ownership, XP farming against respawning targets, raycast hit validation), and it hedges unverified engine behaviour instead of asserting it, which outweighs its dubious throttle figure."
+}

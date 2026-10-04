@@ -1,0 +1,80 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Builds anticipation/dread before reveal (cues, telegraphs) rather than leading with a jump scare",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses that groups of friends reduce fear (separation mechanics or per-player experiences)",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Has a readable threat language players can learn and counterplay",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Includes tension/release pacing and recovery after the encounter",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Considers Roblox constraints (mobile brightness/readability, client-local effects, audio)",
+        "A": "partial",
+        "B": "partial"
+      },
+      {
+        "item": "Is specific to the hospital setting rather than generic",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "The 'Anti-slop check' table and the 'Apex' header are meta process notes that don't help the design"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "A 40% random chance of checking the player's hiding spot undermines the readable, learnable threat",
+        "Scripted ceiling-tile noise forces the first chase instead of it coming from player mistakes",
+        "Concrete speed and radius numbers are presented as settled values with no reasoning"
+      ],
+      "overengineering": [
+        "The noise-radius scaling formula and per-player-count patrol speeds are premature for a first-encounter design"
+      ]
+    },
+    "preference": "A",
+    "reason": "A forces the group to split with a two-location objective, lets one player see a scare the others don't, and makes the call-bell lure a real co-op choice. Its threat rules are fully learnable and closely tied to the hospital. B has more useful Roblox implementation notes, but it only partly handles group separation, adds randomness that hurts readability, and never covers mobile readability."
+  },
+  "judge_cost": 0.08204120000000001,
+  "apex_score": 0.917,
+  "base_score": 0.75,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "The 'Anti-slop check' table and the 'Apex' header are meta process notes that don't help the design"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "A 40% random chance of checking the player's hiding spot undermines the readable, learnable threat",
+      "Scripted ceiling-tile noise forces the first chase instead of it coming from player mistakes",
+      "Concrete speed and radius numbers are presented as settled values with no reasoning"
+    ],
+    "overengineering": [
+      "The noise-radius scaling formula and per-player-count patrol speeds are premature for a first-encounter design"
+    ]
+  },
+  "reason": "A forces the group to split with a two-location objective, lets one player see a scare the others don't, and makes the call-bell lure a real co-op choice. Its threat rules are fully learnable and closely tied to the hospital. B has more useful Roblox implementation notes, but it only partly handles group separation, adds randomness that hurts readability, and never covers mobile readability."
+}

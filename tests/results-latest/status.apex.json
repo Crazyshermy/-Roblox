@@ -1,0 +1,45 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "/roblox-status",
+  "user_slash_command": "roblox-status",
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [],
+  "files_read": [
+    ".claude/skills/roblox/SKILL.md"
+  ],
+  "final_text": "```\nRoblox Apex 1.0.0\nSkills: 22 on disk \u00b7 19 model-invocable discovered \u00b7 user-only: roblox-status, roblox-route, roblox-init\n  \u2713 roblox (router)        \u2713 roblox-architecture     \u2713 roblox-assets\n  \u2713 roblox-boundary-breaker \u2713 roblox-data            \u2713 roblox-debugging\n  \u2713 roblox-game-design     \u2713 roblox-game-feel        \u2713 roblox-genres\n  \u2713 roblox-level-design    \u2713 roblox-luau             \u2713 roblox-networking\n  \u2713 roblox-performance     \u2713 roblox-physics-animation \u2713 roblox-review\n  \u2713 roblox-security        \u2713 roblox-testing          \u2713 roblox-ui-ux\n  \u2713 roblox-visual-direction\n  (user-only, not expected in the model list: roblox-status, roblox-route, roblox-init)\nRouter: ok (SKILL.md has name: roblox; references/currency.md and references/studio-mcp.md both present)\nKnowledge snapshot: 2026-10-02 (fresh, 2 days old)\nProject memory: .apex/ absent \u2192 run /roblox-init\nCLAUDE.md block: present\nStudio MCP: not connected\nIssues:\n- .apex/ is missing, so project.md, decisions.md and debt.md don't exist. Run /roblox-init.\n- No Studio MCP tools (list_roblox_studios, execute_luau, \u2026) are in my toolset. Playtests and runtime checks can't run until it's connected. Setup steps are in .claude/skills/roblox/references/studio-mcp.md, which I didn't open for this report.\n- No duplicate installs: there are no roblox* skills under ~/.claude/skills, so no version-skew risk.\n```",
+  "cost_usd": 0.080117,
+  "turns": 8,
+  "seconds": 12.8,
+  "stderr_tail": "",
+  "check": {
+    "skills_ok": true,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Recommends measuring/profiling first and comparing before/after",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Replaces per-enemy scripts with one manager loop",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Replaces Humanoids with lightweight server-side movement (CFrame/position along path) and client-side rendering/interpolation",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Replaces Touched-based damage with server-side range/spatial checks",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses rendering cost on mobile (model pooling, LOD/animation reduction)",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Preserves the intended experience (doesn't just cap enemy count without discussing it)",
+        "A": "partial",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Calls the Script Performance view an 'F9' tab. The F9 Developer Console has the Script Profiler; Script Performance is a Studio window.",
+        "Advises staggering updates for 'off-screen' enemies inside the server Heartbeat manager, but the server has no camera to know what is off-screen."
+      ],
+      "slop": [
+        "StreamingEnabled suggestion is generic and has no clear link to enemy lag.",
+        "BreakJointsOnDeath and health-display tweaks are low-impact filler."
+      ],
+      "overengineering": [
+        "Example loop allocates new parts/cframes tables every frame and uses table.remove inside the hot loop, while its own comment recommends swap-remove."
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Stray header '*Apex: performance \u2192 genres*' is irrelevant meta-text."
+      ],
+      "overengineering": []
+    },
+    "preference": "B",
+    "reason": "Both cover the same main architectural fixes, but B puts profiling first with a re-profile step, orders the work by payoff, and explicitly protects visual fidelity, while A's extra code and checklist add small inaccuracies without better prioritization."
+  },
+  "judge_cost": 0.0793332,
+  "apex_score": 0.917,
+  "base_score": 0.833,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Stray header '*Apex: performance \u2192 genres*' is irrelevant meta-text."
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Calls the Script Performance view an 'F9' tab. The F9 Developer Console has the Script Profiler; Script Performance is a Studio window.",
+      "Advises staggering updates for 'off-screen' enemies inside the server Heartbeat manager, but the server has no camera to know what is off-screen."
+    ],
+    "slop": [
+      "StreamingEnabled suggestion is generic and has no clear link to enemy lag.",
+      "BreakJointsOnDeath and health-display tweaks are low-impact filler."
+    ],
+    "overengineering": [
+      "Example loop allocates new parts/cframes tables every frame and uses table.remove inside the hot loop, while its own comment recommends swap-remove."
+    ]
+  },
+  "reason": "Both cover the same main architectural fixes, but B puts profiling first with a re-profile step, orders the work by payoff, and explicitly protects visual fidelity, while A's extra code and checklist add small inaccuracies without better prioritization."
+}

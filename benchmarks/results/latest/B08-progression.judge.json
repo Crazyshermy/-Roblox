@@ -1,0 +1,88 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Anchors progression in the specific fantasy (cooking, customers, the city) rather than generic numbers",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Progression changes what the player can do or understand, not only stat multipliers",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Does not default to pets/eggs/rebirths/generic currencies without justification (or explicitly challenges them)",
+        "A": "met",
+        "B": "missed"
+      },
+      {
+        "item": "Considers onboarding and the first minutes of play",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Considers economy sources and sinks if a currency is proposed",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Proposes how to test/validate with players rather than claiming it will be fun",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Franchise prestige reset with permanent % bonuses (rebirth loop) without fantasy justification",
+        "Four currencies including Robux-purchasable premium Neon Tokens",
+        "Pets sold as cosmetics in a ramen-stand game",
+        "2x Yen gamepass",
+        "Daily contracts, login streak, ~40 achievements as generic retention scaffolding",
+        "Exponential base\u00d71.6^level upgrade lines that are mostly stat increases (+speed, +patience, +walk-ins)",
+        "Mars Colony / new-city prestige content disconnected from the night-shift stand fantasy",
+        "Claim 'every run is faster so it stays fun instead of grindy' asserted without evidence"
+      ],
+      "overengineering": [
+        "Four currencies plus a separate Rep tier spine, crew system, franchise, and shift modifiers all at once",
+        "Second stand slot and drone delivery widen scope beyond a small stand"
+      ]
+    },
+    "preference": "A",
+    "reason": "A ties progression to verbs, regulars and the stand, explicitly rejects rebirths and extra currencies with reasons, and covers sinks, onboarding and testable hypotheses; B mostly reuses simulator defaults like prestige, premium currency, pets and 2x gamepasses."
+  },
+  "judge_cost": 0.0829052,
+  "apex_score": 1.0,
+  "base_score": 0.5,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Franchise prestige reset with permanent % bonuses (rebirth loop) without fantasy justification",
+      "Four currencies including Robux-purchasable premium Neon Tokens",
+      "Pets sold as cosmetics in a ramen-stand game",
+      "2x Yen gamepass",
+      "Daily contracts, login streak, ~40 achievements as generic retention scaffolding",
+      "Exponential base\u00d71.6^level upgrade lines that are mostly stat increases (+speed, +patience, +walk-ins)",
+      "Mars Colony / new-city prestige content disconnected from the night-shift stand fantasy",
+      "Claim 'every run is faster so it stays fun instead of grindy' asserted without evidence"
+    ],
+    "overengineering": [
+      "Four currencies plus a separate Rep tier spine, crew system, franchise, and shift modifiers all at once",
+      "Second stand slot and drone delivery widen scope beyond a small stand"
+    ]
+  },
+  "reason": "A ties progression to verbs, regulars and the stand, explicitly rejects rebirths and extra currencies with reasons, and covers sinks, onboarding and testable hypotheses; B mostly reuses simulator defaults like prestige, premium currency, pets and 2x gamepasses."
+}

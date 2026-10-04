@@ -1,0 +1,44 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "Design the HUD and inventory UI for my Roblox survival game that must work great on phones as well as PC and controller.",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-ui-ux",
+    "roblox-genres"
+  ],
+  "files_read": [
+    ".claude/skills/roblox-genres/references/systems.md",
+    ".claude/skills/roblox/references/currency.md"
+  ],
+  "final_text": "*Apex: ui-ux \u2192 genres*\n\nYour repo is empty and I have no Studio connection, so this is a design spec. Nothing is built or tested. The sizes are starting values to check in the Device Emulator, not verified numbers. I assumed a survival game with hunger and thirst, a hotbar, crafting and lootable containers. Tell me if that's wrong.\n\n## Principles\n1. **Phone first, scaled up.** The phone layout is the hardest, so I designed it first. PC and controller get more space and shortcuts, not different logic.\n2. **Opening the inventory doesn't pause the world.** Survival players get attacked while looting. So the HUD hotbar handles anything urgent (eat, heal, equip), and the full inventory is for planning and crafting.\n3. **One interaction model for every device:** select an item, then pick an action. Drag and drop is an optional PC and touch shortcut. It's never the only way, because dragging on a small touchscreen is the usual cause of tedious survival inventories.\n\n## HUD (always visible)\n| Element | PC / console | Phone (landscape) |\n|---|---|---|\n| **Vitals** (health, hunger, thirst) | Slim bars bottom-center, with icons | Same, narrower, kept clear of the thumbstick and jump zones |\n| **Stamina, temperature** | Appear only when changing or in danger | Same |\n| **Hotbar** (6 slots) | Bottom-center, keys 1\u20136 | Vertical column on the right edge, mid-height, above the jump button |\n| **Interact prompt** | World-space `BillboardGui` on the object: glyph, verb, item name | Same, with a large tap target on the prompt |\n| **Pickup feed** | Right side, short-lived stack (\"+3 Wood\") | Top-right, 2 lines max |\n| **Damage direction** | Edge arcs plus a vignette | Same |\n| **Status effects** | Small icon row above vitals | Same |\n\n- **Don't encode state by color alone.** Low vitals pulse, change icon shape and add an optional haptic or audio cue. A critical vital gets a distinct shape or icon, not just red.\n- **Vitals stay readable but quiet.** Full bars dim. Bars below about 30% brighten and get priority.\n- **Safe areas.** Respect `ScreenInsets`, and keep persistent HUD out of the top-left Roblox menu region.\n- **No minimap by default.** A compass strip or in-world markers cost less screen. Add a map only if your game's exploration needs it.\n\n## Inventory (a full-screen panel with two panes)\n**Left pane: Bag grid.** The columns below are my recommendation:\n- Phone: 5 columns \u00d7 4 rows visible, scrollable. Slots are at least 56 px, with at least 8 px gaps.\n- PC: 6\u20138 columns with larger slots.\n- Each slot shows an icon, stack count and durability bar. Rarity or condition uses a shape or border pattern as well as color.\n\n**Right pane: Detail and actions.**\n- Selecting a slot shows its name, stats and a context-aware button row: **Use / Equip / Move to hotbar / Split / Drop**.\n- On phones the detail pane becomes a bottom sheet.\n- Drop and destroy ask for confirmation only when the item is valuable.\n\n**Tabs:** Bag \u00b7 Craft \u00b7 (optional) Character/Equipment.\n- Crafting lists only what the player can make now, then \"almost\" recipes with the missing ingredient shown. It has one \"Craft\" button and a quantity stepper.\n- A \"Craft from nearby containers\" toggle is a design decision for you to make.\n\n**Containers and loot** (chests, corpses, storage):\n- The container opens as a second grid beside or above the bag, with **Take All** and **Quick Move** buttons.\n- Tapping an item with a container open offers \"Move to bag/container\".\n\n**Sort and filter:** a sort button (type, name, recent) and a small filter row (Tools, Food, Materials). Both are needed once a bag holds more than about 20 items.\n\n## Input mapping\n- **Define actions, not keys:** `Interact`, `ToggleInventory`, `HotbarNext/Prev`, `Hotbar1..6`, `UseItem`, `Drop`, `Menu*`. Use the Input Action System, so keyboard, touch and gamepad bind to the same action and players can rebind.\n- **PC:** `Tab` or `I` opens the inventory. Right-click is the context menu, Shift-click quick-moves, and the scroll wheel cycles the hotbar.\n- **Controller:** the d-pad or stick moves a visible focus ring, driven by `GuiService.SelectedObject`.\n  - `A` selects or confirms, `B` always backs out, `Y` opens the context actions, `X` splits or quick-moves.\n  - `LB/RB` switch tabs and the triggers change quantity.\n  - Every screen needs a defined default selection.\n  - Button glyphs follow `LastInputTypeChanged`.\n- **Phone:** tap selects, double-tap uses or equips, and long-press starts a drag. Every drag action also has a button. Add on-screen buttons for actions that have keys (interact, use, inventory).\n\n## Architecture (recommendation)\n- **The server owns inventory state.** The client sends intents such as `Move(from, to, count)`, `Use(slot)` and `Drop(slot, count)`. It never sends results.\n- **Validate everything server-side:** slot bounds, ownership, counts, stack rules, range to containers, and rate limits. The server returns the new state or a delta.\n- **The UI is optimistic:** it moves the item immediately, then reconciles with the server and snaps back with feedback on rejection. This hides latency, so actions feel instant.\n- **Rendering:** one render function per state, pooled slot frames, and updates only for changed slots. Disable the panel (`Enabled = false`) when closed.\n- **Persistence** (DataStore with session locking) matters here because items have value. I'd design it with the inventory system, not bolt it on.\n\n## Accessibility and localization\n- Text sizes that stay readable on a small phone, with a UI scale option.\n- A reduced-motion option for HUD pulses and screen shake.\n- Shapes and icons as well as color for rarity, danger and vitals.\n- 30\u201340% extra room for translated text.\n\n## Verification plan (once built)\nTest the smallest phone, a tablet, 1080p desktop and a 10-foot console view. Complete each of these touch-only and gamepad-only: use a hotbar item, loot a container, craft an item and drop a stack. Also test a lagging server connection, rejected moves and a respawn with the panel open.\n\n## Questions that would change the design\n1. Is inventory **slot-based or weight-based**? I assumed slots.\n2. Does death **drop the inventory**? That affects how much the confirm and quick-move flows matter.\n3. Is the game **PvP**? If so, the hotbar and quick-use matter even more.\n4. Do you want a **visual style** (grim, cartoony, minimal) before I commit to icons and panel treatment?\n\nI can build this as a Rojo project: the UI components, an input action map, the server inventory service and a UI test harness. Do you want that, or should I adjust the design first?",
+  "cost_usd": 0.14512,
+  "turns": 11,
+  "seconds": 38.3,
+  "stderr_tail": ""
+}

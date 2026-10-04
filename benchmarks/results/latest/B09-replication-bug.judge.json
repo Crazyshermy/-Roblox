@@ -1,0 +1,64 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Explains remote events are not ordered relative to attribute/property replication",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Explains streaming: the door may not exist on distant clients (nil)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Recommends driving the client from replicated state (GetAttributeChangedSignal / CollectionService component) instead of the remote, or passing state in the payload",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Mentions handling stream-in (instance added later) / ModelStreamingMode or WaitForChild with timeout",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Suggests how to reproduce (distance, latency)",
+        "A": "met",
+        "B": "missed"
+      },
+      {
+        "item": "Does not invent non-existent APIs",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": []
+    },
+    "preference": "A",
+    "reason": "Both answers explain the cause correctly and give sound fixes; A also gives a concrete way to reproduce the bug (a far-away client plus the Network Simulator) and states a prediction to test, while B has a useful code sample but no reproduction steps."
+  },
+  "judge_cost": 0.0505092,
+  "apex_score": 1.0,
+  "base_score": 0.833,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": []
+  },
+  "reason": "Both answers explain the cause correctly and give sound fixes; A also gives a concrete way to reproduce the bug (a far-away client plus the Network Simulator) and states a prediction to test, while B has a useful code sample but no reproduction steps."
+}
