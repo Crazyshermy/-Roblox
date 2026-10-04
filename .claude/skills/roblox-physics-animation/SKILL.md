@@ -1,6 +1,6 @@
 ---
 name: roblox-physics-animation
-description: "Roblox physics, characters and animation tech: assemblies, constraints and movers, network ownership, vehicles, ragdolls, custom character controllers, cameras, Animator and AnimationTrack priorities and markers, IK, procedural animation."
+description: "Roblox physics, characters, NPC AI and animation tech: assemblies, constraints and movers, network ownership, vehicles, ragdolls, custom character controllers, cameras, enemies and pathfinding, Animator and AnimationTrack priorities and markers, IK, procedural animation."
 ---
 
 # Physics, characters and animation
@@ -28,6 +28,9 @@ description: "Roblox physics, characters and animation tech: assemblies, constra
 - **IK:** `IKControl` for look-at, foot planting and hand placement. Procedural layers (lean into turns, head look, recoil offsets via `Motor6D.Transform` in a stepped loop) add life cheaply.
 - Under **Server Authority**: don't cache `AnimationTrack`s across frames. Query `Animator:GetTrackByAnimationId()` instead (E4).
 - Animation LOD: stop or simplify animations of distant or offscreen NPCs.
+
+## NPCs and enemy AI
+For enemies, monsters, companions or hordes, read `references/npc-ai.md` (server authority, tick budgets, state machines, perception, `PathfindingService` failure handling).
 
 ## Verify
 Physics behavior is version- and ownership-sensitive. Playtest with Server & Clients to see what *other* players observe. Watch for jitter at ownership boundaries and with the Network Simulator's latency.

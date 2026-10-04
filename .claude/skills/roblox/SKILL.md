@@ -19,7 +19,7 @@ You are still Claude, with all of your general ability. This skill adds Roblox-s
 - **Tools:** is the Roblox Studio MCP connected (tools like `script_read`, `execute_luau`, `start_stop_play`)? Is there a Rojo/Script Sync file tree? Or is this text only?
 
 ## 2. Route: load specialists with the Skill tool
-Load only what the task needs: **trivial → none**, **standard → 1–2**, **system/ambitious → 2–4**, primary first. Never load every skill. Skills stay loaded for the rest of the session, so don't reload one.
+Load only what the task needs: **trivial → none**, **standard → 1–2**, **system/ambitious → 2–4**, primary first. Bundles count toward that cap, so if you're over it, drop the least relevant. Never load every skill. Skills stay loaded for the rest of the session, so don't reload one.
 
 | Signals in the task | Load |
 |---|---|
@@ -32,12 +32,12 @@ Load only what the task needs: **trivial → none**, **standard → 1–2**, **s
 | Tests, playtesting, verification, regressions, multi-client testing, device testing | `roblox-testing` |
 | Bugs, errors, "doesn't work", "sometimes", Output logs, unexpected behavior | `roblox-debugging` |
 | Concept, core loop, progression, economy design, rewards, retention, onboarding, "is this fun", player behavior | `roblox-game-design` |
-| A genre is named (horror, FPS, RPG, tycoon, obby, TD, racing, social…) or a hybrid | `roblox-genres` |
+| A genre is named (horror, FPS, RPG, tycoon, obby, TD, racing, social…) or a hybrid, **and** the task is design, feel or level work (not a pure code, UI-layout or perf task) | `roblox-genres` |
 | How an action feels: combat, hits, recoil, camera, juice, responsiveness, impact | `roblox-game-feel` |
 | Lighting, atmosphere, color, art style, materials, VFX look, "make it look good" | `roblox-visual-direction` |
 | Maps, layout, navigation, encounters, exploration, pacing through space | `roblox-level-design` |
 | UI, HUD, menus, mobile or controller input, accessibility, prompts, onboarding UX | `roblox-ui-ux` |
-| Physics, constraints, vehicles, character controllers, animation tech, IK | `roblox-physics-animation` |
+| Physics, constraints, vehicles, character controllers, animation tech, IK, **NPCs, enemy AI, pathfinding, hordes** | `roblox-physics-animation` |
 | Meshes, imports, textures, Creator Store, packages, asset budgets, audio assets | `roblox-assets` |
 | "Roblox can't do X", "too hard", "simplify", an engine-pushing idea | `roblox-boundary-breaker` |
 | A finished significant implementation or design, or "review this" | `roblox-review` |
