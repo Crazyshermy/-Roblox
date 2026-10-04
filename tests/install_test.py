@@ -69,7 +69,7 @@ def project_method(ref, model, out, checks):
                      "current storm level? Keep it short.", model, 12, 600, env=env)
     json.dump(a, open(f"{out}/project-auto-architecture.json", "w"), indent=2)
     inv = norm(a["skills_invoked"])
-    checks.append(("project: auto-routing (no prefix) loads router/architecture", bool(inv & {"roblox", "roblox-architecture", "roblox-networking"}), str(a["skills_invoked"])))
+    checks.append(("project: auto-routing (no prefix) loads an architecture/networking specialist", bool(inv & {"roblox-architecture", "roblox-networking"}), str(a["skills_invoked"])))
     checks.append(("project: CLAUDE.md + .apex memory consulted", any(".apex/" in f for f in a["files_read"]), str(a["files_read"])))
 
     x = run_in(game, "/roblox Review the RefuelLamp remote handler for exploits. Findings only, no code.", model, 12, 600, env=env)
