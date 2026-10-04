@@ -1,6 +1,6 @@
 ---
 name: roblox-data
-description: "Roblox persistence and cross-server services: DataStore player data (session locking, UpdateAsync, budgets, migrations, shutdown saves), purchase receipts, MemoryStore, MessagingService, TeleportService, leaderboards, data-loss and duplication bugs."
+description: "Use for anything Roblox saves, loads, purchases or shares across servers, and for lost or duplicated progress. Covers DataStore player data (session locking, UpdateAsync, budgets, migrations, BindToClose), purchase receipts, MemoryStore, MessagingService, TeleportService and leaderboards."
 ---
 
 # Roblox data and cross-server services
@@ -12,22 +12,23 @@ Data loss and duplication are the most damaging bugs a Roblox game can ship. Bot
 |---|---|
 | Player progress, inventory, settings | **DataStore**, one profile key per player (split by access pattern only if near limits) |
 | Leaderboards | `OrderedDataStore` (periodic writes, cached reads) |
-| Ephemeral, shared, fast: matchmaking queues, live events, server lists, global counters, cross-server trade escrow | **MemoryStore** (sorted maps and queues; everything expires ≤ 45 days) |
+| Ephemeral, shared, fast: matchmaking queues (queue or sorted map), live events, server lists and counters (hash map, avoiding one hot sorted map), cross-server trade escrow | **MemoryStore** (sorted maps and queues; everything expires ≤ 45 days) |
 | Fire-and-forget cross-server notifications (announcements, "refresh your cache") | **MessagingService**, which is **best effort, so never use it for value** |
 | Moving players between places and servers | **TeleportService** (`TeleportAsync` with `TeleportOptions`, reserved servers via `ReserveServer` or the options) |
 
 ## Player data: the non-negotiables
-1. **Session locking.** Only one server may own a player's profile at a time. Without it, a fast server hop lets server A save stale data over server B's, which causes rollbacks and dupes. Use the project's existing profile library if there is one (e.g. ProfileStore). Otherwise implement a lock in key metadata via `UpdateAsync` (official pattern: `creator-docs: cloud-services/data-stores/player-data-purchasing.md`). Don't hand-roll a third approach if the project already has one.
+1. **Session locking.** Only one server may own a player's profile at a time. Without it, a fast server hop lets server A save stale data over server B's, which causes rollbacks and dupes. Use the project's existing profile library if there is one (e.g. ProfileStore). Otherwise implement a lock via `UpdateAsync` with a GUID, an expiry timestamp, and a **refresh on every autosave**. A server that finds its lock taken must stop writing (official pattern: `creator-docs: cloud-services/data-stores/player-data-purchasing.md`). Don't hand-roll a third approach if the project already has one.
 2. **`UpdateAsync` for read-modify-write.** `SetAsync` blindly overwrites. The `UpdateAsync` transform must be pure: it may run multiple times, must not yield, and may return `nil` to cancel.
-3. **Load before play.** Don't let a player act or earn before their data has loaded. If loading fails after retries, kick with a clear message **rather than** starting fresh and overwriting real data with defaults. This is the #1 data-wipe pattern.
+3. **Load before play.** Don't let a player act or earn before their data has loaded. If loading fails after retries, **never** start fresh with defaults that later overwrite real data. Either kick with a clear message, or let them play with saving disabled for that session and tell them. This is the #1 data-wipe pattern.
 4. **Save points:** autosave on an interval (respecting budgets), on `PlayerRemoving`, and in `game:BindToClose` (which has ~30 s; save all players in parallel with `task.spawn` and wait). Don't save on every change.
-5. **Retries:** wrap calls in `pcall` with exponential backoff and a cap. Check `DataStoreService:GetRequestBudgetForRequestType` before bursts.
-6. **Schema version** field in every profile. Write migrations as pure functions `vN → vN+1`, run them on load, test them against fixture snapshots of old data, and never delete fields in the same release that stops using them.
-7. **Store canonical state, not derived or UI state.** Serialize only JSON-safe values (no Instances, no non-string dictionary keys, no NaN/inf). Size-check against the 4,194,304-char limit for unbounded collections (logs, inventories).
-8. **Studio caution:** with "Enable Studio Access to API Services" on, Studio playtests hit **real** DataStores. Use a separate test place or universe, or a dev-scoped store name, for destructive tests.
+5. **Save serialization:** keep one save in flight per player, and **queue** (coalesce) a save requested meanwhile, never drop it. The final save on leave or shutdown, which releases the session lock, must always run after any in-flight save.
+6. **Retries:** wrap calls in `pcall` with exponential backoff and a cap. Check `DataStoreService:GetRequestBudgetForRequestType` before bursts.
+7. **Schema version** field in every profile. Write migrations as pure functions `vN → vN+1`, run them on load, test them against fixture snapshots of old data, and never delete fields in the same release that stops using them.
+8. **Store canonical state, not derived or UI state.** Serialize only JSON-safe values (no Instances, no non-string dictionary keys, no NaN/inf). Size-check against the 4,194,304-char limit for unbounded collections (logs, inventories).
+9. **Studio caution:** with "Enable Studio Access to API Services" on, Studio playtests hit **real** DataStores. Use a separate test place or universe, or a dev-scoped store name, for destructive tests.
 
 ## Purchases
-`ProcessReceipt`: look up the player and their loaded profile (if the player isn't present or not loaded, return `NotProcessedYet`). If `PurchaseId` is already in their processed list, return `PurchaseGranted`. Otherwise grant, record the `PurchaseId`, **save**, and only then return `PurchaseGranted`. Bound the processed-ID list (keep recent IDs). Game passes: check `UserOwnsGamePassAsync` (cached) plus `PromptGamePassPurchaseFinished`, and never trust the client's claim.
+`ProcessReceipt`: there is **no time-based retry**. It re-fires only when the player buys again or rejoins, and a rejoin fires before their data loads. So if the player is in the server, **yield until their profile loads** (the callback has no timeout), and return `NotProcessedYet` only if they left or loading failed. The callback can run on two servers at once, which the session lock makes safe. If `PurchaseId` is already in their processed list, return `PurchaseGranted`. Otherwise grant, record the `PurchaseId`, **save**, and only then return `PurchaseGranted`. Bound the processed-ID list (keep recent IDs). Game passes: check `UserOwnsGamePassAsync` (cached) plus `PromptGamePassPurchaseFinished`, and never trust the client's claim.
 
 ## Cross-server patterns
 - **Global trade or mail:** escrow through a durable store (DataStore record or MemoryStore with a durable fallback), with idempotent claim IDs. MessagingService only *nudges* the recipient's server to check.

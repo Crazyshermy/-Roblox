@@ -22,7 +22,7 @@ description: "Keeps ambitious Roblox ideas alive. Use when something seems impos
 | Perception tricks | audio carrying the illusion, hitstop and frame pacing, post-processing, cutting away at the expensive moment |
 | Streaming and LOD | streaming regions, impostors (billboards or low-poly stand-ins), model LOD swaps, loading behind occluders |
 | Design reframing | change the *rules* so the hard part isn't needed while the feeling remains (only after the technical options, and stated explicitly) |
-4. **Options.** Present 2–4 options. For each, give which parts of the experience survive and which are lost (named, not scored), the complexity, the risk, the performance and security impact, and the upgrade path.
+4. **Options.** Present 2–4 options. For each, give which parts of the experience survive and which are lost (named, not scored), the complexity, the risk, the performance impact **on a mid-range phone**, the security impact, and the upgrade path.
 5. **Spike first.** Prototype the riskiest assumption before committing the architecture, and record the result (E5 if run in Studio).
 6. **Never simplify silently.** If the chosen option loses part of the experience, tell the user exactly what and why, and keep the fuller option on record (`.apex/decisions.md` → rejected or deferred).
 

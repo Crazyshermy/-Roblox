@@ -22,7 +22,7 @@ This is a focused audit to decide what Roblox Apex should be, not a survey. Sour
 **Remove:** genre code templates; retention and monetization playbooks that default to pets, eggs, rebirths and dailies; generic "best practice" lists with no Roblox-specific failure modes.
 
 **Missing everywhere, so Apex built it:**
-- **Currentness.** No pack covered 2026 platform changes: Server Authority GA (July 2026), restructured DataStore limits, IAS full release, the new type solver GA, Script Sync GA, and `Lighting.Technology` being deprecated in favor of `LightingStyle`.
+- **Currentness.** No pack covered 2026 platform changes: Server Authority (announced for all creators July 2026; one docs page still says beta), restructured DataStore limits, IAS full release, the new type solver GA, Script Sync GA, and `Lighting.Technology` being deprecated in favor of `LightingStyle`.
 - **An evidence model** (E0–E5), plus an API-existence checker (`tests/check_api.py`) run against the official reference.
 - **Anti-slop as a gate** with justified/transform/remove verdicts, and creative-ambition preservation (`roblox-boundary-breaker`).
 - **Game feel** as a timeline and channel model with *networked* latency hiding.
@@ -32,7 +32,7 @@ This is a focused audit to decide what Roblox Apex should be, not a survey. Sour
 
 **Outdated in common knowledge (and in models' training data):**
 - DataStore budget "60 + players×10". The current model has experience-level limits (300 + CCU×40 read, ×20 write) plus configurable per-server limits (default 60 + players×40).
-- "Roblox has no netcode or anti-speedhack." Server Authority with prediction and rollback is GA.
+- "Roblox has no netcode or anti-speedhack." Server Authority with prediction and rollback exists and was announced for all creators.
 - `wait`/`spawn`/`delay`, `BodyVelocity`-family movers, legacy chat, and `Lighting.Technology`.
 
 **Contradictions found:**

@@ -17,6 +17,7 @@ SPECIALISTS = ["roblox-architecture", "roblox-assets", "roblox-boundary-breaker"
                "roblox-game-design", "roblox-game-feel", "roblox-genres", "roblox-level-design", "roblox-luau",
                "roblox-networking", "roblox-performance", "roblox-physics-animation", "roblox-review", "roblox-security",
                "roblox-testing", "roblox-ui-ux", "roblox-visual-direction"]
+VERSION = __import__("re").search(r"version: (\S+)", open(os.path.join(os.path.dirname(HERE), ".claude", "skills", "roblox", "SKILL.md")).read()).group(1)
 WRITE_TOOLS = ("Skill Read Glob Grep Write Edit", "Bash WebFetch WebSearch Agent")
 
 
@@ -48,7 +49,7 @@ def project_method(ref, model, out, checks):
     json.dump(s, open(f"{out}/project-status.json", "w"), indent=2)
     disc = norm(s["skills_available"] or [])
     checks.append(("project: all 22 skills discovered in fresh session", len(disc) == 22 and set(SPECIALISTS) <= disc, f"{len(disc)} discovered"))
-    checks.append(("project: /roblox-status reports version", "1.0" in s["final_text"], s["final_text"][:120].replace("\n", " ")))
+    checks.append(("project: /roblox-status reports version", VERSION in s["final_text"], s["final_text"][:120].replace("\n", " ")))
 
     r = run_in(game, "/roblox-route Build a secure player trading system", model, 8, 600, env=env)
     json.dump(r, open(f"{out}/project-route.json", "w"), indent=2)
@@ -91,7 +92,7 @@ def plugin_method(ref, model, out, checks):
     s = run_in(game, "/roblox-status", model, 15, 600, env={"CLAUDE_CONFIG_DIR": cfg})
     json.dump(s, open(f"{out}/plugin-status.json", "w"), indent=2)
     checks.append(("plugin: skills discovered (namespaced)", len(s["skills_available"] or []) == 22 and all(x.startswith("roblox-apex:") for x in s["skills_available"]), f"{len(s['skills_available'] or [])}"))
-    checks.append(("plugin: bare /roblox-status works", "1.0" in s["final_text"], s["final_text"][:100].replace("\n", " ")))
+    checks.append(("plugin: bare /roblox-status works", VERSION in s["final_text"], s["final_text"][:100].replace("\n", " ")))
     a = run_in(game, "Review the RefuelLamp handler in src/server/OilService.luau for exploits. Findings only.", model, 12, 600, env={"CLAUDE_CONFIG_DIR": cfg})
     json.dump(a, open(f"{out}/plugin-auto-security.json", "w"), indent=2)
     checks.append(("plugin: auto-routing reaches namespaced security skill", "roblox-security" in norm(a["skills_invoked"]), str(a["skills_invoked"])))

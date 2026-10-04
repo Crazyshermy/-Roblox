@@ -23,7 +23,7 @@ description: "Roblox physics, characters and animation tech: assemblies, constra
 
 ## Animation
 - Load and play on the **`Animator`** (inside Humanoid or AnimationController). Playing from the client on the local character replicates automatically. NPC animations should be played by the server, or by clients for cosmetic-only LOD.
-- **Priority** (Core < Idle < Movement < Action < Action2–4) and **weights** decide blending. Most "animation won't play" bugs are priority or ownership issues. Animations must be owned by the experience owner (user or group) to load in that experience.
+- **Priority** (Core < Idle < Movement < Action < Action2–4) and **weights** decide blending. Most "animation won't play" bugs are priority or ownership issues. An animation must be owned by the experience owner (user or group) **or explicitly granted to this experience** via asset Permissions to load.
 - Use `AnimationTrack:GetMarkerReachedSignal("Hit")` to sync gameplay and VFX to animation frames. Use `AdjustSpeed` for hitstop and timing.
 - **IK:** `IKControl` for look-at, foot planting and hand placement. Procedural layers (lean into turns, head look, recoil offsets via `Motor6D.Transform` in a stepped loop) add life cheaply.
 - Under **Server Authority**: don't cache `AnimationTrack`s across frames. Query `Animator:GetTrackByAnimationId()` instead (E4).

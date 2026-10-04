@@ -1,6 +1,6 @@
 ---
 name: roblox-networking
-description: "Roblox client/server networking and multiplayer: remotes vs unreliable remotes vs replication, Server Authority (prediction, rollback), network ownership, latency hiding, race conditions, join, leave and respawn mid-action, streaming-safe client code."
+description: "Use when designing or fixing how Roblox state moves between server and clients, or when multiplayer behaves wrong. Covers remotes vs unreliable remotes vs replicated attributes, Server Authority (prediction, rollback), network ownership, latency hiding, races, join, leave and respawn mid-action, and streaming-safe client code."
 ---
 
 # Roblox networking and multiplayer
@@ -13,12 +13,12 @@ The server owns truth. Clients **request**, **predict** and **present**. Validat
 | Persistent shared state that late joiners must see (door open, round state, health) | **Server-set properties and attributes** on replicated instances. Replication handles late join. Don't re-send it via remotes. |
 | A discrete, must-arrive event (purchase result, ability fired, round end) | `RemoteEvent` (reliable, ordered among RemoteEvents) |
 | High-frequency, latest-value-wins data (aim direction, cosmetic positions, VFX cues) | `UnreliableRemoteEvent`. Keep payloads ≤ 1,000 B or they're dropped, and expect loss and reordering. |
-| A client asking the server for data | `RemoteFunction` (client→server) is acceptable. Use **never** `InvokeClient` without a timeout design. |
+| A client asking the server for data | `RemoteFunction` (client→server) is fine. **Never** use server→client `InvokeClient` without a timeout design (see the security contract). |
 | Many players and objects, server-authoritative competitive physics (FPS, racing, sports, fighting) | **Server Authority mode**. See below. |
 
 Remotes are **not ordered relative to property and attribute replication**. If a remote references an instance or attribute the server just changed, the client may not have it yet. Send the needed values in the payload, or make the client tolerate a missing instance (wait with a timeout and handle `nil`).
 
-## Server Authority mode (GA July 2026, E4; read `roblox/references/currency.md`)
+## Server Authority mode (announced for all creators July 2026; young system. APIs E4; read `roblox/references/currency.md`)
 Use it when movement or physics fairness matters and you want responsiveness without hand-written netcode. Cost: it requires an architecture change, and it is a young system.
 - `Workspace.AuthorityMode = Server` turns on NGR, IAS player scripts, Deferred signals, fixed simulation and streaming.
 - Put core gameplay in `RunService:BindToSimulation` in a ModuleScript required on **both** sides. Inputs come through `InputAction`s (`InputContext` under the Player). State lives in attributes on predicted instances, written only inside bound functions. Use `time()` and not `tick()` or `os.clock()`.

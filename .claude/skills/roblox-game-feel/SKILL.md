@@ -11,12 +11,14 @@ description: "Game feel and juice: input response, anticipation, impact, hitstop
 `INPUT → ANTICIPATION → ACTION → IMPACT → FEEDBACK → RECOVERY`
 | Phase | Question | Roblox tools |
 |---|---|---|
-| Input | Does something happen **on the same frame** locally? | client-side response first (animation, sound, camera) via `ContextActionService`/IAS. Never wait on the server to start presentation. |
+| Input | Does something happen **on the same frame** locally, on **every device**? | client-side response first (animation, sound, camera). Bind through `ContextActionService`/IAS or a `ProximityPrompt` (with hold duration for anticipation), so touch and gamepad work too. A keyboard-only key is a mobile bug. Never wait on the server to start presentation. |
 | Anticipation | Is the action telegraphed (for the player's own readability, and opponents' counterplay)? | wind-up animation (`AnimationTrack` + `GetMarkerReachedSignal`), sound swell, slight camera pull |
 | Action | Is the active moment clear and fast? | fast animation segment, trails (`Trail`, `Beam`), whoosh sound |
 | Impact | Does the hit *land*? | **hitstop** (freeze both attacker and target anims ~40–100 ms by `AdjustSpeed(0)`), impact VFX at contact point (`ParticleEmitter:Emit(n)`), impact sound layered (transient + body + tail), target reaction anim/knockback |
 | Feedback | Does the player understand the result? | damage numbers, hit marker, health bar flash, camera shake scaled to magnitude, controller rumble (`HapticService`), UI punch (scale tween) |
 | Recovery | Is there a cost and rhythm? | recovery frames, return-to-idle blend, cooldown readability |
+
+Prefer engine effect primitives (`ParticleEmitter:Emit`, `Beam`, `Trail`, `TweenService`) over per-object per-frame script loops: one `Heartbeat` connection per particle doesn't scale.
 
 Timing values are **conventions (E3), not laws**: tune by feel and playtest, and record chosen values in config.
 

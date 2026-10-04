@@ -42,8 +42,10 @@ BuyRequest.OnServerEvent:Connect(function(player: Player, itemId: unknown, quant
 	if busy[player] then return end
 	busy[player] = true
 	-- check + mutate happen inside Inventory without yielding between them
-	local ok, reason = Inventory.tryPurchase(player, item, quantity :: number)
+	-- pcall so an error (e.g. a DataStore failure) can't leave the player permanently "busy"
+	local called, ok, reason = pcall(Inventory.tryPurchase, player, item, quantity :: number)
 	busy[player] = nil
+	if not called then warn("tryPurchase failed:", ok) return end
 	if not ok then
 		-- optional: tell the client why, for UX; never trust the client to enforce it
 	end

@@ -4,7 +4,7 @@ Verified against `Roblox/creator-docs` (snapshot 2026-10-02) unless marked other
 
 **Most common stale-knowledge traps** (older tutorials, and most AI training data, get these wrong):
 1. DataStore budgets are **not** "60 + players×10" anymore (§Data).
-2. Server Authority with prediction and rollback **is GA (July 2026)**. "Roblox has no built-in anti-speedhack/netcode" is outdated (§Networking).
+2. Server Authority with prediction and rollback exists and was announced as available to all creators (Roblox, July 2026; E3). One docs page (`scripting/security/network-ownership.md`, 2026-10) still says "beta", so treat it as young. "Roblox has no built-in anti-speedhack/netcode" is outdated (§Networking).
 3. The Input Action System is fully released and default player scripts are migrating to it (§Input).
 4. `wait()`, `spawn()` and `delay()` are legacy. Use the `task` library.
 5. Legacy chat (`Chatted` and the Lua chat system) has been superseded by `TextChatService`.
@@ -30,9 +30,10 @@ Verified against `Roblox/creator-docs` (snapshot 2026-10-02) unless marked other
   - Value ≤ **4,194,304** characters per key. Store name, key and scope ≤ **50** chars each. Metadata ≤ 300 chars in total.
   - **Experience-level** limits per minute, shared with Open Cloud: Read **300 + CCU×40**, Write **300 + CCU×20**, List 300 + CCU×2, Remove 300 + CCU×40. `UpdateAsync` consumes both read and write.
   - **Server-level** limits default to Read and Write **60 + players×40**/min. They are creator-configurable via `DataStoreService:SetRateLimitForRequestType()`. Inspect them with `GetRequestBudgetForRequestType()`.
+  - **Per key** (all servers): writes ≤ **4 MB/min**, reads ≤ **25 MB/min** (`KeyThrottled`). Each request rounds up to the next KB. **Storage** cap: 500 MB + 1 MB × lifetime users, measured compressed on latest versions. Don't pre-compress.
   - Throttled requests queue, with **30 per queue**. When a queue is full, requests fail with error codes 301–306.
   - Official docs recommend **session locking** for player data (`player-data-purchasing.md`), and `UpdateAsync` when a write depends on the current value.
-- **MemoryStore** (E4): memory quota **64 KB + 1.2 KB × users** (experience-wide). Requests **1000 + 120 × CCU** units/min. A single structure holds ≤ 1,000,000 items and ≤ 100 MB. Max expiration is **3,888,000 s (45 days)**. When memory is full, writes fail until items expire.
+- **MemoryStore** (E4): memory quota **64 KB + 1.2 KB × users** (experience-wide). Requests **1000 + 120 × CCU** units/min. A single **sorted map or queue** holds ≤ 1,000,000 items and ≤ 100 MB, and lives on one partition (a throughput hot spot). Hash maps spread across partitions, with a per-key limit of about 5k write and 15k read units/min, so they are better for server lists and counters. Max expiration is **3,888,000 s (45 days)**. When memory is full, writes fail until items expire.
 - **MessagingService** (E4, `MessagingService.yaml`): message ≤ **1 kB**. Topics are 1–80 chars. Each server can send **600 + 240 × players**/min. Each topic can receive 40 + 80 × servers/min. **Delivery is best effort and not guaranteed.**
 
 ## Input and UI
@@ -40,7 +41,7 @@ Verified against `Roblox/creator-docs` (snapshot 2026-10-02) unless marked other
 - `TextChatService` is the current chat system. User-authored text shown to *other* users that bypasses chat must go through `TextService:FilterStringAsync` (or equivalent filtering) (E4).
 
 ## Characters
-- `StarterPlayer.CharacterJumpHeight` defaults to **7.2** studs, and `CharacterWalkSpeed` to **16** (E4).
+- `CharacterWalkSpeed` defaults to **16**. Jump: `StarterPlayer.CharacterUseJumpPower` defaults to **true**, so the default jump comes from `JumpPower` 50 and `Workspace.Gravity` (about 6.4 studs), **not** `JumpHeight` 7.2. Measure the real jump in a metrics gym. (E4, `StarterPlayer.yaml`)
 
 ## Luau and tooling
 - Luau's **new type solver** is generally released (2025–2026). Its diagnostics and inference differ from the old solver, so check type errors against current Studio or luau-lsp rather than old blog posts (E4/DevForum).

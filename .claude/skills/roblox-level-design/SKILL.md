@@ -8,7 +8,7 @@ description: "Level and world design: metrics, navigation, landmarks, sightlines
 A level is a **sequence of player decisions and feelings arranged in space**. Design the experience beat-by-beat, then the geometry.
 
 ## Start from metrics (get them from the project; defaults below are E4 engine defaults)
-Character: `WalkSpeed` 16 studs/s, `JumpHeight` 7.2 studs (verify the project's values and any custom controller). Derive: max jumpable gap and height, comfortable corridor width (multiplayer: ≥ 3 characters side by side for main routes), door/ceiling clearance, time-to-cross for key spaces. Build a **metrics gym** (test strip of gaps/heights) before production geometry.
+Character: `WalkSpeed` 16 studs/s. Jump: `StarterPlayer.CharacterUseJumpPower` defaults to **true**, so the default jump comes from `JumpPower` 50 and `Workspace.Gravity` (about 6.4 studs), **not** `JumpHeight` 7.2. Measure the real jump in a metrics gym. Verify the project's values and any custom controller. Derive: max jumpable gap and height, comfortable corridor width (multiplayer: ≥ 3 characters side by side for main routes), door/ceiling clearance, time-to-cross for key spaces. Build a **metrics gym** (test strip of gaps/heights) before production geometry.
 
 ## Navigation and orientation
 - **Landmarks**: unique, visible-from-afar shapes/lights for orientation; one per region.

@@ -31,7 +31,7 @@ Write 2–4 plausible causes and **what each predicts differently**, then run th
 | Animation not playing or stuck | loaded on the wrong Animator; animation priority or weight conflicts; asset ownership or permissions (animation must be owned by the experience owner/group); cached track after Server Authority rollback |
 
 ## 4. Tooling
-- Studio MCP: `get_console_output` after `start_stop_play`; `execute_luau` (Server/Client) to read live state at the moment of failure; `script_grep` to find every writer of the broken state; and the `skill` tool `rbx-debug` for Roblox's own debugger guidance.
+- Studio MCP: `get_console_output` after `start_stop_play`; `execute_luau` (Server/Client) to read live state at the moment of failure; `script_grep` to find every writer of the broken state; and the `skill` tool for Roblox's own debugging guide if one is listed.
 - In-Studio: breakpoints and the Watch window, `debug.traceback()` in error handlers, Server/Client view toggle, Network Simulator for latency bugs.
 - Add **temporary** targeted prints with a unique tag (e.g. `[DBG-trade]`) and remove them after.
 

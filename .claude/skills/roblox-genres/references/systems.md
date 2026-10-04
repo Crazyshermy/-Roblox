@@ -10,7 +10,7 @@
 - **Roblox:** per-plot ownership, server-authoritative purchases, and streaming-friendly plot sizes. Save layout compactly (IDs plus transforms, not instances).
 
 ## Sandbox / building
-- **Keep:** expressive tools with low friction, sharing and showcasing. **Failure:** griefing (needs ownership and permissions), memory and part-count explosions (needs per-player budgets), save size (compact serialization against the 4 MB key limit).
+- **Keep:** expressive tools with low friction, sharing and showcasing. **Failure:** griefing (needs ownership and permissions), memory and part-count explosions (needs per-player budgets), save size (compact serialization; budget under the per-key 4 MB/min write throughput, and shard large builds across keys).
 
 ## Survival
 - **Fantasy:** competence against scarcity. **Keep:** resource pressure, crafting that changes options, day/night or threat cycles. **Failure:** tedious inventory UI on mobile, punishing death that wipes hours, resource farming bots. Death loss needs to be tuned to session length.

@@ -19,14 +19,14 @@ SKILLS_SRC = os.path.join(REPO, ".claude", "skills")
 def make_project(mode: str, fixture: str | None) -> str:
     d = tempfile.mkdtemp(prefix=f"apex-{mode}-")
     subprocess.run(["git", "init", "-q", d], check=True)
-    if mode == "apex":
+    if mode in ("apex", "apex-nomd"):
         dst = os.path.join(d, ".claude", "skills")
         os.makedirs(dst)
         for name in os.listdir(SKILLS_SRC):
             if name.startswith("roblox"):
                 shutil.copytree(os.path.join(SKILLS_SRC, name), os.path.join(dst, name))
         tpl = os.path.join(SKILLS_SRC, "roblox-init", "templates", "CLAUDE-block.md")
-        if os.path.exists(tpl):
+        if os.path.exists(tpl) and mode == "apex":
             shutil.copy(tpl, os.path.join(d, "CLAUDE.md"))
     if fixture:
         src = os.path.join(REPO, "tests", "fixtures", fixture)
@@ -90,7 +90,7 @@ def run(prompt: str, mode: str, model: str, fixture: str | None, max_turns: int,
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--prompt", required=True)
-    ap.add_argument("--mode", default="apex", choices=["apex", "baseline"])
+    ap.add_argument("--mode", default="apex", choices=["apex", "apex-nomd", "baseline"])
     ap.add_argument("--model", default="sonnet")
     ap.add_argument("--fixture", default=None)
     ap.add_argument("--name", default="case")

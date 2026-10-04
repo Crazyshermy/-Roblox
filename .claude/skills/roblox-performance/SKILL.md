@@ -1,6 +1,6 @@
 ---
 name: roblox-performance
-description: "Roblox performance, measure-first: CPU, GPU and rendering, memory and leaks, physics, network, streaming, particles, mobile budgets, MicroProfiler and profiling tools, regression detection. Use for lag, FPS drops, memory growth, or optimization."
+description: "Use for Roblox lag, FPS drops, memory growth, slow servers or any optimization. Measure-first, covering CPU, GPU and rendering, memory and leaks, physics, network, streaming, particles, mobile budgets, MicroProfiler and profiling tools, and regression detection."
 ---
 
 # Roblox performance
@@ -16,7 +16,7 @@ description: "Roblox performance, measure-first: CPU, GPU and rendering, memory 
 | Memory climbs over a session | leaks | per-player tables not cleared, undisconnected connections, instances not destroyed, growing caches. Compare memory categories over time. |
 | Mobile-only problems | GPU and memory budget | test on a real low-end device or the Device Emulator with a memory cap. Watch texture memory, particles and transparency. |
 
-The Studio MCP `skill` tool `rbx-perf-profiling` and `rbx-scene-analysis` carry Roblox's own current guidance. Use them when connected.
+When Studio is connected, check the Studio MCP `skill` tool for Roblox's own profiling guides (names vary, so list them first).
 
 ## Common big wins (verify each by measurement)
 - **Scripts:** event-driven over polling. Don't run `while true do task.wait()` loops per object; use one manager loop or `Heartbeat` over a list. Throttle non-critical updates (AI perception at 5–10 Hz, not 60). Don't do `GetDescendants` or `FindFirstChild` scans in hot paths. Batch remote traffic.

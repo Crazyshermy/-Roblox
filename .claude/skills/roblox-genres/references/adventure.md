@@ -16,4 +16,4 @@
 
 ## Platformer / obby
 - **Fantasy:** mastery of movement. **Keep:** readable hazards, fast respawn near the failure point, difficulty ramps with checkpoints, a movement feel worth mastering. **Break:** default-controller-only obbies. Custom movement (wall jumps, dashes, momentum) creates identity.
-- **Failure:** ambiguous jumps (depth perception), mobile-hostile precision, unfair blind jumps. Measure gaps against character metrics (default `JumpHeight` 7.2 studs, `WalkSpeed` 16; verify the project's values). Test every jump on touch controls.
+- **Failure:** ambiguous jumps (depth perception), mobile-hostile precision, unfair blind jumps. Measure gaps against character metrics (the default jump is about 6.4 studs via JumpPower 50, not JumpHeight 7.2, and `WalkSpeed` is 16. Measure the project's real values). Test every jump on touch controls.

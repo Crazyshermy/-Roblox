@@ -17,7 +17,7 @@ CASES = [
         "why": "/roblox-status works and the session really discovers the skills",
         "prompt": "/roblox-status",
         "expect_skills_any": [],  # user slash command: expanded by harness, not a Skill tool call
-        "must": [r"1\.0\.0", r"roblox-security", r"roblox-game-design", r"(not connected|Studio MCP)"],
+        "must": [r"\b1\.\d+\.\d+\b", r"roblox-security", r"roblox-game-design", r"(not connected|Studio MCP)"],
         "must_not": [],
     },
     {
@@ -88,6 +88,16 @@ CASES = [
         "must_not": [r"(?i)^\s*(yes|good plan|sounds good)[.!,]"],
     },
     {
+        "id": "security-nomd",
+        "mode": "apex-nomd",
+        "why": "Plugin users who never ran /roblox-init: no CLAUDE.md block, security must still auto-route",
+        "prompt": "Review this Roblox handler for exploits, findings only: RefuelLamp.OnServerEvent:Connect(function(player, amount) "
+                  "player.leaderstats.Oil.Value -= amount; LampService.addFuel(amount) end)",
+        "expect_skills_any": ["roblox-security"],
+        "must": [r"(?i)negative", r"(?i)nan|math\.huge|inf"],
+        "must_not": [],
+    },
+    {
         "id": "route-inspect",
         "why": "/roblox-route explains routing for a trading system without executing it",
         "prompt": "/roblox-route Build a secure player trading system",
@@ -139,7 +149,7 @@ def main():
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", f"smoke-{stamp}")
     os.makedirs(out, exist_ok=True)
-    jobs = [(c, "apex") for c in cases] + ([(c, "baseline") for c in cases if not c["prompt"].startswith("/roblox-")] if a.with_baseline else [])
+    jobs = [(c, c.get("mode", "apex")) for c in cases] + ([(c, "baseline") for c in cases if not c["prompt"].startswith("/roblox-")] if a.with_baseline else [])
     results = {}
     with cf.ThreadPoolExecutor(a.jobs) as ex:
         futs = {ex.submit(run, c["prompt"], mode, a.model, None, 12, 600): (c, mode) for c, mode in jobs}
@@ -155,7 +165,7 @@ def main():
     lines = [f"# Smoke test {stamp} (model: {a.model})", "", "| case | mode | skills invoked | skills ok | markers ok | cost |", "|---|---|---|---|---|---|"]
     total = 0.0
     for c in cases:
-        for mode in ("apex", "baseline"):
+        for mode in ("apex", "apex-nomd", "baseline"):
             r = results.get((c["id"], mode))
             if not r:
                 continue
@@ -164,7 +174,7 @@ def main():
     lines += ["", f"Total cost: ${total:.2f}", "", "Case intents:"] + [f"- **{c['id']}**: {c['why']}" for c in cases]
     open(os.path.join(out, "summary.md"), "w").write("\n".join(lines) + "\n")
     print("\n".join(lines))
-    apex_fail = [k for k, r in results.items() if k[1] == "apex" and not (r["check"]["skills_ok"] and r["check"]["markers_ok"])]
+    apex_fail = [k for k, r in results.items() if k[1] != "baseline" and not (r["check"]["skills_ok"] and r["check"]["markers_ok"])]
     sys.exit(1 if apex_fail else 0)
 
 

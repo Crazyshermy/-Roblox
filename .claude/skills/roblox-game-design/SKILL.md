@@ -1,6 +1,6 @@
 ---
 name: roblox-game-design
-description: "Game design for Roblox: core fantasy, loops, progression, pacing, rewards, economy sources and sinks, social systems, retention, onboarding, failure and recovery, anti-slop challenges to genre-default mechanics, player-behavior hypotheses, evidence-driven iteration on fun."
+description: "Use when inventing, evaluating or improving a Roblox game concept, mechanic, progression, economy or reward system, or when asking whether something is fun. Covers core fantasy, loops, pacing, social systems, onboarding, failure and recovery, anti-slop challenges to genre-default mechanics, and evidence-driven iteration."
 ---
 
 # Roblox game design
@@ -42,4 +42,4 @@ If the user's idea is unusual, protect what makes it unusual. Don't steer it tow
 Never output fake fun scores. Reason with **hypotheses**: name the expected experience, the mechanism, what you'd observe if it works, and how it could fail. Use the iteration loop in `references/experiments.md` (OBSERVE → PROBLEM → HYPOTHESIS → CHANGE → TEST → COMPARE → KEEP/REVERT → RECORD). Player-motivation reasoning lives in `references/player-model.md`: those are behavioral hypotheses, not validated psychology. **Real player behavior beats every model, including yours.**
 
 ## Output shape for design proposals
-Fantasy and pillar served → mechanic → the player's decision → feedback → how it fails and recovers → why it belongs (the anti-slop answer) → how to test it → risks and open questions. Keep it tight and skip lines that don't apply.
+Fantasy and pillar served → mechanic → the player's decision → feedback → how it fails and recovers → why it belongs (the anti-slop answer) → **how we'd know it works** (what to observe in a playtest; never skip this line, even when asked to be brief) → risks and open questions. Keep it tight and skip the other lines that don't apply.

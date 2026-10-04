@@ -82,6 +82,7 @@ NOT_API = {"ProfileStore", "ProfileService", "Knit", "Matter", "Fusion", "TestEZ
            "RenderStepped", "TeleportInitFailed", "Hit", "Persistent", "Atomic", "Experimental", "Default", "Future",
            "Deferred", "Server", "Client", "Edit", "Legacy", "Box", "Hull", "PreciseConvexDecomposition", "Automatic",
            "HumanoidRootPart",  # instance name
+           "KeyThrottled",  # DataStore error name (error-codes-and-limits.md)
            "ArePaidRandomItemsRestricted"}  # key in PolicyService:GetPolicyInfoForPlayerAsync() result (verified in PolicyService.yaml)
 bare = {}
 for root, _, files in os.walk(SKILLS):

@@ -12,14 +12,14 @@ Roblox Studio ships a built-in MCP server (Assistant → … → Manage MCP Serv
 | Run the game | `start_stop_play`, then `get_console_output` | Always read console output after a playtest. A silent failure is still a failure. |
 | See it | `screen_capture` | Use for visual, UI and feel claims, after cheaper checks. Images are expensive. |
 | Act like a player | `character_navigation`, `user_keyboard_input`, `user_mouse_input` | Smoke-test interactions and UI flows. |
-| Docs and Roblox skills | `http_get` (Roblox docs), `skill` (e.g. `rbx-perf-profiling`, `rbx-debug`, `rbx-unit-test`, `rbx-docs-search`) | Use these to verify current APIs. Don't guess. |
+| Docs and Roblox skills | `http_get` (Roblox docs), `skill` (Roblox-authored guides. Names observed in 2026 include `rbx-perf-profiling`, `rbx-debug` and `rbx-unit-test`, but they aren't documented and may change, so list what is available at runtime) | Use these to verify current APIs. Don't guess. |
 | Assets | `search_asset`, `insert_asset`, `generate_mesh`/`generate_material`/`generate_procedural_model` + `wait_job_finished` | **Vet inserted assets** (see `roblox-security`). |
 
 ## When to use what
 - **Before editing:** search and read the relevant scripts. Inspect the instances they reference.
 - **Uncertain API or engine behavior:** probe it with `execute_luau` in Edit or Server, rather than reasoning from memory.
 - **After a change:** playtest → console output → (navigate/input) → screenshot if the claim is visual. For multiplayer claims, a solo playtest is **not** sufficient evidence. Say so, and use Server & Clients (manual, or a test harness).
-- **Performance claims:** measure (Roblox `rbx-perf-profiling` skill, MicroProfiler, Developer Console Stats) before and after. Never claim a speedup you didn't measure.
+- **Performance claims:** measure (Roblox profiling guides via the `skill` tool if listed, MicroProfiler, Developer Console Stats) before and after. Never claim a speedup you didn't measure.
 
 ## When Studio isn't connected (files only, or text only)
 - Work from the Rojo or Script Sync tree, and use `luau-lsp`/`selene`/`StyLua` if the project has them.

@@ -3,10 +3,10 @@ name: roblox
 description: "Use for ANY Roblox, Roblox Studio, Luau or Rojo task, including quick questions, bugs, code, systems, multiplayer, data, security, performance, testing, game design, feel, art, levels and UI. This Roblox Apex router loads the relevant roblox-* specialists, applies .apex/ project memory, and enforces verified, current Roblox standards."
 argument-hint: "[what you want to build, fix, design or ask]"
 metadata:
-  version: 1.0.0
+  version: 1.1.0
 ---
 
-# Roblox Apex: router and execution policy (v1.0.0)
+# Roblox Apex: router and execution policy (v1.1.0)
 
 Request: $ARGUMENTS
 (If that is empty, use the user's latest message or ask what they want. Don't lecture about the system.)
@@ -74,11 +74,17 @@ Write for a Roblox developer, not about this skill system. Don't mention `.apex/
 ## 5. Working loop
 UNDERSTAND → PLAN → IMPLEMENT → VERIFY → OBSERVE → DEBUG → IMPROVE → RETEST
 - **Before** significant changes, read the relevant scripts, find their callers and dependencies, learn the current behavior, and name the risks.
-- **Verify** with the strongest means available: Studio MCP playtest plus console output, then unit tests (Jest-Lua/TestEZ), then static reasoning, which is the weakest and must be labeled as unverified. Tool guidance is in `references/studio-mcp.md`.
-- **Report** what was verified, how, and what wasn't.
+- **Close the loop when Studio is connected.** If tools ending in `start_stop_play` and `get_console_output` are available, then after your **last** code edit and **before** your final answer:
+  1. start a playtest,
+  2. read the console output,
+  3. if the output shows errors related to your change, fix them and repeat,
+  4. stop the playtest.
+  Add `execute_luau` probes for state you can't see in the console, and use multiple clients for multiplayer claims. Skip this only for pure design or advice answers that make no edits.
+- **Without Studio:** use the project's tests or linters if any exist. Otherwise say plainly that the change is untested at runtime, and give the exact playtest steps.
+- **End every answer that changes code with one line:** `Verified: <what, how> · Not verified: <what>`. Never imply a test you didn't run. Tool guidance is in `references/studio-mcp.md`.
 
 ## 6. Definition of done (scale to size)
-"It runs" is only one dimension. For `system`+ work, check each one that applies: functionality · architecture fit · security · performance · multiplayer edge cases (join mid-action, leave mid-action, respawn, streaming) · UX · game feel · visual quality · design purpose · maintainability. Use `roblox-review` for the structured pass. Don't produce numeric quality scores.
+"It runs" is only one dimension. For `system`+ work, check each one that applies: functionality · architecture fit · security · performance · multiplayer edge cases (join mid-action, leave mid-action, respawn, streaming) · **cross-device input** (anything bound to a key also works on touch and gamepad: `ProximityPrompt`, `ContextActionService` buttons or IAS) · UX · game feel · visual quality · design purpose · maintainability. Use `roblox-review` for the structured pass. Don't produce numeric quality scores.
 
 ## References (read only when needed)
 - `references/currency.md`: version-sensitive platform facts with verification dates. Read it before quoting limits or new-feature behavior.

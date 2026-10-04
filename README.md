@@ -10,7 +10,7 @@ The skills provide expertise and judgment. The MCP and tools provide the ability
 
 ## What it does differently
 - **Routes, doesn't dump.** A ~2.3k-token router loads only the 0–4 specialists a task needs (~1k tokens each). Mandatory bundles stop the expensive misses: anything touching value loads security + data.
-- **Current, not tutorial-era.** Version-sensitive facts are verified against Roblox's official docs (snapshot 2026-10-02): Server Authority GA, the 2026 DataStore limits, IAS, the new type solver, the `LightingStyle` replacement for `Lighting.Technology`. Every engine API named in the skills is machine-checked against the official reference.
+- **Current, not tutorial-era.** Version-sensitive facts are verified against Roblox's official docs (snapshot 2026-10-02): Server Authority (announced for all creators July 2026), the 2026 DataStore limits, IAS, the new type solver, the `LightingStyle` replacement for `Lighting.Technology`. Every engine API named in the skills is machine-checked against the official reference.
 - **Challenges slop.** Pets, eggs, rebirths, generic coins and battle passes need a reason to exist *in this game*. The verdicts are justified, transform or remove.
 - **Protects ambition.** "Roblox can't do that" triggers a verified-limitation and technique search (client illusion, simulation split, precomputation, procedural generation…), not a quiet downgrade.
 - **Honest about evidence.** It separates facts from recommendations. Simulated players are never treated as real-player evidence. There are no fake "fun = 92" scores.
