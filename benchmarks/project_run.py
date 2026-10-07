@@ -21,7 +21,8 @@ SIM = os.path.join(REPO, "tests", "studio_sim", "server.py")
 SKILLS = os.path.join(REPO, ".claude", "skills")
 CLAUDE_BLOCK = os.path.join(SKILLS, "roblox-init", "templates", "CLAUDE-block.md")
 EDIT = ("Read Glob Grep Edit Write Skill mcp__roblox_studio", "Bash WebFetch WebSearch Agent")
-CTX = "This is my Roblox game (Rojo project; Roblox Studio is connected through MCP). "
+CTX = ("This is my Roblox game (Rojo project; Roblox Studio is connected through MCP; playtesting is safe: "
+       "Studio uses a separate test place with its own DataStores). ")
 
 TASKS = [
     {"id": "P1-respawn-hud", "prompt": CTX + "Players say the HUD breaks and sometimes errors after they respawn. Fix it.",
@@ -71,6 +72,27 @@ TASKS = [
                 "Keeps gameplay authority on the server while presentation is client-side",
                 "Notes performance/mobile considerations",
                 "Offers options or a staged path with trade-offs"]},
+    {"id": "P8-npc-chase", "prompt": CTX + "When the lamp runs out, a monster should spawn and chase the nearest player across the island. Implement it.",
+     "rubric": ["Monster AI runs on the server with server network ownership (SetNetworkOwner(nil)) of its root",
+                "Uses PathfindingService with status/failure handling (non-Success status, Blocked, MoveTo 8s timeout or stuck detection)",
+                "Explicit state machine or clear states (idle/chase/search) and target selection that handles target leaving/dying/respawning",
+                "Throttled updates (no per-frame pathfinding; reasonable recompute rate) and cleanup when the lamp is relit",
+                "Telegraphs the threat (sound/light cue) and keeps it fair/readable",
+                "Code compiles and integrates with LampService (fuel state) without breaking existing behavior"]},
+    {"id": "P9-dev-product", "prompt": CTX + "Add a developer product that sells a can of 50 oil for Robux.",
+     "rubric": ["Grants only inside MarketplaceService.ProcessReceipt (not PromptProductPurchaseFinished or a client remote)",
+                "Idempotent on PurchaseId; returns PurchaseGranted only after the grant is durably recorded, NotProcessedYet otherwise",
+                "Handles the player not yet loaded / left (yield until loaded or NotProcessedYet), and a single ProcessReceipt handler",
+                "Client only prompts (PromptProductPurchase); no client-trusted grant path",
+                "Persists the purchased oil (not only leaderstats) or flags that DataService must be fixed for it to stick",
+                "States what wasn't verified (real purchase flow needs Studio test mode / live)"]},
+    {"id": "P10-mobile-controls", "prompt": CTX + "Most of my players are on phones and some use controllers. Make the HUD and refueling work well for them.",
+     "rubric": ["Refuel works on touch and gamepad (ProximityPrompt, ContextActionService button, or Input Action System), not only the E key",
+                "HUD layout is scale-based/responsive with safe-area handling and readable text on small screens",
+                "Touch targets are large enough and placed away from default thumbstick/jump zones",
+                "Server still validates the refuel (client-initiated prompt/remote treated as untrusted)",
+                "Keeps or fixes existing HUD behavior (respawn-safe) without breaking it",
+                "Mentions how to verify on Device Emulator presets / real devices"]},
 ]
 
 
@@ -112,11 +134,12 @@ def process_metrics(calls, proj, luau_compile):
     return m
 
 
-def run_arm(task, arm, model, luau_compile):
+def run_arm(task, arm, model, luau_compile, unsynced=False):
     proj = make_project(arm)
     cfg = tempfile.mkdtemp(prefix="apex-cfg-")
     mcp = {"mcpServers": {"roblox_studio": {"command": "python3", "args": [SIM],
-                                            "env": {"STUDIO_SIM_ROOT": proj, "LUAU_COMPILE": luau_compile}}}}
+                                            "env": {"STUDIO_SIM_ROOT": proj, "LUAU_COMPILE": luau_compile,
+                                                    "STUDIO_SIM_UNSYNCED": "1" if unsynced else "0"}}}}
     r = run_in(proj, task["prompt"], model, 40, 1500, allowed=EDIT[0], disallowed=EDIT[1],
                extra_args=["--mcp-config", json.dumps(mcp), "--strict-mcp-config"], env={"CLAUDE_CONFIG_DIR": cfg})
     r["diff"] = subprocess.run(["git", "-C", proj, "diff", "--", "src", "default.project.json"], capture_output=True, text=True).stdout
@@ -159,13 +182,15 @@ def main():
     ap.add_argument("--judge-model", default="opus")
     ap.add_argument("--only", default="")
     ap.add_argument("--jobs", type=int, default=8)
+    ap.add_argument("--sim-unsynced", action="store_true", help="Studio never receives file edits (Rojo/Script Sync not running)")
     a = ap.parse_args()
+    a.luau_compile = os.path.abspath(a.luau_compile)  # the simulator runs with cwd = temp project
     tasks = [t for t in TASKS if not a.only or any(t["id"].startswith(x) for x in a.only.split(","))]
-    out = os.path.join(HERE, "results", "project-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+    out = os.path.join(HERE, "results", ("project-unsynced-" if a.sim_unsynced else "project-") + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
     os.makedirs(out, exist_ok=True)
     runs = {}
     with cf.ThreadPoolExecutor(a.jobs) as ex:
-        fut = {ex.submit(run_arm, t, arm, a.model, a.luau_compile): (t["id"], arm) for t in tasks for arm in ("baseline", "apex")}
+        fut = {ex.submit(run_arm, t, arm, a.model, a.luau_compile, a.sim_unsynced): (t["id"], arm) for t in tasks for arm in ("baseline", "apex")}
         for f in cf.as_completed(fut):
             k = fut[f]
             runs[k] = f.result()

@@ -1,0 +1,86 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Server owns crate state and who is holding it; clients send intent (grab/release)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Handles one player leaving, dying or respawning mid-carry",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses network ownership / physics authority of the crate explicitly",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses latency so the carry still feels responsive (client presentation/prediction or Server Authority)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Handles concurrency (both grab same handle; third player)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Proposes how to test with multiple clients",
+        "A": "missed",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "`#holders == 2` doesn't work when holders is a dictionary keyed by Player: the length operator returns 0, so the crate would never count as carried",
+        "Says the crate 'stays anchored' with 0-1 holders but also unanchors and drives it with AlignPosition; it never says when anchoring switches"
+      ],
+      "slop": [
+        "'Make the crate's hitbox slightly smaller than the visuals' for doorways is generic advice with no reasoning",
+        "'Rate-limit GrabRequest and ReleaseRequest' is a generic security bullet"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "The 'Apex: networking \u2192 physics-animation \u2192 game-design' header and the notes about .apex/ files are tooling noise",
+        "Some of the playtest observation criteria (players narrating to each other, time to first delivery) are generic design-metric filler"
+      ],
+      "overengineering": [
+        "The Strain attribute with a grace-period grip break goes beyond the core request, though it's reasonable"
+      ]
+    },
+    "preference": "B",
+    "reason": "B meets every rubric item, including the same-frame grab race, the third player, hiding grab latency and a concrete multi-client test plan with the Network Simulator, while A has no test plan, says little about the grab race, and has a Lua bug in its core 'both holding' check."
+  },
+  "judge_cost": 0.0773132,
+  "apex_score": 1.0,
+  "base_score": 0.667,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "The 'Apex: networking \u2192 physics-animation \u2192 game-design' header and the notes about .apex/ files are tooling noise",
+      "Some of the playtest observation criteria (players narrating to each other, time to first delivery) are generic design-metric filler"
+    ],
+    "overengineering": [
+      "The Strain attribute with a grace-period grip break goes beyond the core request, though it's reasonable"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "`#holders == 2` doesn't work when holders is a dictionary keyed by Player: the length operator returns 0, so the crate would never count as carried",
+      "Says the crate 'stays anchored' with 0-1 holders but also unanchors and drives it with AlignPosition; it never says when anchoring switches"
+    ],
+    "slop": [
+      "'Make the crate's hitbox slightly smaller than the visuals' for doorways is generic advice with no reasoning",
+      "'Rate-limit GrabRequest and ReleaseRequest' is a generic security bullet"
+    ],
+    "overengineering": []
+  },
+  "reason": "B meets every rubric item, including the same-frame grab race, the third player, hiding grab latency and a concrete multi-client test plan with the Network Simulator, while A has no test plan, says little about the grab race, and has a Lua bug in its core 'both holding' check."
+}

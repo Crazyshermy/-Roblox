@@ -9,7 +9,7 @@ description: "Keeps ambitious Roblox ideas alive. Use when something seems impos
 
 ## Procedure
 1. **Experience.** In one or two sentences, what must the player *perceive and feel*? Separate perception from mechanism. ("Time rewinds around me" needs the world to visibly move backward for that player and stay consistent for others. It doesn't need the engine to literally reverse physics.)
-2. **Limitation.** Name the exact constraint and its type: engine feature, API, performance, networking, asset, platform policy, or development cost. **Verify it** with current docs (`roblox/references/currency.md`, Studio MCP `http_get`) or an `execute_luau` probe. An unverified "Roblox can't" is rejected, and old limitations are often gone (EditableMesh/EditableImage, Server Authority, Parallel Luau, Audio API, IAS).
+2. **Limitation.** Name the exact constraint and its type: engine feature, API, performance, networking, asset, platform policy, or development cost. **Verify it** with current docs (`${CLAUDE_SKILL_DIR}/../roblox/references/currency.md`, Studio MCP `http_get`) or an `execute_luau` probe. An unverified "Roblox can't" is rejected, and old limitations are often gone (EditableMesh/EditableImage, Server Authority, Parallel Luau, Audio API, IAS).
 3. **Search the technique space.** Consider each family before choosing:
 | Family | Examples |
 |---|---|

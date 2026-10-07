@@ -9,11 +9,11 @@ Genres are **player expectation contracts**. Know which expectations to honor (s
 
 ## Procedure
 1. Identify the genre(s) and read **only** the matching card file:
-   - `references/horror.md`: horror, psychological horror, mystery, stealth
-   - `references/action.md`: FPS/shooter, fighting/combat, battle royale, racing, sports
-   - `references/systems.md`: simulator, tycoon, sandbox, survival, simulation, strategy, tower defense
-   - `references/adventure.md`: RPG, MMO-style, adventure, puzzle, platformer/obby
-   - `references/social.md`: social/hangout, roleplay, party games, social deduction
+   - `${CLAUDE_SKILL_DIR}/references/horror.md`: horror, psychological horror, mystery, stealth
+   - `${CLAUDE_SKILL_DIR}/references/action.md`: FPS/shooter, fighting/combat, battle royale, racing, sports
+   - `${CLAUDE_SKILL_DIR}/references/systems.md`: simulator, tycoon, sandbox, survival, simulation, strategy, tower defense
+   - `${CLAUDE_SKILL_DIR}/references/adventure.md`: RPG, MMO-style, adventure, puzzle, platformer/obby
+   - `${CLAUDE_SKILL_DIR}/references/social.md`: social/hangout, roleplay, party games, social deduction
 2. Extract: the fantasy the genre promises, the loops, the **conventions to keep**, the **conventions safe to break**, the **failure modes**, and the Roblox constraints.
 3. For **hybrids**, find where the genres' needs **conflict** and design the resolution *through mechanics*. Example: horror needs isolation and social deduction needs communication, so proximity-limited voice or chat creates isolation through the rules. Example: tycoon's idle accumulation vs survival's scarcity becomes a base that produces only while defended.
 4. Pass the result to `roblox-game-design` reasoning. Genre knowledge informs the design; it doesn't dictate it.

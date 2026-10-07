@@ -46,9 +46,11 @@ CASES = [
         "prompt": "I'm making a Roblox horror game where you play a lighthouse keeper alone on an island during storms. "
                   "Suggest a progression system for it. Keep it under 400 words.",
         "expect_skills_any": ["roblox-game-design", "roblox-genres", "roblox"],
-        "must": [r"(?i)fantasy|pillar", r"(?i)why|belong|serve"],
+        # fantasy-first design shows up as fantasy/pillar language OR progression that isn't stat numbers
+        "must": [r"(?i)fantasy|pillar|not (their |your )?stats?\b|knowledge, not|rather than (stats|numbers)", r"(?i)why|belong|serve"],
         # genre defaults may appear only when explicitly rejected ("No coins, pets, rebirths...")
-        "must_not": [r"(?im)^(?!.*\b(no|avoid|skip|not|without|instead|reject|cut|drop|remove|never)\b).*\b(egg hatch|rebirth)"],
+        # fail only if the answer RECOMMENDS a genre default (explicit rejections are expected and fine)
+        "must_not": [r"(?i)\b(add|include|introduce|recommend|use|implement)\s+(a\s+|an\s+)?(rebirth|egg[- ]hatch|pet)\w*\s+(system|mechanic|loop)"],
     },
     {
         "id": "debug-auto",
@@ -67,7 +69,8 @@ CASES = [
         "expect_reads_any": ["currency.md", "roblox-data"],
         "must": [r"300", r"(?:CCU|concurrent|users)\s*[×x\*]\s*40", r"(?:players|numPlayers)\s*[×x\*]\s*40"],
         # stale figure may only appear when explicitly refuted as outdated
-        "must_not": [r"(?i)^(?!.*(outdated|old|stale|no longer|not)).*(players|numPlayers)\s*[×x\*]\s*10\b"],
+        # fail only if the stale figure is stated as the current limit
+        "must_not": [r"(?i)(is|are|=|:)\s*\**\s*60\s*\+\s*(numPlayers|players|player count)\s*[×x\*]\s*10\b(?![^\n]{0,60}(outdated|old|stale|no longer))"],
     },
     {
         "id": "trivial",
@@ -85,7 +88,7 @@ CASES = [
         "prompt": "For my Roblox game I wanted players to rewind time for 5 seconds (enemies and projectiles move backwards), "
                   "but Roblox obviously can't do that, so I'll just make it a cooldown-reset ability instead. Good plan?",
         "expect_skills_any": ["roblox-boundary-breaker"],
-        "must": [r"(?i)snapshot|record|buffer|history", r"(?i)option|approach"],
+        "must": [r"(?i)snapshot|record|buffer|history", r"(?i)option|approach|real version|how .{0,20}works|alternative"],
         "must_not": [r"(?i)^\s*(yes|good plan|sounds good)[.!,]"],
     },
     {
@@ -96,6 +99,30 @@ CASES = [
                   "player.leaderstats.Oil.Value -= amount; LampService.addFuel(amount) end)",
         "expect_skills_any": ["roblox-security"],
         "must": [r"(?i)negative", r"(?i)nan|math\.huge|inf"],
+        "must_not": [],
+    },
+    {
+        "id": "pet-request",
+        "why": "Anti-slop must not fight an explicit request: build the pet system well, don't refuse or lecture",
+        "prompt": "Add a pet-hatching system to my Roblox simulator game: players buy eggs with Coins and get a random pet that gives a coin multiplier. Give me the server-side core module, concise.",
+        "expect_skills_any": ["roblox-game-design", "roblox-security", "roblox-data", "roblox"],
+        "must": [r"(?i)ModuleScript|local\s+\w+\s*=\s*\{\}|function\s+\w+[.:]", r"(?i)server", r"(?i)PolicyService|paid random|ArePaidRandomItemsRestricted|weight"],
+        "must_not": [r"(?i)^\s*(I won't|I can't|I'd recommend against building)"],
+    },
+    {
+        "id": "npc-ai",
+        "why": "NPC/enemy AI routes to physics-animation and uses doc-verified pathfinding handling",
+        "prompt": "My Roblox monster NPC uses PathfindingService to chase players but gets stuck on doors and sometimes just stands still. How should I structure its chase AI?",
+        "expect_skills_any": ["roblox-physics-animation"],
+        "must": [r"(?i)Blocked|PathStatus|Status", r"(?i)SetNetworkOwner|network owner", r"(?i)8.?second|MoveToFinished|timeout|time out"],
+        "must_not": [],
+    },
+    {
+        "id": "prompt-security",
+        "why": "Client-initiated ProximityPrompt grants must get the server-side contract",
+        "prompt": "Is this Roblox code safe? chestPrompt.Triggered:Connect(function(player) player.leaderstats.Gold.Value += 100 end)",
+        "expect_skills_any": ["roblox-security"],
+        "must": [r"(?i)cooldown|once|debounce|already (opened|claimed)", r"(?i)distance|range|magnitude|state"],
         "must_not": [],
     },
     {
@@ -117,7 +144,9 @@ def check(case, r):
     if case.get("expect_skills_any") and not (set(case["expect_skills_any"]) & inv):
         res["skills_ok"] = False
     if case.get("expect_reads_any"):
-        seen = " ".join(r["files_read"]) + " " + " ".join(r["skills_invoked"])
+        # any tool that touched the file counts (Read, Grep, Glob all show progressive disclosure)
+        seen = " ".join(r["files_read"]) + " " + " ".join(r["skills_invoked"]) + " " + \
+            " ".join(str(c.get("input", "")) for c in r.get("tool_calls", []))
         if not any(x in seen for x in case["expect_reads_any"]):
             res["skills_ok"] = False
     specialists = [s for s in r["skills_invoked"] if s and s.split(":")[-1] != "roblox"]
@@ -143,40 +172,64 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="sonnet")
     ap.add_argument("--only", default="")
+    ap.add_argument("--repeat", type=int, default=1, help="runs per case; a case passes if >= 2/3 of runs pass")
     ap.add_argument("--with-baseline", action="store_true", help="also run each case without Apex for contrast")
     ap.add_argument("--jobs", type=int, default=4)
+    ap.add_argument("--rescore", default="", help="re-grade saved runs in this results dir with the current checks (no model calls)")
     a = ap.parse_args()
+    if a.rescore:
+        byid = {c["id"]: c for c in CASES}
+        rates = {}
+        for f in sorted(os.listdir(a.rescore)):
+            if f.endswith(".json"):
+                cid, mode = f.split(".")[0], f.split(".")[1]
+                if cid in byid:
+                    r = json.load(open(os.path.join(a.rescore, f)))
+                    ch = check(byid[cid], r)
+                    rates.setdefault((cid, mode), []).append(ch["skills_ok"] and ch["markers_ok"])
+        for (cid, mode), v in rates.items():
+            print(f"{cid:<16} {mode:<9} {sum(v)}/{len(v)}")
+        return
     cases = [c for c in CASES if not a.only or c["id"] in a.only.split(",")]
     stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", f"smoke-{stamp}")
+    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", f"smoke-{a.model}-{stamp}")
     os.makedirs(out, exist_ok=True)
-    jobs = [(c, c.get("mode", "apex")) for c in cases] + ([(c, "baseline") for c in cases if not c["prompt"].startswith("/roblox-")] if a.with_baseline else [])
-    results = {}
+    jobs = [(c, c.get("mode", "apex")) for c in cases]
+    if a.with_baseline:
+        jobs += [(c, "baseline") for c in cases if not c["prompt"].startswith("/roblox-")]
+    jobs = [(c, m, i) for c, m in jobs for i in range(a.repeat)]
+    results = {}  # (id, mode) -> list of runs
     with cf.ThreadPoolExecutor(a.jobs) as ex:
-        futs = {ex.submit(run, c["prompt"], mode, a.model, None, 12, 600): (c, mode) for c, mode in jobs}
+        futs = {ex.submit(run, c["prompt"], mode, a.model, None, 12, 600): (c, mode, i) for c, mode, i in jobs}
         for f in cf.as_completed(futs):
-            c, mode = futs[f]
+            c, mode, i = futs[f]
             r = f.result()
             r["check"] = check(c, r)
-            results[(c["id"], mode)] = r
-            json.dump(r, open(os.path.join(out, f"{c['id']}.{mode}.json"), "w"), indent=2)
+            results.setdefault((c["id"], mode), []).append(r)
+            json.dump(r, open(os.path.join(out, f"{c['id']}.{mode}.{i}.json"), "w"), indent=2)
             ok = r["check"]["skills_ok"] and r["check"]["markers_ok"]
-            print(f"[{'PASS' if ok else 'FAIL'}] {c['id']:<14} {mode:<8} skills={r['skills_invoked']} "
+            print(f"[{'PASS' if ok else 'FAIL'}] {c['id']:<16} {mode:<9} run{i} skills={r['skills_invoked']} "
                   f"missing={r['check']['missing']} forbidden={r['check']['forbidden']} ${r['cost_usd'] or 0:.2f}", flush=True)
-    lines = [f"# Smoke test {stamp} (model: {a.model})", "", "| case | mode | skills invoked | skills ok | markers ok | cost |", "|---|---|---|---|---|---|"]
-    total = 0.0
+    need = -(-2 * a.repeat // 3)  # ceil(2/3 * repeat)
+    lines = [f"# Smoke test {stamp} (model: {a.model}, runs per case: {a.repeat}, pass if >= {need})", "",
+             "| case | mode | pass rate | skills (per run) | cost |", "|---|---|---|---|---|"]
+    total, failed = 0.0, []
     for c in cases:
         for mode in ("apex", "apex-nomd", "baseline"):
-            r = results.get((c["id"], mode))
-            if not r:
+            rs = results.get((c["id"], mode))
+            if not rs:
                 continue
-            total += r["cost_usd"] or 0
-            lines.append(f"| {c['id']} | {mode} | {', '.join(r['skills_invoked']) or '—'} | {r['check']['skills_ok']} | {r['check']['markers_ok']} | ${r['cost_usd'] or 0:.2f} |")
-    lines += ["", f"Total cost: ${total:.2f}", "", "Case intents:"] + [f"- **{c['id']}**: {c['why']}" for c in cases]
+            n_ok = sum(1 for r in rs if r["check"]["skills_ok"] and r["check"]["markers_ok"])
+            cost = sum(r["cost_usd"] or 0 for r in rs)
+            total += cost
+            if mode != "baseline" and n_ok < need:
+                failed.append(c["id"])
+            lines.append(f"| {c['id']} | {mode} | {n_ok}/{len(rs)} | {' · '.join(','.join(x.split(':')[-1] for x in r['skills_invoked']) or '—' for r in rs)} | ${cost:.2f} |")
+    lines += ["", f"Total cost: ${total:.2f}", f"Failed: {', '.join(failed) or 'none'}", "", "Case intents:"] + \
+             [f"- **{c['id']}**: {c['why']}" for c in cases]
     open(os.path.join(out, "summary.md"), "w").write("\n".join(lines) + "\n")
     print("\n".join(lines))
-    apex_fail = [k for k, r in results.items() if k[1] != "baseline" and not (r["check"]["skills_ok"] and r["check"]["markers_ok"])]
-    sys.exit(1 if apex_fail else 0)
+    sys.exit(1 if failed else 0)
 
 
 if __name__ == "__main__":

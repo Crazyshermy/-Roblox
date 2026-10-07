@@ -17,7 +17,10 @@ Roblox Studio ships a built-in MCP server (Assistant → … → Manage MCP Serv
 
 ## When to use what
 - **Before editing:** search and read the relevant scripts. Inspect the instances they reference.
-- **Uncertain API or engine behavior:** probe it with `execute_luau` in Edit or Server, rather than reasoning from memory.
+- **Every call needs a `studio_id`:** get it from `list_roblox_studios`. With several Studios open, confirm the place name first.
+- **Uncertain API or engine behavior:** probe with `execute_luau` rather than reasoning from memory. Prefer the **Server or Client DataModel during a playtest**. Edit-DataModel code changes the saved place, so keep Edit-mode probes read-only unless the change is intended (and then tell the user).
+- **Did my edit reach Studio?** After editing files, `script_read` or `script_grep` for a changed line before playtesting. A playtest of stale code verifies nothing.
+- **Playtests can write real data.** With "Enable Studio Access to API Services" on, a playtest's DataStore writes hit the experience's real stores. If the game saves data and it's unknown whether playtests use a test place or store, ask once before the first playtest, then record the answer in `.apex/project.md`.
 - **After a change:** playtest → console output → (navigate/input) → screenshot if the claim is visual. For multiplayer claims, a solo playtest is **not** sufficient evidence. Say so, and use Server & Clients (manual, or a test harness).
 - **Performance claims:** measure (Roblox profiling guides via the `skill` tool if listed, MicroProfiler, Developer Console Stats) before and after. Never claim a speedup you didn't measure.
 

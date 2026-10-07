@@ -1,6 +1,6 @@
 {
   "name": "roblox-apex",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Roblox Apex: a Roblox development intelligence layer for Claude Code. It provides the /roblox router plus specialist skills for engineering, security, performance, testing, game design, feel, art, levels and UI.",
   "author": {
     "name": "crazyshermy"

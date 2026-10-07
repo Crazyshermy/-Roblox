@@ -1,0 +1,75 @@
+{
+  "apex_score": 0.5,
+  "base_score": 0.667,
+  "winner": "apex",
+  "reason": "Neither answer uses pathfinding, but B's anchored, server-driven monster is fairer (12 studs/s versus the 16 player WalkSpeed), its range-based attack is more reliable, it handles a lamp that is already out at startup, and it states its limits clearly; A has explicit network ownership but a monster players can't outrun.",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "The stray header '*Apex: physics-animation \u2192 architecture*' is meaningless output",
+      "It runs the nearest-player scan and PivotTo on every Heartbeat when a throttled loop would do"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "MonsterSpeed 18 is faster than the default player WalkSpeed of 16, so players can't escape, and the answer doesn't address fairness",
+      "Damage comes from a Touched handler on a single limbless Humanoid part, which is fragile (HipHeight 3 on a 4-stud root makes it hover), and the answer only notes this as unverified"
+    ],
+    "overengineering": []
+  },
+  "raw": {
+    "items": [
+      {
+        "item": "Monster AI runs on the server with server network ownership (SetNetworkOwner(nil)) of its root",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Uses PathfindingService with status/failure handling (non-Success status, Blocked, MoveTo 8s timeout or stuck detection)",
+        "A": "missed",
+        "B": "missed"
+      },
+      {
+        "item": "Explicit state machine or clear states (idle/chase/search) and target selection that handles target leaving/dying/respawning",
+        "A": "partial",
+        "B": "partial"
+      },
+      {
+        "item": "Throttled updates (no per-frame pathfinding; reasonable recompute rate) and cleanup when the lamp is relit",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Telegraphs the threat (sound/light cue) and keeps it fair/readable",
+        "A": "partial",
+        "B": "partial"
+      },
+      {
+        "item": "Code compiles and integrates with LampService (fuel state) without breaking existing behavior",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "MonsterSpeed 18 is faster than the default player WalkSpeed of 16, so players can't escape, and the answer doesn't address fairness",
+        "Damage comes from a Touched handler on a single limbless Humanoid part, which is fragile (HipHeight 3 on a 4-stud root makes it hover), and the answer only notes this as unverified"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "The stray header '*Apex: physics-animation \u2192 architecture*' is meaningless output",
+        "It runs the nearest-player scan and PivotTo on every Heartbeat when a throttled loop would do"
+      ],
+      "overengineering": []
+    },
+    "preference": "B",
+    "reason": "Neither answer uses pathfinding, but B's anchored, server-driven monster is fairer (12 studs/s versus the 16 player WalkSpeed), its range-based attack is more reliable, it handles a lamp that is already out at startup, and it states its limits clearly; A has explicit network ownership but a monster players can't outrun."
+  },
+  "judge_cost": 0.1050092
+}

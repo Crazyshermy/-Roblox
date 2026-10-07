@@ -18,7 +18,7 @@ The server owns truth. Clients **request**, **predict** and **present**. Validat
 
 Remotes are **not ordered relative to property and attribute replication**. If a remote references an instance or attribute the server just changed, the client may not have it yet. Send the needed values in the payload, or make the client tolerate a missing instance (wait with a timeout and handle `nil`).
 
-## Server Authority mode (announced for all creators July 2026; young system. APIs E4; read `roblox/references/currency.md`)
+## Server Authority mode (announced for all creators July 2026; young system. APIs E4; read `${CLAUDE_SKILL_DIR}/../roblox/references/currency.md`)
 Use it when movement or physics fairness matters and you want responsiveness without hand-written netcode. Cost: it requires an architecture change, and it is a young system.
 - `Workspace.AuthorityMode = Server` turns on NGR, IAS player scripts, Deferred signals, fixed simulation and streaming.
 - Put core gameplay in `RunService:BindToSimulation` in a ModuleScript required on **both** sides. Inputs come through `InputAction`s (`InputContext` under the Player). State lives in attributes on predicted instances, written only inside bound functions. Use `time()` and not `tick()` or `os.clock()`.

@@ -18,12 +18,15 @@ Each case runs a fresh temporary project with the skills installed, sends one pr
 | `trivial` | proportionality | ≤ 1 specialist, ≤ 2,500 chars |
 | `ambition` | creative ambition | boundary-breaker loaded; snapshot/record approach; options; doesn't open with "yes, good plan" |
 | `security-nomd` | auto-routing **without** a CLAUDE.md block (plugin users who skipped `/roblox-init`) | security loaded; negative and NaN amounts found |
+| `pet-request` | anti-slop respects an explicit request | builds the server module (with a weights/`PolicyService` mention); no refusal or lecture |
+| `npc-ai` | NPC/enemy AI routing | physics-animation loaded; path status/`Blocked`, network ownership, `MoveTo` timeout |
+| `prompt-security` | client-initiated `ProximityPrompt` grants | security loaded; cooldown/once-only and distance/state checks |
 | `route-inspect` | `/roblox-route` explains routing | names security, data, networking, plus skipped skills |
 
-Add `--with-baseline` to run each case without Apex as a contrast.
+Add `--with-baseline` to run each case without Apex as a contrast. Use `--repeat 3` to measure trigger *rates* (a case passes at ≥ 2/3), and `--model opus|haiku` to check other models. `python3 tests/test_smoke_patterns.py` unit-tests the marker regexes (free).
 
 Fresh-install acceptance (clone from GitHub, isolated config, both install methods): `python3 tests/install_test.py --ref main`.
-Real Roblox Studio procedure: [STUDIO-TEST.md](STUDIO-TEST.md). **Not yet run.**
+Real Roblox Studio procedure: [STUDIO-TEST.md](STUDIO-TEST.md). **Live Roblox Studio: NOT VERIFIED — requires local Windows Roblox Studio validation.**
 
 ## Manual (interactive Claude Code, about 5 minutes)
 Open Claude Code in a project where Apex is installed.

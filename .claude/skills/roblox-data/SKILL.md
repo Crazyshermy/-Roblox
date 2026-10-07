@@ -5,7 +5,7 @@ description: "Use for anything Roblox saves, loads, purchases or shares across s
 
 # Roblox data and cross-server services
 
-Data loss and duplication are the most damaging bugs a Roblox game can ship. Both are usually caused by **concurrency**, not by syntax. Current limits are in `roblox/references/currency.md`. The budgets changed in 2026, so don't quote old numbers.
+Data loss and duplication are the most damaging bugs a Roblox game can ship. Both are usually caused by **concurrency**, not by syntax. Current limits are in `${CLAUDE_SKILL_DIR}/../roblox/references/currency.md`. The budgets changed in 2026, so don't quote old numbers.
 
 ## Choose the store
 | Data | Store |
@@ -28,7 +28,7 @@ Data loss and duplication are the most damaging bugs a Roblox game can ship. Bot
 9. **Studio caution:** with "Enable Studio Access to API Services" on, Studio playtests hit **real** DataStores. Use a separate test place or universe, or a dev-scoped store name, for destructive tests.
 
 ## Purchases
-`ProcessReceipt`: there is **no time-based retry**. It re-fires only when the player buys again or rejoins, and a rejoin fires before their data loads. So if the player is in the server, **yield until their profile loads** (the callback has no timeout), and return `NotProcessedYet` only if they left or loading failed. The callback can run on two servers at once, which the session lock makes safe. If `PurchaseId` is already in their processed list, return `PurchaseGranted`. Otherwise grant, record the `PurchaseId`, **save**, and only then return `PurchaseGranted`. Bound the processed-ID list (keep recent IDs). Game passes: check `UserOwnsGamePassAsync` (cached) plus `PromptGamePassPurchaseFinished`, and never trust the client's claim.
+`ProcessReceipt`: there is **no time-based retry**. It re-fires only when the player buys again or rejoins, and a rejoin fires before their data loads. So if the player is in the server, **yield until their profile loads** (the callback has no timeout), and return `NotProcessedYet` only if they left or loading failed. The callback can run on two servers at once, which the session lock makes safe. Exactly **one** script may set `ProcessReceipt`. Like any callback, a second assignment silently replaces the first (E3; documented for Bindable/RemoteFunction callbacks), so route every product through one handler table. Never grant from `PromptProductPurchaseFinished`, which the docs explicitly forbid (E4). If `PurchaseId` is already in their processed list, return `PurchaseGranted`. Otherwise grant, record the `PurchaseId`, **save**, and only then return `PurchaseGranted`. Bound the processed-ID list (keep recent IDs). Game passes: check `UserOwnsGamePassAsync` (cached) plus `PromptGamePassPurchaseFinished`, and never trust the client's claim.
 
 ## Cross-server patterns
 - **Global trade or mail:** escrow through a durable store (DataStore record or MemoryStore with a durable fallback), with idempotent claim IDs. MessagingService only *nudges* the recipient's server to check.

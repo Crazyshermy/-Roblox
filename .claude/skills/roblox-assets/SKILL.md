@@ -10,7 +10,10 @@ description: "Roblox asset pipeline: mesh import, scale and pivots, collision fi
 - **Collision:** set `CollisionFidelity` per use. `Box` or `Hull` for most props, `PreciseConvexDecomposition` only where needed. Decor gets `CanCollide=false`, `CanQuery=false`, `CanTouch=false`.
 - `RenderFidelity = Automatic` allows LOD. Provide sensible triangle counts for the on-screen size and reuse identical meshes, because identical mesh plus material instances render efficiently.
 - **Textures:** size to on-screen importance (don't put 1024² on a pebble). Use `SurfaceAppearance` for PBR on hero assets. `MaterialVariant`s give a consistent material language across parts and terrain. Texture memory is the main mobile memory cost.
-- **Audio:** normalize loudness, trim silence, and use variants for repeated sounds. Organize with `SoundGroup`s. Confirm the newer Audio API vs `Sound` usage matches the project.
+- **Audio:** normalize loudness, trim silence, and use variants for repeated sounds.
+  - **Two systems, both current** (E4, `audio/index.md`). `Sound` and `SoundGroup` are simple and not deprecated, which makes them fine for one-shots and UI.
+  - **The wired Audio API** builds a graph: `AudioPlayer` (source) → `Wire` → effects (`AudioReverb`, `AudioEqualizer`, `AudioFilter`, `AudioCompressor`, `AudioPitchShifter`…) → `AudioEmitter` (a 3D "speaker" on a part) → `AudioListener` (the "microphone" at the camera or character) → `AudioDeviceOutput`. Use it when you need real mixing (an `AudioFader` per bus), shared effect chains, reactive visuals (`AudioAnalyzer`), or per-listener 3D control. That covers horror, ambience and music layering. `AcousticSimulationEnabled` on **both** the `AudioEmitter` and the `AudioListener` gives automatic occlusion (muffled through walls), diffraction and reverberation (E4).
+  - Don't mix both systems for the same bus. Pick one per project and record it in `.apex/decisions.md`.
 
 ## Organization
 - Templates in `ServerStorage` (server-spawned) or `ReplicatedStorage` (client-cloned cosmetics). Use **Packages** for assets reused across places, and update them deliberately (auto-update can surprise you).

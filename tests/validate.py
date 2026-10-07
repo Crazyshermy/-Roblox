@@ -44,7 +44,10 @@ for d in sorted(os.listdir(ROOT)):
     p = os.path.join(ROOT, d, "SKILL.md")
     if not d.startswith("roblox") or not os.path.isfile(p):
         continue
-    text = open(p, encoding="utf-8").read()
+    raw = open(p, "rb").read()
+    if b"\r\n" in raw:
+        errors.append(f"{d}: CRLF line endings (breaks frontmatter parsing on some setups; see .gitattributes)")
+    text = raw.decode("utf-8").replace("\r\n", "\n")
     fm = frontmatter(text)
     skills[d] = (fm, text)
     if not fm:
@@ -62,12 +65,16 @@ for d in sorted(os.listdir(ROOT)):
         errors.append(f"{d}: SKILL.md {lines} lines > 500")
     elif lines > 160:
         warnings.append(f"{d}: SKILL.md {lines} lines (keep specialists lean)")
-    for ref in re.findall(r"`(references/[\w./-]+\.md)`", text):
+    # reference links must be absolute via ${CLAUDE_SKILL_DIR} (a bare `references/x.md` gets resolved
+    # against the project root by some models, e.g. Haiku in v1.2 testing)
+    for ref in re.findall(r"(?<![}/\w])`(references/[\w./-]+\.md)`", text):
+        errors.append(f"{d}: bare reference path `{ref}`; use `${{CLAUDE_SKILL_DIR}}/{ref}`")
+    for ref in re.findall(r"`\$\{CLAUDE_SKILL_DIR\}/(references/[\w./-]+\.md)`", text):
         if not os.path.isfile(os.path.join(ROOT, d, ref)):
             errors.append(f"{d}: referenced file missing: {ref}")
-    for ref in re.findall(r"`roblox/(references/[\w./-]+\.md)`", text):
-        if not os.path.isfile(os.path.join(ROOT, "roblox", ref)):
-            errors.append(f"{d}: referenced router file missing: roblox/{ref}")
+    for other, ref in re.findall(r"`\$\{CLAUDE_SKILL_DIR\}/\.\./(roblox[a-z-]*)/(references/[\w./-]+\.md)`", text):
+        if not os.path.isfile(os.path.join(ROOT, other, ref)):
+            errors.append(f"{d}: referenced file missing: {other}/{ref}")
     for other in set(re.findall(r"`(roblox-[a-z-]+)`", text)):
         if other not in os.listdir(ROOT):
             errors.append(f"{d}: mentions unknown skill `{other}`")
