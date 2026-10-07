@@ -1,0 +1,82 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Flags client-supplied damage as critical",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing cooldown/rate limit (XP farming via spam)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing range / line-of-sight / target validity checks",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing type validation of abilityName/target (nil char, non-Instance target)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags that ability ownership/unlock is not checked",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Provides a corrected server-authoritative version or clear fix list",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Defines an unused MAX_RANGE constant in its own fix, then tells the user to remove it",
+        "Says ownership is unchecked, but the fixed code never checks ownership",
+        "The note about client-created fake Humanoids is muddled and adds nothing"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "The '~500 calls/s per client' remote throttle figure is stated as fact without support"
+      ],
+      "slop": [
+        "Leaked internal header 'Apex: security \u2192 networking'",
+        "References to `execute_luau` and 'the data skill' assume tooling the user may not have"
+      ],
+      "overengineering": []
+    },
+    "preference": "B",
+    "reason": "B covers everything A does and adds an ownership-check stub, a workspace-descendant check, latency tolerance on the range check, a concrete list of attacks to test and clearly stated assumptions, though it has some leaked internal noise."
+  },
+  "judge_cost": 0.0800652,
+  "apex_score": 1.0,
+  "base_score": 0.917,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "The '~500 calls/s per client' remote throttle figure is stated as fact without support"
+    ],
+    "slop": [
+      "Leaked internal header 'Apex: security \u2192 networking'",
+      "References to `execute_luau` and 'the data skill' assume tooling the user may not have"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Defines an unused MAX_RANGE constant in its own fix, then tells the user to remove it",
+      "Says ownership is unchecked, but the fixed code never checks ownership",
+      "The note about client-created fake Humanoids is muddled and adds nothing"
+    ],
+    "overengineering": []
+  },
+  "reason": "B covers everything A does and adds an ownership-check stub, a workspace-descendant check, latency tolerance on the range check, a concrete list of attacks to test and clearly stated assumptions, though it has some leaked internal noise."
+}

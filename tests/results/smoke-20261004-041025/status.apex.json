@@ -1,0 +1,45 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "/roblox-status",
+  "user_slash_command": "roblox-status",
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [],
+  "files_read": [
+    ".claude/skills/roblox/SKILL.md"
+  ],
+  "final_text": "```\nRoblox Apex 1.0.0\nSkills: 22 on disk \u00b7 19 model-invocable discovered \u00b7 user-only: roblox-status, roblox-route, roblox-init\n  \u2713 roblox, roblox-architecture, roblox-assets, roblox-boundary-breaker, roblox-data,\n    roblox-debugging, roblox-game-design, roblox-game-feel, roblox-genres, roblox-level-design,\n    roblox-luau, roblox-networking, roblox-performance, roblox-physics-animation, roblox-review,\n    roblox-security, roblox-testing, roblox-ui-ux, roblox-visual-direction\n  \u2717 missing: none\nRouter: ok (name: roblox; references/currency.md and references/studio-mcp.md present)\nKnowledge snapshot: 2026-10-02 (fresh, 2 days old)\nProject memory: .apex/ absent \u2192 run /roblox-init\nCLAUDE.md block: present\nStudio MCP: not connected\nIssues:\n- .apex/ is missing (project.md, decisions.md and debt.md). Run /roblox-init so the skills have project memory to read.\n- No Studio MCP tools are in this session, so playtests and console checks can't run. To connect: in Studio, open Assistant \u2192 \u2026 \u2192 Manage MCP Servers \u2192 \"Enable Studio as MCP server\", then add that server to Claude Code. Per studio-mcp.md, tools usually appear as `mcp__<server>__<tool>`.\n- No duplicate installs: nothing under `~/.claude/skills/roblox*`.\n```",
+  "cost_usd": 0.0885658,
+  "turns": 9,
+  "seconds": 15.4,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "check": {
+    "skills_ok": true,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}

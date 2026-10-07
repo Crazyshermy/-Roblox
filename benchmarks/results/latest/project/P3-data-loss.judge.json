@@ -1,0 +1,71 @@
+{
+  "apex_score": 0.917,
+  "base_score": 0.667,
+  "winner": "apex",
+  "reason": "A's save path re-checks the lock and stops writing once it loses it, it adds an autosave, its BindToClose waits for saves that are still running, and it guards OilService's use of leaderstats before data loads; B's save never checks who owns the lock and has no autosave, and B's BindToClose can return while a PlayerRemoving save is still running because of the early return on the saving flag.",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": [
+      "The save queue that merges pending saves and tracks releaseRequested is more machinery than this game needs, though it does work correctly"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": [
+      "When a player leaves during loading, B builds a throwaway leaderstats object just to release the lock, which is an awkward workaround"
+    ]
+  },
+  "raw": {
+    "items": [
+      {
+        "item": "Identifies that defaulting to 0 on a failed load causes wipes (fails safe: retry/kick or block saving)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Replaces blind SetAsync with UpdateAsync and/or session locking (or a proven library) to stop stale overwrites on fast server hops",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Adds BindToClose to save on shutdown",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Retries with backoff and handles nil/old data shape",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Doesn't let play/earning start before data is loaded (or guards leaderstats access)",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "States how to test it (two servers, Studio API access caution) without claiming it was verified",
+        "A": "partial",
+        "B": "partial"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": [
+        "The save queue that merges pending saves and tracks releaseRequested is more machinery than this game needs, though it does work correctly"
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": [
+        "When a player leaves during loading, B builds a throwaway leaderstats object just to release the lock, which is an awkward workaround"
+      ]
+    },
+    "preference": "A",
+    "reason": "A's save path re-checks the lock and stops writing once it loses it, it adds an autosave, its BindToClose waits for saves that are still running, and it guards OilService's use of leaderstats before data loads; B's save never checks who owns the lock and has no autosave, and B's BindToClose can return while a PlayerRemoving save is still running because of the early return on the saving flag."
+  },
+  "judge_cost": 0.0995252
+}

@@ -1,0 +1,53 @@
+{
+  "model": "sonnet",
+  "prompt": "Review this Roblox handler for exploits, findings only: RefuelLamp.OnServerEvent:Connect(function(player, amount) player.leaderstats.Oil.Value -= amount; LampService.addFuel(amount) end)",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox-security"
+  ],
+  "files_read": [],
+  "tool_calls": [
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-security"
+      }
+    }
+  ],
+  "final_text": "## Findings (ranked by severity)\n\n**1. Critical: negative `amount` gives free oil and drains the lamp (modified client)**\n`RefuelLamp:FireServer(-1e9)` makes `Oil.Value -= -1e9`, so the player gains a billion oil. `addFuel(-1e9)` also pulls fuel out of the shared lamp, which sabotages every other player.\n\n**2. Critical: no type or shape validation (modified client)**\n- `amount` can be a string, table, `nil`, `NaN` or `\u00b1inf`.\n- A string that coerces, or a table, errors the handler.\n- `NaN` makes `Oil.Value` NaN. Every `>=` comparison against it is then false, and the value may be saved to the DataStore.\n- `math.huge` sets `Oil` to `-inf` and sets lamp fuel to `inf`, so the lamp can never run out.\n- Non-integers such as `0.0001` allow rounding games.\n\n**3. High: no affordability check (UI-reachable if the UI lets the player try, otherwise modified client)**\nThe handler never checks that `Oil >= amount`. A player with 0 oil can fire `amount = 1000`. `Oil` goes to -1000 and the lamp still gets 1000 fuel. This is free refueling, and it can also break any \"can afford\" logic elsewhere that assumes `Oil >= 0`.\n\n**4. High: `leaderstats` is treated as the source of truth (modified client, design)**\n- The handler writes directly to `player.leaderstats.Oil`, which breaks the \"one writer\" rule. Any other writer to this value (shops, pickups, saves) can race with this one.\n- `player.leaderstats` may not exist yet, or may be nil after a respawn or load race. Then `.leaderstats` errors and the handler dies.\n- The spend and the grant are separate, unguarded steps. If `addFuel` errors or rejects the amount (for example, lamp already full), the player has still paid.\n\n**5. Medium: no precondition checks (modified client)**\n- There is no proximity check, so the remote can be fired from anywhere on the map.\n- There is no check for alive state, game or round state, or whether the lamp is full or exists.\n- Overfilling the lamp wastes the player's oil, or exceeds the lamp's cap if `addFuel` doesn't clamp.\n\n**6. Medium: no rate limit (modified client)**\nNothing stops the remote being spammed at the engine's throttle (about 500 calls/s per client, shared across all remotes). Each call hits `addFuel`, which may do replication, UI or datastore work. Spam is also a cheap way to dodge any per-call cooldown the UI enforces.\n\n**7. Low: unsafe `addFuel` contract (theoretical, depends on `LampService`)**\nThe handler passes the raw client number straight into `addFuel`. If `addFuel` doesn't clamp, validate and round internally, the problems above carry through to lamp state. I can't see `LampService`, so I can't confirm this.\n\n**8. Low: atomicity (theoretical)**\nThe two writes happen with no yields between them, so there is no dupe window in this snippet. If `addFuel` yields, as it would with a DataStore or `task.wait` call, a second call can be interleaved after the spend but before the grant completes. That gives a double-spend or double-grant window.",
+  "cost_usd": 0.07304100000000001,
+  "turns": 3,
+  "seconds": 20.7,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "mode": "apex-nomd",
+  "check": {
+    "skills_ok": true,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}

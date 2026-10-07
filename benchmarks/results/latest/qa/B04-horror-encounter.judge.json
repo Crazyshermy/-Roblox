@@ -1,0 +1,82 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Builds anticipation/dread before reveal (cues, telegraphs) rather than leading with a jump scare",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses that groups of friends reduce fear (separation mechanics or per-player experiences)",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Has a readable threat language players can learn and counterplay",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Includes tension/release pacing and recovery after the encounter",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Considers Roblox constraints (mobile brightness/readability, client-local effects, audio)",
+        "A": "partial",
+        "B": "partial"
+      },
+      {
+        "item": "Is specific to the hospital setting rather than generic",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Says clients fire noise events through a RemoteEvent so exploiters 'can't spoof it'. Noise reported by the client can still be faked or held back. Server-side validation only limits the damage; footstep noise should be worked out on the server.",
+        "Says the client heartbeat layer 'rises with distance'. It should get stronger as she gets closer, not farther away.",
+        "Lighting flicker and ColorCorrection are presented as cheap polish without saying they have to run locally on each client. If the server changes Lighting, every player gets the same effect, which breaks per-player proximity effects."
+      ],
+      "slop": [
+        "A wheelchair that rolls by itself and a PA saying 'Visiting hours are over' are stock horror clich\u00e9s.",
+        "The monster is 'blind and hunts by sound', yet Hunt can also start when she sees a player under 12 studs away in light. The two rules contradict each other and muddy the threat language.",
+        "A 30% random roll to find hidden players undercuts the claim that it's 'not random death'.",
+        "The stun from a thrown object or slammed door is a generic genre mechanic with no justification."
+      ],
+      "overengineering": []
+    },
+    "preference": "A",
+    "reason": "A is the stronger answer. It splits information between players so a group can't trivialize the scare, its tells are consistent, it has explicit recovery and wipe handling, and it makes no wrong Roblox claims. B's blind-but-sighted contradiction, random hide checks and shaky claim that client noise can't be spoofed weaken it."
+  },
+  "judge_cost": 0.0943772,
+  "apex_score": 0.917,
+  "base_score": 0.667,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Says clients fire noise events through a RemoteEvent so exploiters 'can't spoof it'. Noise reported by the client can still be faked or held back. Server-side validation only limits the damage; footstep noise should be worked out on the server.",
+      "Says the client heartbeat layer 'rises with distance'. It should get stronger as she gets closer, not farther away.",
+      "Lighting flicker and ColorCorrection are presented as cheap polish without saying they have to run locally on each client. If the server changes Lighting, every player gets the same effect, which breaks per-player proximity effects."
+    ],
+    "slop": [
+      "A wheelchair that rolls by itself and a PA saying 'Visiting hours are over' are stock horror clich\u00e9s.",
+      "The monster is 'blind and hunts by sound', yet Hunt can also start when she sees a player under 12 studs away in light. The two rules contradict each other and muddy the threat language.",
+      "A 30% random roll to find hidden players undercuts the claim that it's 'not random death'.",
+      "The stun from a thrown object or slammed door is a generic genre mechanic with no justification."
+    ],
+    "overengineering": []
+  },
+  "reason": "A is the stronger answer. It splits information between players so a group can't trivialize the scare, its tells are consistent, it has explicit recovery and wipe handling, and it makes no wrong Roblox claims. B's blind-but-sighted contradiction, random hide checks and shaky claim that client noise can't be spoofed weaken it."
+}

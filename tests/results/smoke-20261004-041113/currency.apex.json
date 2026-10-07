@@ -1,0 +1,45 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "/roblox What is the DataStore request budget per minute for GetAsync and SetAsync right now? Short answer.",
+  "user_slash_command": "roblox",
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [],
+  "files_read": [
+    ".claude/skills/roblox/references/currency.md"
+  ],
+  "final_text": "Per the project's currency reference (checked against the creator-docs snapshot of 2026-10-02, E4), the per-minute budgets are the same for `GetAsync` and `SetAsync` apart from the base amounts:\n\n- **Per server (default):** `GetAsync` (read) and `SetAsync` (write) each get **60 + players \u00d7 40** requests per minute. You can change this with `DataStoreService:SetRateLimitForRequestType()`, and `GetRequestBudgetForRequestType()` shows the current value.\n- **Per experience (shared with Open Cloud):** `GetAsync` gets **300 + CCU \u00d7 40** per minute. `SetAsync` gets **300 + CCU \u00d7 20** per minute. `UpdateAsync` uses both the read and write budgets.\n\nThrottled requests queue, with 30 per queue. Once a queue is full, requests fail with error codes 301\u2013306.\n\nI didn't check this in Studio or against the live docs. The older \"60 + players \u00d7 10\" figure is outdated.",
+  "cost_usd": 0.09244419999999999,
+  "turns": 4,
+  "seconds": 11.9,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "check": {
+    "skills_ok": true,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}

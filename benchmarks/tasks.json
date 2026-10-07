@@ -1,0 +1,122 @@
+[
+  {
+    "id": "B01-currency-system",
+    "prompt": "Write a secure server-side currency system for my Roblox game: players earn Gold from defeating enemies and spend it in a shop. Give me the core modules (concise) and explain the key decisions.",
+    "rubric": [
+      "Server is the only writer of Gold; client never sends amounts or prices",
+      "Validates remote arguments (types, NaN/inf, bounds) and rate-limits shop requests",
+      "Avoids yields between balance check and deduction (atomic spend)",
+      "Persistence handled safely (UpdateAsync or session-locked profile; load-before-play; BindToClose)",
+      "Does not treat leaderstats as source of truth",
+      "Kill rewards awarded by server-side kill attribution, not a client 'I killed X' remote"
+    ]
+  },
+  {
+    "id": "B02-multiplayer-interaction",
+    "prompt": "Design how two players can carry a heavy crate together in my Roblox co-op game (both must hold it for it to move). How should this work across client and server?",
+    "rubric": [
+      "Server owns crate state and who is holding it; clients send intent (grab/release)",
+      "Handles one player leaving, dying or respawning mid-carry",
+      "Addresses network ownership / physics authority of the crate explicitly",
+      "Addresses latency so the carry still feels responsive (client presentation/prediction or Server Authority)",
+      "Handles concurrency (both grab same handle; third player)",
+      "Proposes how to test with multiple clients"
+    ]
+  },
+  {
+    "id": "B03-datastore-debug",
+    "prompt": "Players in my Roblox game sometimes lose progress, especially when they leave one server and quickly join another. My save code: PlayerRemoving -> DataStore:SetAsync(userId, data); on join: GetAsync and if it fails I give them default data. What's going on and how do I fix it?",
+    "rubric": [
+      "Identifies the fast server-hop race (stale data overwrite) and the need for session locking",
+      "Identifies 'default data on failed load' as a data-wipe cause (should kick/retry instead)",
+      "Recommends UpdateAsync / proper retry with backoff instead of blind SetAsync",
+      "Mentions BindToClose for shutdown saves",
+      "Suggests a way to reproduce/verify (two servers / forced rejoin, test store)",
+      "Does not state outdated DataStore limits as current fact"
+    ]
+  },
+  {
+    "id": "B04-horror-encounter",
+    "prompt": "Design the first monster encounter for my Roblox co-op horror game set in an abandoned hospital (2-4 players).",
+    "rubric": [
+      "Builds anticipation/dread before reveal (cues, telegraphs) rather than leading with a jump scare",
+      "Addresses that groups of friends reduce fear (separation mechanics or per-player experiences)",
+      "Has a readable threat language players can learn and counterplay",
+      "Includes tension/release pacing and recovery after the encounter",
+      "Considers Roblox constraints (mobile brightness/readability, client-local effects, audio)",
+      "Is specific to the hospital setting rather than generic"
+    ]
+  },
+  {
+    "id": "B05-optimize",
+    "prompt": "My Roblox tower defense lags on mobile when there are 300 enemies. Each enemy is a Humanoid R15 rig with a Script inside that does a while true do task.wait() loop calling MoveTo toward the next waypoint and checks Touched for damage. How should I optimize this?",
+    "rubric": [
+      "Recommends measuring/profiling first and comparing before/after",
+      "Replaces per-enemy scripts with one manager loop",
+      "Replaces Humanoids with lightweight server-side movement (CFrame/position along path) and client-side rendering/interpolation",
+      "Replaces Touched-based damage with server-side range/spatial checks",
+      "Addresses rendering cost on mobile (model pooling, LOD/animation reduction)",
+      "Preserves the intended experience (doesn't just cap enemy count without discussing it)"
+    ]
+  },
+  {
+    "id": "B06-mobile-ui",
+    "prompt": "Design the HUD and inventory UI for my Roblox survival game that must work great on phones as well as PC and controller.",
+    "rubric": [
+      "Minimal HUD with clear information hierarchy (critical vs on-demand)",
+      "Touch targets sized for thumbs, placed away from default jump/thumbstick, safe areas/notches",
+      "Controller navigation of inventory (selection/focus, back closes)",
+      "Responsive layout approach (scale, aspect ratio constraints, UIScale) rather than pixel-absolute",
+      "Accessibility (not color-only, readable text size)",
+      "Server does not trust UI/inventory state from client"
+    ]
+  },
+  {
+    "id": "B07-remote-review",
+    "prompt": "Review this Roblox remote handler for exploitability:\n```lua\nlocal Remote = game.ReplicatedStorage.UseAbility\nRemote.OnServerEvent:Connect(function(player, abilityName, target, damage)\n  local char = player.Character\n  if target and target:FindFirstChild('Humanoid') then\n    target.Humanoid:TakeDamage(damage)\n  end\n  player.leaderstats.XP.Value += 10\nend)\n```",
+    "rubric": [
+      "Flags client-supplied damage as critical",
+      "Flags missing cooldown/rate limit (XP farming via spam)",
+      "Flags missing range / line-of-sight / target validity checks (any target anywhere, incl. other players' or non-combat Humanoids)",
+      "Flags missing type validation of abilityName/target (nil char, non-Instance target)",
+      "Flags that ability ownership/unlock is not checked",
+      "Provides a corrected server-authoritative version or clear fix list"
+    ]
+  },
+  {
+    "id": "B08-progression",
+    "prompt": "Design a progression system for my Roblox game about running a small night-shift ramen stand in a cyberpunk city.",
+    "rubric": [
+      "Anchors progression in the specific fantasy (cooking, customers, the city) rather than generic numbers",
+      "Progression changes what the player can do or understand, not only stat multipliers",
+      "Does not default to pets/eggs/rebirths/generic currencies without justification (or explicitly challenges them)",
+      "Considers onboarding and the first minutes of play",
+      "Considers economy sources and sinks if a currency is proposed",
+      "Proposes how to test/validate with players rather than claiming it will be fun"
+    ]
+  },
+  {
+    "id": "B09-replication-bug",
+    "prompt": "In my Roblox game, the server sets a door's Open attribute to true and immediately fires a RemoteEvent DoorOpened to all clients. The client handler reads door:GetAttribute('Open') and plays an animation if true. Sometimes the animation doesn't play, and players far away get an error that the door is nil. StreamingEnabled is on. Why?",
+    "rubric": [
+      "Explains remote events are not ordered relative to attribute/property replication",
+      "Explains streaming: the door may not exist on distant clients (nil)",
+      "Recommends driving the client from replicated state (GetAttributeChangedSignal / CollectionService component) instead of the remote, or passing state in the payload",
+      "Mentions handling stream-in (instance added later) / ModelStreamingMode or WaitForChild with timeout",
+      "Suggests how to reproduce (distance, latency)",
+      "Does not invent non-existent APIs"
+    ]
+  },
+  {
+    "id": "B10-combat-feel",
+    "prompt": "My Roblox melee combat works but feels weak and laggy: on click, the client fires a remote, the server checks the hit and then tells the client to play the swing animation and hit effect. How do I make it feel great without making it exploitable?",
+    "rubric": [
+      "Moves presentation (swing animation/sound) to the client immediately on input",
+      "Server still validates hits (cooldown, range, timing) and applies damage",
+      "Adds impact feedback channels: hitstop, impact sound, VFX, camera shake, target reaction",
+      "Handles server rejection/misprediction gracefully",
+      "Puts latency in anticipation/wind-up rather than the impact; or mentions Server Authority prediction as an option",
+      "Uses animation markers or timing to sync hit frames"
+    ]
+  }
+]

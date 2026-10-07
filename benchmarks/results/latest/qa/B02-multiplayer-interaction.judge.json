@@ -1,0 +1,80 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Server owns crate state and who is holding it; clients send intent (grab/release)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Handles one player leaving, dying or respawning mid-carry",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses network ownership / physics authority of the crate explicitly",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Addresses latency so the carry still feels responsive (client presentation/prediction or Server Authority)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Handles concurrency (both grab same handle; third player)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Proposes how to test with multiple clients",
+        "A": "missed",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Generic 'optionally smooth with local interpolation' without saying how it fits server-owned replication"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Stray 'Apex: networking \u2192 physics-animation \u2192 ...' header line",
+        "Generic juice list (strain audio, dust, camera nudge)"
+      ],
+      "overengineering": [
+        "Strain meter/attribute and playtest success-metric section go beyond the client/server question",
+        "Server Authority mode aside adds little"
+      ]
+    },
+    "preference": "B",
+    "reason": "B covers every rubric item, including simultaneous-grab resolution, concrete latency masking (IKControl, slack constraints) and multi-client playtesting with simulated latency, while A misses testing and only partly handles latency and same-frame concurrency."
+  },
+  "judge_cost": 0.0724532,
+  "apex_score": 1.0,
+  "base_score": 0.667,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Stray 'Apex: networking \u2192 physics-animation \u2192 ...' header line",
+      "Generic juice list (strain audio, dust, camera nudge)"
+    ],
+    "overengineering": [
+      "Strain meter/attribute and playtest success-metric section go beyond the client/server question",
+      "Server Authority mode aside adds little"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Generic 'optionally smooth with local interpolation' without saying how it fits server-owned replication"
+    ],
+    "overengineering": []
+  },
+  "reason": "B covers every rubric item, including simultaneous-grab resolution, concrete latency masking (IKControl, slack constraints) and multi-client playtesting with simulated latency, while A misses testing and only partly handles latency and same-frame concurrency."
+}

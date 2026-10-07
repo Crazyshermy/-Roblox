@@ -1,0 +1,83 @@
+{
+  "model": "sonnet",
+  "prompt": "Write a secure server-side currency system for my Roblox game: players earn Gold from defeating enemies and spend it in a shop. Give me the core modules (concise) and explain the key decisions.",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-security",
+    "roblox-data",
+    "roblox-networking"
+  ],
+  "files_read": [
+    ".claude/skills/roblox/references/currency.md"
+  ],
+  "tool_calls": [
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox"
+      }
+    },
+    {
+      "tool": "Glob",
+      "input": {
+        "pattern": "**/*",
+        "path": "/tmp/apex-apex-xfa05cz7"
+      }
+    },
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-security"
+      }
+    },
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-data"
+      }
+    },
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-networking"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-apex-xfa05cz7/.claude/skills/roblox/references/currency.md"
+      }
+    }
+  ],
+  "final_text": "*Apex: security \u2192 data \u2192 networking*\n\nI couldn't write these into your project, because this session has no file-write tool. The modules are below, ready to paste. Nothing has been run.\n\n## Key decisions\n\n1. **No remote ever grants Gold.** Earning is a server-to-server call from your combat code when an enemy dies. The client's only gold-related remote is `ShopBuy(itemId)`, a request that the server prices and decides.\n2. **One writer.** Only `Wallet` mutates `gold`, and it enforces integer, positive and capped amounts. This blocks NaN, inf, negative and overflow edges. The `Gold` attribute on the player is a read-only mirror for the UI, never the source of truth.\n3. **Gold and inventory live in one profile record.** A purchase deducts Gold and adds the item in the same synchronous block with no yield, so there is no duplication window. Both are saved together, so a crash can't keep the item and refund the Gold.\n4. **Session-locked saves.** Only one server can own a profile, which stops the \"hop servers and save stale gold\" dupe. Saves use `UpdateAsync` and are serialized per player. There is a final save on leave and in `BindToClose`. If loading fails, the player is kicked rather than started on defaults that would overwrite real data.\n5. **Each enemy pays once.** A weak-keyed set stops double rewards if your death code fires twice. Reward values come from a server table keyed by enemy type.\n6. **Shop validation.** The handler checks the item ID's type and length, then looks it up in a server catalog. It checks stack limits and balance, and it applies a token-bucket rate limit. There is no quantity argument, which removes a whole class of overflow and negative-quantity bugs.\n\nI assumed you have no profile library. If you use ProfileStore or similar, replace `PlayerData` with it and keep the `get`/`onLoaded` surface.\n\n## Modules (`ServerScriptService/Economy/`)\n\n**PlayerData.luau**\n```lua\n--!strict\nlocal DataStoreService = game:GetService(\"DataStoreService\")\nlocal HttpService = game:GetService(\"HttpService\")\nlocal Players = game:GetService(\"Players\")\nlocal RunService = game:GetService(\"RunService\")\n\n-- Studio uses a separate store so playtests can't touch live data\nlocal STORE = DataStoreService:GetDataStore(if RunService:IsStudio() then \"PlayerData_dev\" else \"PlayerData_v1\")\nlocal SERVER_ID = HttpService:GenerateGUID(false)\nlocal LOCK_TIMEOUT, AUTOSAVE, LOAD_TRIES = 120, 60, 5\n\nexport type Data = { v: number, gold: number, items: { [string]: number } }\ntype Record = { lock: { id: string, t: number }?, data: Data }\n\nlocal sessions: { [Player]: Data } = {}\nlocal inflight: { [Player]: boolean } = {}\nlocal loadedCallbacks: { (Player, Data) -> () } = {}\nlocal PlayerData = {}\n\nlocal function reconcile(d: any): Data\n\td = if type(d) == \"table\" then d else {}\n\td.v = d.v or 1\n\td.gold = d.gold or 0\n\td.items = d.items or {}\n\treturn d\nend\n\nlocal function load(player: Player): Data?\n\tlocal locked = false\n\tfor attempt = 1, LOAD_TRIES do\n\t\tlocal ok, rec = pcall(function()\n\t\t\treturn STORE:UpdateAsync(tostring(player.UserId), function(old: Record?)\n\t\t\t\tlocked = false\n\t\t\t\tlocal lock = old and old.lock\n\t\t\t\tif lock and lock.id ~= SERVER_ID and os.time() - lock.t < LOCK_TIMEOUT then\n\t\t\t\t\tlocked = true\n\t\t\t\t\treturn nil -- another server owns this profile: cancel\n\t\t\t\tend\n\t\t\t\tlocal r: Record = old or { data = reconcile(nil) }\n\t\t\t\tr.lock = { id = SERVER_ID, t = os.time() }\n\t\t\t\treturn r\n\t\t\tend)\n\t\tend)\n\t\tif ok and not locked and rec then\n\t\t\treturn reconcile((rec :: Record).data)\n\t\tend\n\t\ttask.wait(attempt * 3)\n\tend\n\treturn nil\nend\n\n-- returns ok, lost (lost = another server took the lock)\nlocal function write(player: Player, data: Data, release: boolean): (boolean, boolean)\n\twhile inflight[player] do task.wait() end -- one save in flight; never drop one\n\tinflight[player] = true\n\tlocal snap: Data = { v = data.v, gold = data.gold, items = table.clone(data.items) }\n\tlocal lost, ok = false, false\n\tfor attempt = 1, 3 do\n\t\tlocal success = pcall(function()\n\t\t\tSTORE:UpdateAsync(tostring(player.UserId), function(old: Record?)\n\t\t\t\tlost = false\n\t\t\t\tif not old or not old.lock or old.lock.id ~= SERVER_ID then\n\t\t\t\t\tlost = true\n\t\t\t\t\treturn nil\n\t\t\t\tend\n\t\t\t\told.data = snap\n\t\t\t\told.lock = if release then nil else { id = SERVER_ID, t = os.time() }\n\t\t\t\treturn old\n\t\t\tend)\n\t\tend)\n\t\tif success then ok = not lost break end\n\t\ttask.wait(attempt * 2)\n\tend\n\tinflight[player] = nil\n\treturn ok, lost\nend\n\nfunction PlayerData.get(player: Player): Data?\n\treturn sessions[player]\nend\n\nfunction PlayerData.onLoaded(fn: (Player, Data) -> ())\n\ttable.insert(loadedCallbacks, fn)\nend\n\nfunction PlayerData.start()\n\tlocal function onAdded(player: Player)\n\t\tlocal data = load(player)\n\t\tif player.Parent ~= Players then\n\t\t\tif data then write(player, data, true) end -- left mid-load: release the lock\n\t\t\treturn\n\t\tend\n\t\tif not data then\n\t\t\tplayer:Kick(\"Couldn't load your data. Please rejoin.\")\n\t\t\treturn\n\t\tend\n\t\tsessions[player] = data\n\t\tfor _, cb in loadedCallbacks do cb(player, data) end\n\tend\n\tPlayers.PlayerAdded:Connect(onAdded)\n\tfor _, p in Players:GetPlayers() do task.spawn(onAdded, p) end\n\n\tPlayers.PlayerRemoving:Connect(function(player)\n\t\tlocal data = sessions[player]\n\t\tsessions[player] = nil\n\t\tif data then write(player, data, true) end\n\tend)\n\n\ttask.spawn(function()\n\t\twhile true do\n\t\t\ttask.wait(AUTOSAVE)\n\t\t\tfor player, data in sessions do\n\t\t\t\tif not inflight[player] then\n\t\t\t\t\ttask.spawn(function()\n\t\t\t\t\t\tlocal _, lost = write(player, data, false)\n\t\t\t\t\t\tif lost then\n\t\t\t\t\t\t\tsessions[player] = nil\n\t\t\t\t\t\t\tplayer:Kick(\"Your session was opened on another server.\")\n\t\t\t\t\t\tend\n\t\t\t\t\tend)\n\t\t\t\tend\n\t\t\tend\n\t\tend\n\tend)\n\n\tgame:BindToClose(function()\n\t\tlocal pending = 0\n\t\tfor player, data in sessions do\n\t\t\tsessions[player] = nil\n\t\t\tpending += 1\n\t\t\ttask.spawn(function()\n\t\t\t\twrite(player, data, true)\n\t\t\t\tpending -= 1\n\t\t\tend)\n\t\tend\n\t\twhile pending > 0 do task.wait() end\n\tend)\nend\n\nreturn PlayerData\n```\n\n**Wallet.luau**\n```lua\n--!strict\nlocal PlayerData = require(script.Parent.PlayerData)\n\nlocal MAX_GOLD = 1_000_000_000\nlocal Wallet = {}\n\nlocal function validAmount(n: any): boolean\n\treturn type(n) == \"number\" and n == math.floor(n) and n > 0 and n <= MAX_GOLD\nend\n\nlocal function mirror(player: Player, gold: number)\n\tplayer:SetAttribute(\"Gold\", gold) -- presentation only\nend\n\nPlayerData.onLoaded(function(player, data) mirror(player, data.gold) end)\n\nfunction Wallet.balance(player: Player): number?\n\tlocal d = PlayerData.get(player)\n\treturn d and d.gold\nend\n\nfunction Wallet.grant(player: Player, amount: number): boolean\n\tlocal d = PlayerData.get(player)\n\tif not d or not validAmount(amount) then return false end\n\td.gold = math.min(d.gold + amount, MAX_GOLD)\n\tmirror(player, d.gold)\n\treturn true\nend\n\n-- No yields: check and subtract are atomic\nfunction Wallet.spend(player: Player, amount: number): boolean\n\tlocal d = PlayerData.get(player)\n\tif not d or not validAmount(amount) or d.gold < amount then return false end\n\td.gold -= amount\n\tmirror(player, d.gold)\n\treturn true\nend\n\nreturn Wallet\n```\n\n**Rewards.luau** (called by your server-side combat code)\n```lua\n--!strict\nlocal Wallet = require(script.Parent.Wallet)\n\nlocal GOLD_FOR: { [string]: number } = { Goblin = 5, Orc = 12, Boss = 250 } -- tune to your economy\nlocal paid = setmetatable({}, { __mode = \"k\" }) :: { [Instance]: boolean }\nlocal Rewards = {}\n\nfunction Rewards.onEnemyDefeated(enemy: Instance, enemyType: string, killer: Player)\n\tlocal gold = GOLD_FOR[enemyType]\n\tif not gold or paid[enemy] then return end\n\tpaid[enemy] = true -- mark first: each enemy pays at most once\n\tWallet.grant(killer, gold)\nend\n\nreturn Rewards\n```\n\n**Catalog.luau**\n```lua\n--!strict\nreturn {\n\tsword_iron = { price = 100, max = 1 },\n\tpotion_small = { price = 15, max = 20 },\n} :: { [string]: { price: number, max: number } }\n```\n\n**Shop.luau**\n```lua\n--!strict\nlocal Players = game:GetService(\"Players\")\nlocal ReplicatedStorage = game:GetService(\"ReplicatedStorage\")\nlocal PlayerData = require(script.Parent.PlayerData)\nlocal Wallet = require(script.Parent.Wallet)\nlocal Catalog = require(script.Parent.Catalog)\n\nlocal remote = Instance.new(\"RemoteFunction\")\nremote.Name = \"ShopBuy\"\nremote.Parent = ReplicatedStorage\n\nlocal BURST, REFILL = 5, 2 -- tokens, tokens/sec\nlocal buckets: { [Player]: { n: number, t: number } } = {}\n\nlocal function allow(player: Player): boolean\n\tlocal now = os.clock()\n\tlocal b = buckets[player] or { n = BURST, t = now }\n\tb.n = math.min(BURST, b.n + (now - b.t) * REFILL)\n\tb.t = now\n\tbuckets[player] = b\n\tif b.n < 1 then return false end\n\tb.n -= 1\n\treturn true\nend\n\nPlayers.PlayerRemoving:Connect(function(p) buckets[p] = nil end)\n\n-- Returns a status string for UI feedback only; the client is never trusted with the outcome\nremote.OnServerInvoke = function(player: Player, itemId: unknown): string\n\tif not allow(player) then return \"rate\" end\n\tif type(itemId) ~= \"string\" or #itemId > 32 then return \"bad\" end\n\tlocal item = Catalog[itemId]\n\tif not item then return \"bad\" end\n\tlocal data = PlayerData.get(player)\n\tif not data then return \"loading\" end\n\tlocal owned = data.items[itemId] or 0\n\tif owned >= item.max then return \"maxed\" end\n\tif not Wallet.spend(player, item.price) then return \"poor\" end\n\tdata.items[itemId] = owned + 1 -- same tick as the spend: no dupe window\n\treturn \"ok\"\nend\n\nreturn {}\n```\n\n**Main.server.luau** (a Script in the same folder)\n```lua\n--!strict\nlocal PlayerData = require(script.Parent.PlayerData)\nrequire(script.Parent.Wallet)  -- registers its onLoaded hook before start()\nrequire(script.Parent.Shop)\nPlayerData.start()\n```\n\n## Attack list (what the server should do)\n- `ShopBuy(nil / 5 / {} / \"x\"\u00d71000 / \"../\")`: returns `\"bad\"`.\n- `ShopBuy(\"sword_iron\")` \u00d750 in one frame: the rate limit rejects the excess, and `max` blocks a second sword anyway.\n- Buy with insufficient Gold: returns `\"poor\"`, with no state change.\n- Fire `onEnemyDefeated` twice for one enemy: pays once.\n- Rejoin or server-hop quickly: the second server's load retries until the lock is released, and fails with a kick rather than a stale overwrite.\n\n## Caveats\n- **Combat code must be server-authoritative.** If a client can claim \"I killed X\", Gold can be farmed no matter how the wallet is built. Credit the killer from server-side damage tracking.\n- **Gold-per-minute telemetry.** Add a simple per-player counter that flags impossible rates. It isn't included, to keep this concise.\n- **Remaining follow-ups (not included):** a transaction log for support and refunds, and `ProcessReceipt` handling if you later sell Gold for Robux.\n- **Crash window.** Autosave runs every 60 s, so a server crash can lose up to a minute of earnings. It cannot duplicate anything. If that matters, add a debounced save after each purchase.\n- **Unverified API behavior.** I avoided relying on what `UpdateAsync` returns when the transform cancels, and used flags instead. I did not verify DataStore limits for your player count.\n\nVerified: nothing run (no Studio connection or Luau runtime this session) \u00b7 Not verified: compile and type-check, runtime behavior, multi-server lock handoff. To test, use Studio Server & Clients with 2 clients: buy until broke, spam `ShopBuy` from a client console, and rejoin quickly to exercise the lock.",
+  "cost_usd": 0.24464200000000003,
+  "turns": 11,
+  "seconds": 97.9,
+  "stderr_tail": "",
+  "mode": "apex"
+}

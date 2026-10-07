@@ -1,0 +1,39 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "In my Roblox game, the server sets a door's Open attribute to true and immediately fires a RemoteEvent DoorOpened to all clients. The client handler reads door:GetAttribute('Open') and plays an animation if true. Sometimes the animation doesn't play, and players far away get an error that the door is nil. StreamingEnabled is on. Why?",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox-debugging"
+  ],
+  "files_read": [],
+  "final_text": "There are two separate causes. Both come from StreamingEnabled and from how remotes and replication are ordered. I haven't run anything. This comes from how the engine behaves and from what you described.\n\n## 1. \"Door is nil\" for far-away players: the door is streamed out\n\nWith StreamingEnabled, a client only holds the instances within its streaming radius.\n\n- `FireAllClients(door)` sends the door as an instance argument. If a client doesn't have that door, the argument arrives as `nil`.\n- If you send a path or a name instead and look it up with `workspace.Doors.X`, a missing door gives the same nil error.\n\nThe \"far away\" pattern fits this. Nearby players have the door and distant ones don't. A door that was streamed out, or hasn't streamed in yet, doesn't exist on that client.\n\n## 2. Animation sometimes doesn't play: the remote and the attribute race\n\nRemote events and property or attribute replication travel as separate streams. Roblox doesn't guarantee that they arrive in the order the server sent them.\n\n- The server sets `Open = true` and then fires the remote.\n- The client can receive the remote first, before the attribute change has been applied.\n- `GetAttribute('Open')` then returns the old value, `false` or `nil`, and your `if` skips the animation.\n\nStreaming makes this worse. A door that streams in right at that moment can also be missing, or arrive in a different state.\n\n## Fixes\n\n1. **Don't read the attribute inside the remote handler.** Put the target state in the payload: `DoorOpened:FireAllClients(door, true)`. Then the client doesn't depend on replication timing for the state.\n2. **Handle the door being absent.** Either:\n   - **Drop the remote and drive it from state.** Use `door:GetAttributeChangedSignal(\"Open\")` on the client. Hook it up with `CollectionService:GetInstanceAddedSignal(\"Door\")` so it runs whenever a door streams in. When a door streams in, read its current `Open` value and set the visual state straight away, with no animation. This is the robust approach, because late-streaming and late-joining players end up correct without any events.\n   - **Keep the remote** and guard against nil. If `door` is nil, ignore the event, because the streaming-in path will set the right state when the door arrives.\n3. **Optionally** set `ModelStreamingMode = Persistent` on critical doors. Use it sparingly, because it costs memory and bandwidth.\n\nI'd go with the attribute-driven version. Replicated state is what drives the visual, and the animation is a presentation of that state. If the player is within range and sees the door change, you play the animation. Otherwise you snap to the final state.\n\nIf you want to confirm this before changing anything, add a print of `door` and `door:GetAttribute(\"Open\")` at the top of the handler. Then test with two clients and the Network Simulator at high latency, with one client standing far away. If I'm right, you'll see nil doors for the far client and stale attribute values for the near one. If you share the client script, I can write the exact change.",
+  "cost_usd": 0.0685598,
+  "turns": 3,
+  "seconds": 14.2,
+  "stderr_tail": ""
+}

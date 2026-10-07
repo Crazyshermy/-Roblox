@@ -1,0 +1,90 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Moves presentation (swing animation/sound) to the client immediately on input",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Server still validates hits (cooldown, range, timing) and applies damage",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Adds impact feedback channels: hitstop, impact sound, VFX, camera shake, target reaction",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Handles server rejection/misprediction gracefully",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Puts latency in anticipation/wind-up rather than the impact; or mentions Server Authority prediction as an option",
+        "A": "met",
+        "B": "missed"
+      },
+      {
+        "item": "Uses animation markers or timing to sync hit frames",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Haptics row and the ContextActionService/touch/gamepad aside don't address the question",
+        "'Apex:' header and the no-memory/no-Studio-connection preamble add nothing"
+      ],
+      "overengineering": [
+        "NaN/inf validation of a swingId the server never uses"
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "The server code uses an undefined hitPosition",
+        "HitEffect:FireAllClients also fires to the attacker, who already played the effect locally, so they see it twice"
+      ],
+      "slop": [
+        "Input buffering, combos and lunge are genre-default mechanics the question didn't ask for",
+        "Generic hardening advice (rate-limit all remotes, network ownership, flag suspicious patterns)"
+      ],
+      "overengineering": [
+        "The rewind snapshot system is laid out in detail, but it's optional for melee"
+      ]
+    },
+    "preference": "A",
+    "reason": "A meets every rubric item: it handles misprediction cleanly, puts latency into the wind-up, mentions Server Authority, and avoids double effects; B leaves out the anticipation idea and its sample code has a double-effect bug and an undefined variable."
+  },
+  "judge_cost": 0.0824492,
+  "apex_score": 1.0,
+  "base_score": 0.75,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Haptics row and the ContextActionService/touch/gamepad aside don't address the question",
+      "'Apex:' header and the no-memory/no-Studio-connection preamble add nothing"
+    ],
+    "overengineering": [
+      "NaN/inf validation of a swingId the server never uses"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "The server code uses an undefined hitPosition",
+      "HitEffect:FireAllClients also fires to the attacker, who already played the effect locally, so they see it twice"
+    ],
+    "slop": [
+      "Input buffering, combos and lunge are genre-default mechanics the question didn't ask for",
+      "Generic hardening advice (rate-limit all remotes, network ownership, flag suspicious patterns)"
+    ],
+    "overengineering": [
+      "The rewind snapshot system is laid out in detail, but it's optional for melee"
+    ]
+  },
+  "reason": "A meets every rubric item: it handles misprediction cleanly, puts latency into the wind-up, mentions Server Authority, and avoids double effects; B leaves out the anticipation idea and its sample code has a double-effect bug and an undefined variable."
+}

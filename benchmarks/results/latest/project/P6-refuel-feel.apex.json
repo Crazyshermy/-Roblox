@@ -1,0 +1,259 @@
+{
+  "model": "sonnet",
+  "prompt": "This is my Roblox game (Rojo project; Roblox Studio is connected through MCP). Refueling the lamp feels flat \u2014 you press E and a number changes. Make it feel good.",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-game-feel"
+  ],
+  "files_read": [
+    "src/client/Refuel.client.luau",
+    "src/server/OilService.luau",
+    "src/server/LampService.luau",
+    "src/client/HUD.client.luau",
+    "src/shared/Config.luau",
+    "README.md",
+    "default.project.json",
+    "src/server/Main.server.luau"
+  ],
+  "tool_calls": [
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox"
+      }
+    },
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-game-feel"
+      }
+    },
+    {
+      "tool": "Bash",
+      "input": {
+        "command": "cd /tmp/apex-proj-apex-6d9x7y7s && ls -a && cat .apex/project.md .apex/decisions.md 2>/dev/null | head -150; grep -ril \"refuel\\|lamp\" --include=*.lua --include=*.luau --include=*.json . | head -20"
+      }
+    },
+    {
+      "tool": "ToolSearch",
+      "input": {
+        "query": "select:mcp__roblox_studio__execute_luau,mcp__roblox_studio__get_console_output,mcp__roblox_studio__start_stop_play,mcp__roblox_studio__script_grep,mcp__roblox_studio__script_read,mcp__roblox_studio__s",
+        "max_results": 10
+      }
+    },
+    {
+      "tool": "Glob",
+      "input": {
+        "pattern": "**/*",
+        "path": "/tmp/apex-proj-apex-6d9x7y7s"
+      }
+    },
+    {
+      "tool": "mcp__roblox_studio__script_grep",
+      "input": {
+        "pattern": "[Rr]efuel"
+      }
+    },
+    {
+      "tool": "mcp__roblox_studio__search_game_tree",
+      "input": {
+        "query": "Lamp"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/client/Refuel.client.luau"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/server/OilService.luau"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/server/LampService.luau"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/client/HUD.client.luau"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/shared/Config.luau"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/README.md"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/default.project.json"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/server/Main.server.luau"
+      }
+    },
+    {
+      "tool": "mcp__roblox_studio__execute_luau",
+      "input": {
+        "code": "local l=workspace.Lamp print(l.ClassName,l.Position,l.Size,l.Light.Brightness,l.Light.Range,l.Light.Color) for _,c in l:GetChildren() do print(c.Name,c.ClassName) end print(#game.ReplicatedStorage.Rem",
+        "datamodel_type": "Edit"
+      }
+    },
+    {
+      "tool": "Write",
+      "input": {
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/shared/Config.luau",
+        "content": "-- Tunable values shared by server and client.\nreturn {\n\tMaxFuel = 100,\n\tFuelDrainPerSecond = 1,\n\tOilPerCan = 10,\n\tCanRespawnSeconds = 20,\n\tSaveKeyPrefix = \"player_\",\n\n\t-- Refuel feel\n\tRefuelCooldown "
+      }
+    },
+    {
+      "tool": "Write",
+      "input": {
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/server/LampService.luau",
+        "content": "local ReplicatedStorage = game:GetService(\"ReplicatedStorage\")\nlocal Config = require(ReplicatedStorage.Shared.Config)\n\nlocal LampChanged = ReplicatedStorage.Remotes.LampChanged\nlocal lamp = workspace"
+      }
+    },
+    {
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/server/OilService.luau",
+        "old_string": "\tRefuelLamp.OnServerEvent:Connect(function(player, amount)\n\t\tplayer.leaderstats.Oil.Value -= amount\n\t\tLampService.addFuel(amount)\n\tend)\nend",
+        "new_string": "\t-- The client only requests a refuel; the server decides how much oil moves.\n\tRefuelLamp.OnServerEvent:Connect(function(player)\n\t\tlocal now = os.clock()\n\t\tif now - (lastRefuel[player] or 0) < Config."
+      }
+    },
+    {
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/server/OilService.luau",
+        "old_string": "local RefuelLamp = ReplicatedStorage.Remotes.RefuelLamp\n\nlocal OilService = {}",
+        "new_string": "local RefuelLamp = ReplicatedStorage.Remotes.RefuelLamp\nlocal LampRefueled = ReplicatedStorage.Remotes.LampRefueled\n\nlocal lastRefuel: { [Player]: number } = {}\n\nlocal OilService = {}"
+      }
+    },
+    {
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/default.project.json",
+        "old_string": "        \"LampChanged\": { \"$className\": \"RemoteEvent\" }",
+        "new_string": "        \"LampChanged\": { \"$className\": \"RemoteEvent\" },\n        \"LampRefueled\": { \"$className\": \"RemoteEvent\" }"
+      }
+    },
+    {
+      "tool": "Write",
+      "input": {
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/client/Refuel.client.luau",
+        "content": "local Players = game:GetService(\"Players\")\nlocal ReplicatedStorage = game:GetService(\"ReplicatedStorage\")\nlocal UserInputService = game:GetService(\"UserInputService\")\nlocal ContextActionService = game"
+      }
+    },
+    {
+      "tool": "Write",
+      "input": {
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/client/HUD.client.luau",
+        "content": "local Players = game:GetService(\"Players\")\nlocal ReplicatedStorage = game:GetService(\"ReplicatedStorage\")\nlocal TweenService = game:GetService(\"TweenService\")\n\nlocal player = Players.LocalPlayer\nlocal"
+      }
+    },
+    {
+      "tool": "mcp__roblox_studio__start_stop_play",
+      "input": {
+        "action": "start"
+      }
+    },
+    {
+      "tool": "mcp__roblox_studio__get_console_output",
+      "input": {}
+    },
+    {
+      "tool": "mcp__roblox_studio__start_stop_play",
+      "input": {
+        "action": "stop"
+      }
+    },
+    {
+      "tool": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/tmp/apex-proj-apex-6d9x7y7s/src/client/HUD.client.luau",
+        "old_string": "local humanoid = player.Character.Humanoid",
+        "new_string": "local character = player.Character or player.CharacterAdded:Wait()\nlocal humanoid = character:WaitForChild(\"Humanoid\")"
+      }
+    },
+    {
+      "tool": "mcp__roblox_studio__start_stop_play",
+      "input": {
+        "action": "start"
+      }
+    },
+    {
+      "tool": "mcp__roblox_studio__get_console_output",
+      "input": {}
+    },
+    {
+      "tool": "mcp__roblox_studio__start_stop_play",
+      "input": {
+        "action": "stop"
+      }
+    }
+  ],
+  "final_text": "*Apex: game-feel*\n\nRefueling now plays out as a short sequence instead of a number changing. I couldn't actually run any of it. The Studio connection here is a simulator that only does syntax checks.\n\n**What the player sees**\n1. **Press E.** Six glowing oil orbs leave the player and arc up to the lamp over about 0.55s. This gives the action a wind-up and hides the network round trip.\n2. **Orbs land.** The lamp flares: a warm light surge fades out over about 0.9s, and a burst of sparks scales with how much oil went in.\n3. **HUD.** The fuel readout punches in size and flashes gold, then settles. When another player refuels, you see their orbs fly from them and the same flare.\n4. **Rejected requests.** The orbs fly right away, but the flare only plays once the server confirms. If the server rejects the request, no fake flare shows.\n5. **Lamp already full.** Nothing is sent and your oil is kept. Previously the oil was wasted.\n6. **Controls.** The action now also works on touch (a button) and gamepad (X) through `ContextActionService`. Before, it was keyboard only.\n\n**Server hole I fixed**\nThe old handler subtracted whatever `amount` the client sent. A negative value would have given the player oil, and an oversized one would have given the lamp free fuel. The client now sends no amount. The server works out the transfer from the player's real oil and the lamp's free space. There is also a 0.6s per-player cooldown.\n\n**Other changes**\n- I added a `LampRefueled` remote to `default.project.json`.\n- I fixed an existing `HUD.client.luau` crash: `player.Character` was nil at script start, which killed the HUD script.\n- All timings and counts are in `Config.luau` for tuning.\n\n**Decisions for you**\n- **Sound is silent.** The most important missing layer is the pour and flare audio. I didn't invent asset IDs, so paste `rbxassetid://` IDs into `Config.Sounds` (`Pour`, `Flare`, `Full`) and they play with pitch variation.\n- **Press E from anywhere.** I kept this because the lamp floats 30 studs up and players can't reach it. If you want players to walk to a lamp and hold a prompt, that would add more anticipation, but it changes the design. Tell me if you want it.\n\nVerified: the playtest console was clean after the HUD fix, but it only does syntax checks, so no game logic ran \u00b7 Not verified: how it looks or feels, the orb arcs and flare timing, multiplayer visuals, touch and gamepad binding, and the server cooldown and rejection paths. To check: playtest with two clients, grab a can, press E, and confirm the other client sees the orbs and flare.",
+  "cost_usd": 0.34405480000000005,
+  "turns": 33,
+  "seconds": 97.5,
+  "stderr_tail": "",
+  "diff": "diff --git a/default.project.json b/default.project.json\nindex d788f53..68f667c 100644\n--- a/default.project.json\n+++ b/default.project.json\n@@ -10,7 +10,8 @@\n       \"Remotes\": {\n         \"$className\": \"Folder\",\n         \"RefuelLamp\": { \"$className\": \"RemoteEvent\" },\n-        \"LampChanged\": { \"$className\": \"RemoteEvent\" }\n+        \"LampChanged\": { \"$className\": \"RemoteEvent\" },\n+        \"LampRefueled\": { \"$className\": \"RemoteEvent\" }\n       }\n     },\n     \"StarterPlayer\": {\ndiff --git a/src/client/HUD.client.luau b/src/client/HUD.client.luau\nindex c8f04b5..b560573 100644\n--- a/src/client/HUD.client.luau\n+++ b/src/client/HUD.client.luau\n@@ -1,8 +1,10 @@\n local Players = game:GetService(\"Players\")\n local ReplicatedStorage = game:GetService(\"ReplicatedStorage\")\n+local TweenService = game:GetService(\"TweenService\")\n \n local player = Players.LocalPlayer\n-local humanoid = player.Character.Humanoid\n+local character = player.Character or player.CharacterAdded:Wait()\n+local humanoid = character:WaitForChild(\"Humanoid\")\n \n local gui = Instance.new(\"ScreenGui\")\n gui.Name = \"HUD\"\n@@ -14,6 +16,23 @@ label.Position = UDim2.new(0, 10, 0, 10)\n label.TextScaled = true\n label.Parent = gui\n \n-ReplicatedStorage.Remotes.LampChanged.OnClientEvent:Connect(function(fuel)\n+local scale = Instance.new(\"UIScale\")\n+scale.Parent = label\n+\n+local lastFuel = 0\n+\n+local function render(fuel)\n+\tlastFuel = fuel\n \tlabel.Text = \"Lamp fuel: \" .. fuel .. \"  |  Health: \" .. math.floor(humanoid.Health)\n+end\n+\n+ReplicatedStorage.Remotes.LampChanged.OnClientEvent:Connect(render)\n+\n+-- Punch the readout when anyone refuels so the number change has weight.\n+ReplicatedStorage.Remotes.LampRefueled.OnClientEvent:Connect(function(_userId, _amount, fuel)\n+\trender(fuel)\n+\tscale.Scale = 1.2\n+\tlabel.TextColor3 = Color3.fromRGB(255, 190, 90)\n+\tTweenService:Create(scale, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()\n+\tTweenService:Create(label, TweenInfo.new(0.8), { TextColor3 = Color3.new(0, 0, 0) }):Play()\n end)\ndiff --git a/src/client/Refuel.client.luau b/src/client/Refuel.client.luau\nindex cef8f2c..aec06d0 100644\n--- a/src/client/Refuel.client.luau\n+++ b/src/client/Refuel.client.luau\n@@ -1,16 +1,200 @@\n local Players = game:GetService(\"Players\")\n local ReplicatedStorage = game:GetService(\"ReplicatedStorage\")\n local UserInputService = game:GetService(\"UserInputService\")\n+local ContextActionService = game:GetService(\"ContextActionService\")\n+local TweenService = game:GetService(\"TweenService\")\n+\n+local Config = require(ReplicatedStorage.Shared.Config)\n \n local player = Players.LocalPlayer\n local RefuelLamp = ReplicatedStorage.Remotes.RefuelLamp\n+local LampChanged = ReplicatedStorage.Remotes.LampChanged\n+local LampRefueled = ReplicatedStorage.Remotes.LampRefueled\n+\n+local lamp = workspace:WaitForChild(\"Lamp\")\n+\n+local WARM = Color3.fromRGB(255, 190, 90)\n+local lastFuel = Config.MaxFuel -- latest value the server told us\n+local lastPress = 0\n+\n+-- Client-only presentation objects on the lamp (the server owns lamp.Light).\n+local flare = Instance.new(\"PointLight\")\n+flare.Name = \"RefuelFlare\"\n+flare.Color = WARM\n+flare.Range = 90\n+flare.Brightness = 0\n+flare.Parent = lamp\n+\n+local burst = Instance.new(\"ParticleEmitter\")\n+burst.Name = \"RefuelBurst\"\n+burst.Enabled = false\n+burst.Rate = 0\n+burst.Color = ColorSequence.new(WARM, Color3.fromRGB(255, 235, 170))\n+burst.LightEmission = 1\n+burst.Lifetime = NumberRange.new(0.6, 1.2)\n+burst.Speed = NumberRange.new(12, 26)\n+burst.SpreadAngle = Vector2.new(180, 180)\n+burst.Size = NumberSequence.new({\n+\tNumberSequenceKeypoint.new(0, 1.4),\n+\tNumberSequenceKeypoint.new(1, 0),\n+})\n+burst.Parent = lamp\n+\n+local function playSound(id: string, pitchJitter: number?)\n+\tif id == \"\" then\n+\t\treturn\n+\tend\n+\tlocal sound = Instance.new(\"Sound\")\n+\tsound.SoundId = id\n+\tsound.PlaybackSpeed = 1 + (math.random() - 0.5) * 2 * (pitchJitter or 0.08)\n+\tsound.Parent = lamp\n+\tsound.Ended:Once(function()\n+\t\tsound:Destroy()\n+\tend)\n+\tsound:Play()\n+end\n+\n+local function flareLamp(amount: number)\n+\tlocal strength = math.clamp(amount / 40, 0.35, 1)\n+\tburst:Emit(math.floor(12 + 28 * strength))\n+\tflare.Brightness = 6 * strength + 2\n+\tTweenService:Create(\n+\t\tflare,\n+\t\tTweenInfo.new(Config.RefuelFlareSeconds, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),\n+\t\t{ Brightness = 0 }\n+\t):Play()\n+\tplaySound(Config.Sounds.Flare)\n+end\n+\n+-- Sends glowing oil from `fromPos` to the lamp along an arc; calls onArrive after the last one lands.\n+local function sendOrbs(fromPos: Vector3, onArrive: (() -> ())?)\n+\tlocal target = lamp.Position\n+\tlocal count = Config.RefuelOrbCount\n+\tlocal landed = 0\n+\n+\tfor i = 1, count do\n+\t\ttask.delay((i - 1) * Config.RefuelOrbStagger, function()\n+\t\t\tlocal orb = Instance.new(\"Part\")\n+\t\t\torb.Shape = Enum.PartType.Ball\n+\t\t\torb.Size = Vector3.one * 0.8\n+\t\t\torb.Material = Enum.Material.Neon\n+\t\t\torb.Color = WARM\n+\t\t\torb.Anchored = true\n+\t\t\torb.CanCollide = false\n+\t\t\torb.CanQuery = false\n+\t\t\torb.CanTouch = false\n+\t\t\torb.CastShadow = false\n+\t\t\torb.Position = fromPos\n+\t\t\torb.Parent = workspace\n+\n+\t\t\tlocal control = (fromPos + target) / 2\n+\t\t\t\t+ Vector3.new((math.random() - 0.5) * 16, 12 + math.random() * 8, (math.random() - 0.5) * 16)\n+\n+\t\t\tlocal t = Instance.new(\"NumberValue\")\n+\t\t\tt.Changed:Connect(function(a)\n+\t\t\t\tlocal p = fromPos:Lerp(control, a):Lerp(control:Lerp(target, a), a)\n+\t\t\t\torb.Position = p\n+\t\t\tend)\n+\t\t\tlocal tween = TweenService:Create(\n+\t\t\t\tt,\n+\t\t\t\tTweenInfo.new(Config.RefuelOrbTravel, Enum.EasingStyle.Quad, Enum.EasingDirection.In),\n+\t\t\t\t{ Value = 1 }\n+\t\t\t)\n+\t\t\ttween.Completed:Once(function()\n+\t\t\t\torb:Destroy()\n+\t\t\t\tt:Destroy()\n+\t\t\t\tlanded += 1\n+\t\t\t\tif landed == count and onArrive then\n+\t\t\t\t\tonArrive()\n+\t\t\t\tend\n+\t\t\tend)\n+\t\t\ttween:Play()\n+\t\tend)\n+\tend\n+end\n+\n+local function rootPosition(character: Model?): Vector3?\n+\tlocal root = character and character:FindFirstChild(\"HumanoidRootPart\")\n+\treturn root and (root :: BasePart).Position\n+end\n \n-UserInputService.InputBegan:Connect(function(input, processed)\n-\tif processed then return end\n-\tif input.KeyCode == Enum.KeyCode.E then\n-\t\tlocal oil = player.leaderstats.Oil.Value\n-\t\tif oil > 0 then\n-\t\t\tRefuelLamp:FireServer(oil)\n+-- State for the refuel *this* client just requested: orbs fly immediately, the flare waits for the\n+-- server's confirmation so a rejected request never shows a fake refuel.\n+local mine = { token = 0, arrived = false, amount = nil :: number? }\n+\n+local function tryFlareMine(token: number)\n+\tif mine.token ~= token or not mine.arrived or not mine.amount then\n+\t\treturn\n+\tend\n+\tlocal amount = mine.amount\n+\tmine.token += 1\n+\tflareLamp(amount)\n+end\n+\n+local function requestRefuel()\n+\tlocal now = os.clock()\n+\tif now - lastPress < Config.RefuelCooldown then\n+\t\treturn\n+\tend\n+\n+\tlocal leaderstats = player:FindFirstChild(\"leaderstats\")\n+\tlocal oil = leaderstats and leaderstats:FindFirstChild(\"Oil\")\n+\tlocal origin = rootPosition(player.Character)\n+\tif not oil or oil.Value <= 0 or not origin then\n+\t\treturn\n+\tend\n+\tif lastFuel >= Config.MaxFuel then\n+\t\tplaySound(Config.Sounds.Full)\n+\t\treturn\n+\tend\n+\n+\tlastPress = now\n+\tmine.token += 1\n+\tlocal token = mine.token\n+\tmine.arrived = false\n+\tmine.amount = nil\n+\n+\tplaySound(Config.Sounds.Pour)\n+\tsendOrbs(origin + Vector3.new(0, 1, 0), function()\n+\t\tmine.arrived = true\n+\t\ttryFlareMine(token)\n+\t\t-- give the server a short grace window; after that the request is treated as rejected\n+\t\ttask.delay(0.5, function()\n+\t\t\tif mine.token == token then\n+\t\t\t\tmine.token += 1\n+\t\t\tend\n+\t\tend)\n+\tend)\n+\tRefuelLamp:FireServer()\n+end\n+\n+LampChanged.OnClientEvent:Connect(function(fuel: number)\n+\tlastFuel = fuel\n+end)\n+\n+LampRefueled.OnClientEvent:Connect(function(userId: number, amount: number, fuel: number)\n+\tlastFuel = fuel\n+\tif userId == player.UserId then\n+\t\tmine.amount = amount\n+\t\ttryFlareMine(mine.token)\n+\telse\n+\t\tlocal other = Players:GetPlayerByUserId(userId)\n+\t\tlocal origin = other and rootPosition(other.Character)\n+\t\tif origin then\n+\t\t\tsendOrbs(origin + Vector3.new(0, 1, 0), function()\n+\t\t\t\tflareLamp(amount)\n+\t\t\tend)\n+\t\telse\n+\t\t\tflareLamp(amount)\n \t\tend\n \tend\n end)\n+\n+-- ContextActionService gives touch and gamepad a button too, not just the E key.\n+ContextActionService:BindAction(\"RefuelLamp\", function(_, state)\n+\tif state == Enum.UserInputState.Begin then\n+\t\trequestRefuel()\n+\tend\n+\treturn Enum.ContextActionResult.Sink\n+end, true, Enum.KeyCode.E, Enum.KeyCode.ButtonX)\n+ContextActionService:SetTitle(\"RefuelLamp\", \"Refuel\")\ndiff --git a/src/server/LampService.luau b/src/server/LampService.luau\nindex 86c8907..3271e5a 100644\n--- a/src/server/LampService.luau\n+++ b/src/server/LampService.luau\n@@ -7,8 +7,23 @@ local lamp = workspace.Lamp\n local LampService = {}\n local fuel = Config.MaxFuel\n \n+local function updateLight()\n+\tlamp.Light.Brightness = 3 * (fuel / Config.MaxFuel)\n+end\n+\n+function LampService.getFuel()\n+\treturn fuel\n+end\n+\n+-- Adds up to `amount` fuel and returns how much the lamp actually accepted.\n function LampService.addFuel(amount)\n-\tfuel = math.min(Config.MaxFuel, fuel + amount)\n+\tlocal accepted = math.clamp(amount, 0, Config.MaxFuel - fuel)\n+\tif accepted <= 0 then\n+\t\treturn 0\n+\tend\n+\tfuel += accepted\n+\tupdateLight()\n+\treturn accepted\n end\n \n function LampService.start()\n@@ -16,7 +31,7 @@ function LampService.start()\n \t\twhile true do\n \t\t\ttask.wait(1)\n \t\t\tfuel = math.max(0, fuel - Config.FuelDrainPerSecond)\n-\t\t\tlamp.Light.Brightness = 3 * (fuel / Config.MaxFuel)\n+\t\t\tupdateLight()\n \t\t\tLampChanged:FireAllClients(fuel)\n \t\tend\n \tend)\ndiff --git a/src/server/OilService.luau b/src/server/OilService.luau\nindex f9c3dbf..79e9c60 100644\n--- a/src/server/OilService.luau\n+++ b/src/server/OilService.luau\n@@ -4,6 +4,9 @@ local Config = require(ReplicatedStorage.Shared.Config)\n local LampService = require(script.Parent.LampService)\n \n local RefuelLamp = ReplicatedStorage.Remotes.RefuelLamp\n+local LampRefueled = ReplicatedStorage.Remotes.LampRefueled\n+\n+local lastRefuel: { [Player]: number } = {}\n \n local OilService = {}\n \n@@ -27,9 +30,31 @@ function OilService.start()\n \t\tsetupCan(can)\n \tend\n \n-\tRefuelLamp.OnServerEvent:Connect(function(player, amount)\n-\t\tplayer.leaderstats.Oil.Value -= amount\n-\t\tLampService.addFuel(amount)\n+\t-- The client only requests a refuel; the server decides how much oil moves.\n+\tRefuelLamp.OnServerEvent:Connect(function(player)\n+\t\tlocal now = os.clock()\n+\t\tif now - (lastRefuel[player] or 0) < Config.RefuelCooldown then\n+\t\t\treturn\n+\t\tend\n+\n+\t\tlocal leaderstats = player:FindFirstChild(\"leaderstats\")\n+\t\tlocal oil = leaderstats and leaderstats:FindFirstChild(\"Oil\")\n+\t\tif not oil or oil.Value <= 0 then\n+\t\t\treturn\n+\t\tend\n+\n+\t\tlocal accepted = LampService.addFuel(oil.Value)\n+\t\tif accepted <= 0 then\n+\t\t\treturn -- lamp already full: keep the player's oil\n+\t\tend\n+\n+\t\tlastRefuel[player] = now\n+\t\toil.Value -= accepted\n+\t\tLampRefueled:FireAllClients(player.UserId, accepted, LampService.getFuel())\n+\tend)\n+\n+\tPlayers.PlayerRemoving:Connect(function(player)\n+\t\tlastRefuel[player] = nil\n \tend)\n end\n \ndiff --git a/src/shared/Config.luau b/src/shared/Config.luau\nindex 2912114..c7006ba 100644\n--- a/src/shared/Config.luau\n+++ b/src/shared/Config.luau\n@@ -5,4 +5,18 @@ return {\n \tOilPerCan = 10,\n \tCanRespawnSeconds = 20,\n \tSaveKeyPrefix = \"player_\",\n+\n+\t-- Refuel feel\n+\tRefuelCooldown = 0.6, -- server-enforced minimum seconds between refuels per player\n+\tRefuelOrbCount = 6,\n+\tRefuelOrbStagger = 0.06,\n+\tRefuelOrbTravel = 0.55, -- seconds an orb takes to reach the lamp (also hides network latency)\n+\tRefuelFlareSeconds = 0.9,\n+\n+\t-- Fill in rbxassetid:// ids to enable; empty = silent. (No ids were invented.)\n+\tSounds = {\n+\t\tPour = \"\",\n+\t\tFlare = \"\",\n+\t\tFull = \"\",\n+\t},\n }\n",
+  "process": {
+    "edited": true,
+    "skills": [
+      "roblox",
+      "roblox-game-feel"
+    ],
+    "inspected_before_edit": true,
+    "playtest_after_last_edit": true,
+    "console_after_last_edit": true,
+    "syntax_errors": [],
+    "sim_console_errors_after": 0
+  },
+  "arm": "apex"
+}

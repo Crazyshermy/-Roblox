@@ -1,0 +1,92 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Moves presentation (swing animation/sound) to the client immediately on input",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Server still validates hits (cooldown, range, timing) and applies damage",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Adds impact feedback channels: hitstop, impact sound, VFX, camera shake, target reaction",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Handles server rejection/misprediction gracefully",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Puts latency in anticipation/wind-up rather than the impact; or mentions Server Authority prediction as an option",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Uses animation markers or timing to sync hit frames",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Says the server should tell other clients to play the attacker's swing. An animation played on the local player's own Animator already replicates, so other clients would play it twice.",
+        "Says the wind-up makes the attacker see the impact on time, but hitstop, impact sound and VFX only fire on hitConfirm. That arrives about a full round trip plus the wind-up after the click, so the impact still lags at real ping.",
+        "Gives a Server Authority 'GA July 2026' date sourced to unverifiable internal 'currency notes, E4', along with leaked tool meta ('Apex route', '.apex/', 'E3 practice')."
+      ],
+      "slop": [
+        "Opens with a routing and meta preamble that doesn't help the user"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Says hit effects should not go back to the attacker, but the server code uses broadcastHitFx:FireAllClients, which includes the attacker.",
+        "Recommends showing damage numbers instantly on the predicted hit, which contradicts its own advice not to predict outcomes.",
+        "Server code doesn't nil-check tRoot before reading tRoot.Position, and LOS is mentioned but not implemented."
+      ],
+      "slop": [
+        "The forward-lunge suggestion is a generic genre default"
+      ],
+      "overengineering": [
+        "Position-history rewind is in the base server sketch rather than added only if needed"
+      ]
+    },
+    "preference": "B",
+    "reason": "B gets Roblox animation replication right, covers rejection and reconciliation explicitly, and times hits with markers, while A double-plays the replicated swing, delays impact feedback until server confirm despite claiming otherwise, and includes unverifiable meta claims; A's wind-up latency hiding and Server Authority mention don't make up for that."
+  },
+  "judge_cost": 0.3365,
+  "apex_score": 0.917,
+  "base_score": 0.917,
+  "winner": "baseline",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "Says the server should tell other clients to play the attacker's swing. An animation played on the local player's own Animator already replicates, so other clients would play it twice.",
+      "Says the wind-up makes the attacker see the impact on time, but hitstop, impact sound and VFX only fire on hitConfirm. That arrives about a full round trip plus the wind-up after the click, so the impact still lags at real ping.",
+      "Gives a Server Authority 'GA July 2026' date sourced to unverifiable internal 'currency notes, E4', along with leaked tool meta ('Apex route', '.apex/', 'E3 practice')."
+    ],
+    "slop": [
+      "Opens with a routing and meta preamble that doesn't help the user"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Says hit effects should not go back to the attacker, but the server code uses broadcastHitFx:FireAllClients, which includes the attacker.",
+      "Recommends showing damage numbers instantly on the predicted hit, which contradicts its own advice not to predict outcomes.",
+      "Server code doesn't nil-check tRoot before reading tRoot.Position, and LOS is mentioned but not implemented."
+    ],
+    "slop": [
+      "The forward-lunge suggestion is a generic genre default"
+    ],
+    "overengineering": [
+      "Position-history rewind is in the base server sketch rather than added only if needed"
+    ]
+  },
+  "reason": "B gets Roblox animation replication right, covers rejection and reconciliation explicitly, and times hits with markers, while A double-plays the replicated swing, delays impact feedback until server confirm despite claiming otherwise, and includes unverifiable meta claims; A's wind-up latency hiding and Server Authority mention don't make up for that."
+}

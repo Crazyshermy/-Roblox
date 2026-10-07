@@ -1,0 +1,81 @@
+{
+  "apex_score": 1.0,
+  "base_score": 0.5,
+  "winner": "apex",
+  "reason": "A pushes back on the downgrade, describes fog's camera-wide limit correctly, keeps gameplay authority on the server and covers mobile performance; B gets fog wrong and leaves out server authority.",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Unexplained internal header 'Apex: boundary-breaker \u2192 visual-direction' leaked into the answer"
+    ],
+    "overengineering": []
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Claims FogStart/FogEnd make visibility 'close in around the lamp'. Lighting fog is measured from the camera, not from a world point like the lamp.",
+      "Treats Lighting.Fog* and Atmosphere as interchangeable. When an Atmosphere object is present, it overrides the Lighting fog properties.",
+      "Suggests a 'dark Neon' material for the boundary. Neon glows, so it can't be used to make the boundary read as dark.",
+      "Implies CollectionService tags make per-frame distance checks cheap. Tags only help gather the objects; they don't reduce the cost of checking them every frame."
+    ],
+    "slop": [
+      "Opens with 'Yes, darkening the screen works', which partly validates the downgrade"
+    ],
+    "overengineering": []
+  },
+  "raw": {
+    "items": [
+      {
+        "item": "Does not simply agree to the downgrade; preserves the intended experience",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Identifies the real constraints rather than asserting impossibility",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Proposes concrete Roblox techniques (client-side fog/atmosphere driven by distance, local parts/VFX, server-authoritative darkness radius, etc.)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Keeps gameplay authority on the server while presentation is client-side",
+        "A": "met",
+        "B": "missed"
+      },
+      {
+        "item": "Notes performance/mobile considerations",
+        "A": "met",
+        "B": "partial"
+      },
+      {
+        "item": "Offers options or a staged path with trade-offs",
+        "A": "met",
+        "B": "partial"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Unexplained internal header 'Apex: boundary-breaker \u2192 visual-direction' leaked into the answer"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "Claims FogStart/FogEnd make visibility 'close in around the lamp'. Lighting fog is measured from the camera, not from a world point like the lamp.",
+        "Treats Lighting.Fog* and Atmosphere as interchangeable. When an Atmosphere object is present, it overrides the Lighting fog properties.",
+        "Suggests a 'dark Neon' material for the boundary. Neon glows, so it can't be used to make the boundary read as dark.",
+        "Implies CollectionService tags make per-frame distance checks cheap. Tags only help gather the objects; they don't reduce the cost of checking them every frame."
+      ],
+      "slop": [
+        "Opens with 'Yes, darkening the screen works', which partly validates the downgrade"
+      ],
+      "overengineering": []
+    },
+    "preference": "A",
+    "reason": "A pushes back on the downgrade, describes fog's camera-wide limit correctly, keeps gameplay authority on the server and covers mobile performance; B gets fog wrong and leaves out server authority."
+  },
+  "judge_cost": 0.05403720000000001
+}

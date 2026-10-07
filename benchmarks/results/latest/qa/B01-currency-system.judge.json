@@ -1,0 +1,94 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Server is the only writer of Gold; client never sends amounts or prices",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Validates remote arguments (types, NaN/inf, bounds) and rate-limits shop requests",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Avoids yields between balance check and deduction (atomic spend)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Persistence handled safely (UpdateAsync or session-locked profile; load-before-play; BindToClose)",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Does not treat leaderstats as source of truth",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Kill rewards awarded by server-side kill attribution, not a client 'I killed X' remote",
+        "A": "met",
+        "B": "partial"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "Ships a broken/confusing DataService.Loaded stub (assigns a BindableEvent, then overwrites it with a table) and patches it afterward in prose instead of fixing the code",
+        "BindToClose uses a fixed task.wait(5) instead of waiting for saves to finish, so saves can be cut off",
+        "A player who leaves during load never has the lock released, so their profile stays locked for up to 90s",
+        "Saves on leave or autosave don't retry or serialize, so saves can overlap or be lost silently"
+      ],
+      "slop": [
+        "Generic 'consider ProfileService/ProfileStore' and 'ProcessReceipt must be idempotent' advice tacked on at the end"
+      ],
+      "overengineering": []
+    },
+    "B_flags": {
+      "incorrect_or_stale": [
+        "--!strict code (e.g. setmetatable cast, untyped 'unknown' params) likely produces type-check errors as written"
+      ],
+      "slop": [
+        "Meaningless 'Apex: security \u2192 data \u2192 networking' header and a meta note about having no file-write tool",
+        "Gold-per-minute telemetry and transaction-log suggestions are generic follow-ups"
+      ],
+      "overengineering": [
+        "Token-bucket rate limiter where a simple debounce would do",
+        "A separate Studio dev datastore plus a per-player inflight save serialization loop goes beyond the 'concise' request"
+      ]
+    },
+    "preference": "B",
+    "reason": "Both get the core security right, but B's persistence is more correct (it releases the lock if a player leaves mid-load, serializes and retries saves, kicks on a lost lock, and waits for saves in BindToClose), while A ships a broken Loaded stub and has weaker shutdown and lock handling; A's kill attribution is a bit more concrete."
+  },
+  "judge_cost": 0.12307320000000001,
+  "apex_score": 0.917,
+  "base_score": 0.917,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "--!strict code (e.g. setmetatable cast, untyped 'unknown' params) likely produces type-check errors as written"
+    ],
+    "slop": [
+      "Meaningless 'Apex: security \u2192 data \u2192 networking' header and a meta note about having no file-write tool",
+      "Gold-per-minute telemetry and transaction-log suggestions are generic follow-ups"
+    ],
+    "overengineering": [
+      "Token-bucket rate limiter where a simple debounce would do",
+      "A separate Studio dev datastore plus a per-player inflight save serialization loop goes beyond the 'concise' request"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [
+      "Ships a broken/confusing DataService.Loaded stub (assigns a BindableEvent, then overwrites it with a table) and patches it afterward in prose instead of fixing the code",
+      "BindToClose uses a fixed task.wait(5) instead of waiting for saves to finish, so saves can be cut off",
+      "A player who leaves during load never has the lock released, so their profile stays locked for up to 90s",
+      "Saves on leave or autosave don't retry or serialize, so saves can overlap or be lost silently"
+    ],
+    "slop": [
+      "Generic 'consider ProfileService/ProfileStore' and 'ProcessReceipt must be idempotent' advice tacked on at the end"
+    ],
+    "overengineering": []
+  },
+  "reason": "Both get the core security right, but B's persistence is more correct (it releases the lock if a player leaves mid-load, serializes and retries saves, kicks on a lost lock, and waits for saves in BindToClose), while A ships a broken Loaded stub and has weaker shutdown and lock handling; A's kill attribution is a bit more concrete."
+}

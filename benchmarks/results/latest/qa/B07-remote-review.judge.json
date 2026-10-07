@@ -1,0 +1,84 @@
+{
+  "apex_label": "A",
+  "raw": {
+    "items": [
+      {
+        "item": "Flags client-supplied damage as critical",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing cooldown/rate limit (XP farming via spam)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing range / line-of-sight / target validity checks",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags missing type validation of abilityName/target (nil char, non-Instance target)",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Flags that ability ownership/unlock is not checked",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Provides a corrected server-authoritative version or clear fix list",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [
+        "States as fact an engine throttle of about 500 remote calls per second shared across all remotes, and derives 5,000 XP/s from it; this is not a documented fixed limit"
+      ],
+      "slop": [
+        "Mentions .apex/decisions.md, which has nothing to do with the user's task",
+        "Offers to run tests 'through the MCP connection' in Studio, which is an off-topic tooling aside",
+        "Repeated hedging such as 'I haven't verified' and 'I haven't run these' adds length without content"
+      ],
+      "overengineering": [
+        "Rejects any extra trailing arguments with select('#', ...), which may break existing client calls and adds little security once damage is ignored"
+      ]
+    },
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Generic design-note advice, such as capping XP per minute, is not tied to this code"
+      ],
+      "overengineering": []
+    },
+    "preference": "B",
+    "reason": "Both cover every rubric item with sound server-authoritative fixes, but B is tighter, adds the useful FindFirstChildOfClass point, and leaves out A's stray tooling references and its dubious throttle figure."
+  },
+  "judge_cost": 0.0822852,
+  "apex_score": 1.0,
+  "base_score": 1.0,
+  "winner": "baseline",
+  "apex_flags": {
+    "incorrect_or_stale": [
+      "States as fact an engine throttle of about 500 remote calls per second shared across all remotes, and derives 5,000 XP/s from it; this is not a documented fixed limit"
+    ],
+    "slop": [
+      "Mentions .apex/decisions.md, which has nothing to do with the user's task",
+      "Offers to run tests 'through the MCP connection' in Studio, which is an off-topic tooling aside",
+      "Repeated hedging such as 'I haven't verified' and 'I haven't run these' adds length without content"
+    ],
+    "overengineering": [
+      "Rejects any extra trailing arguments with select('#', ...), which may break existing client calls and adds little security once damage is ignored"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Generic design-note advice, such as capping XP per minute, is not tied to this code"
+    ],
+    "overengineering": []
+  },
+  "reason": "Both cover every rubric item with sound server-authoritative fixes, but B is tighter, adds the useful FindFirstChildOfClass point, and leaves out A's stray tooling references and its dubious throttle figure."
+}

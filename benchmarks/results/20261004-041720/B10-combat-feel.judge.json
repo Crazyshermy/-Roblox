@@ -1,0 +1,77 @@
+{
+  "apex_label": "B",
+  "raw": {
+    "items": [
+      {
+        "item": "Moves presentation (swing animation/sound) to the client immediately on input",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Server still validates hits (cooldown, range, timing) and applies damage",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Adds impact feedback channels: hitstop, impact sound, VFX, camera shake, target reaction",
+        "A": "met",
+        "B": "met"
+      },
+      {
+        "item": "Handles server rejection/misprediction gracefully",
+        "A": "partial",
+        "B": "met"
+      },
+      {
+        "item": "Puts latency in anticipation/wind-up rather than the impact; or mentions Server Authority prediction as an option",
+        "A": "missed",
+        "B": "met"
+      },
+      {
+        "item": "Uses animation markers or timing to sync hit frames",
+        "A": "met",
+        "B": "met"
+      }
+    ],
+    "A_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "Generic feel list items such as forward lunge and input buffering, given without tying them to the user's problem"
+      ],
+      "overengineering": []
+    },
+    "A_flags_notes_inconsistency": "The client code calls detectHits() on click, which contradicts its own advice to check hits on the animation marker. The HitFX:FireAllClients line also contradicts the advice to skip the attacker.",
+    "B_flags": {
+      "incorrect_or_stale": [],
+      "slop": [
+        "A brief 'Apex' header line and a project-scan preamble that add nothing to the answer"
+      ],
+      "overengineering": [
+        "A per-player token bucket and anomaly counting are more than this question needs, though both are mentioned only briefly"
+      ]
+    },
+    "preference": "B",
+    "reason": "B covers every rubric item: it fades rejected hits quietly, puts latency into the wind-up, and offers Server Authority as an option. A's code also contradicts its own advice on marker timing and on skipping the attacker."
+  },
+  "judge_cost": 0.0767012,
+  "apex_score": 1.0,
+  "base_score": 0.75,
+  "winner": "apex",
+  "apex_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "A brief 'Apex' header line and a project-scan preamble that add nothing to the answer"
+    ],
+    "overengineering": [
+      "A per-player token bucket and anomaly counting are more than this question needs, though both are mentioned only briefly"
+    ]
+  },
+  "base_flags": {
+    "incorrect_or_stale": [],
+    "slop": [
+      "Generic feel list items such as forward lunge and input buffering, given without tying them to the user's problem"
+    ],
+    "overengineering": []
+  },
+  "reason": "B covers every rubric item: it fades rejected hits quietly, puts latency into the wind-up, and offers Server Authority as an option. A's code also contradicts its own advice on marker timing and on skipping the attacker."
+}

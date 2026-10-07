@@ -1,0 +1,41 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "My Roblox tower defense lags on mobile when there are 300 enemies. Each enemy is a Humanoid R15 rig with a Script inside that does a while true do task.wait() loop calling MoveTo toward the next waypoint and checks Touched for damage. How should I optimize this?",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-performance",
+    "roblox-genres"
+  ],
+  "files_read": [],
+  "final_text": "Apex route: roblox-performance, roblox-genres (mobile lag in a tower defense)\n\nI didn't find a `.apex/` folder or any enemy code in this repo. Everything below comes from your description and general Roblox practice. I haven't profiled or tested any of it, so treat it as recommendations until you measure.\n\n## What's probably costing you\n\nWith 300 enemies you have 300 Humanoids, 300 script threads and a lot of `Touched` traffic.\n\n1. **300 Humanoids.** Each one runs its own state machine and physics simulation, plus a 15-part R15 rig with Motor6Ds. That is about 4,500 parts. Mobile CPUs struggle most with this.\n2. **300 `while true do task.wait()` loops.** Each one calls `MoveTo` and does pathing work every tick. That is a lot of separate resumes per frame where one loop would do.\n3. **`Touched` on rig parts.** It fires on every contact, including enemy-to-enemy and enemy-to-terrain. Contact events are expensive and unreliable for this job.\n4. **Replication.** The server drives movement, so every enemy's position replicates to every client every frame.\n\nBefore changing anything, confirm this with the MicroProfiler (Ctrl+F6) on a real phone, using a fixed 300-enemy scenario. Check whether frames are long in scripts, physics, replication or render. I expect scripts, physics and replication, but I haven't measured it.\n\n## Recommended architecture\n\n**1. Make enemies data on the server and models on the client.**\n- Each enemy is a plain table: `{pathId, distance, speed, hp, id}`.\n- Precompute each path as waypoints with cumulative distances. Position is then a lookup at `distance`, so there is no `MoveTo` and no Humanoid pathing.\n- One server `Heartbeat` loop updates every enemy: `e.distance += e.speed * dt`.\n- Keep the server's enemies as data only. A server-side model is optional, and you can skip it.\n\n**2. Replicate events, not positions.**\n- Send \"enemy X spawned at server time T on path P with speed S\" and \"enemy X's speed changed to S2 at time T2\" (slows, stuns).\n- Each client reconstructs position from `distance = baseDistance + speed * (now - T)` and renders the model locally.\n- This removes nearly all per-frame replication. Slow and stun effects are just speed-change events.\n- The server stays authoritative on health, damage and leaks. Clients only present.\n\n**3. Drop the Humanoid, keep the look.**\n- Use a Humanoid-less rig with Motor6Ds and an `Animator` under an `AnimationController`. Check that the current docs still recommend this for non-character rigs before committing.\n- The client places the rig with `PivotTo` each frame. For many enemies, `workspace:BulkMoveTo` is worth trying, but profile it first.\n- Set `CanCollide`, `CanTouch` and `CanQuery` to false on every enemy part. Path followers don't need physics.\n- Anchor them all.\n\n**4. Replace `Touched` with the server's data.**\n- **Reaching the base:** when `distance >= pathLength`, the enemy leaks and the base takes damage. No collision is needed.\n- **Tower damage:** towers query the enemy list by position. A simple range check per tower on a throttled tick (5\u201310 Hz) is fine at 300 enemies. If it gets heavy, use a spatial grid bucketed by path segment.\n- **Projectiles:** resolve hits in code, such as a swept distance check against enemy positions, or hitscan with instant damage. Don't rely on physical contact.\n\n**5. Add rendering LOD on mobile.** This is where the rig cost lives.\n- Animate only enemies near the camera. For distant ones, freeze the pose or stop the Animator.\n- Simplify the mesh further out. Look at `RenderFidelity` and fewer parts.\n- Cap particles, shadows and health bars per enemy. Consider showing health bars only on damaged or targeted enemies.\n- Set `CastShadow = false` on small parts.\n\n## Order of attack\n\n1. Profile the current build for a baseline: client FPS, server heartbeat and script time at 300 enemies.\n2. Consolidate to a single server loop and replace `Touched`. This is cheap and removes a lot of overhead even if you keep the Humanoids for now.\n3. Move to data-driven movement with client-side rendering and event replication. This is the big win.\n4. Remove the Humanoids and add animation LOD.\n5. Re-profile on a real low-end phone and set a budget, for example \"300 enemies at \u226530 FPS on a low-end device\".\n\n## Trade-offs\n\n- **Client-rendered enemies** can differ slightly between players if a speed-change message arrives late. For a tower defense this is usually invisible, and the server's data stays the source of truth.\n- **No Humanoid** means no built-in health, death animation or ragdoll. You'll write those yourself, but a death effect is cheap to do on the client.\n- **If a mechanic needs physical interaction** (enemies pushing each other, blocking), say so. I'd find another way to preserve that feel rather than keep 300 Humanoids.\n\nWould you like me to sketch the server enemy manager and the client renderer in Luau? If you can share your current enemy script and path setup, I can tailor it. A rough picture of the enemy types and effects (slows, flyers, bosses) would help too, since they affect the replication design.",
+  "cost_usd": 0.1067334,
+  "turns": 8,
+  "seconds": 28.8,
+  "stderr_tail": ""
+}

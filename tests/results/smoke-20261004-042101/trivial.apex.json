@@ -1,0 +1,45 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "Write a Roblox script that makes a part slowly spin.",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox"
+  ],
+  "files_read": [],
+  "final_text": "Put this in a `Script` (server) parented to the part:\n\n```lua\n--!strict\nlocal RunService = game:GetService(\"RunService\")\n\nlocal part = script.Parent :: BasePart\nlocal DEGREES_PER_SECOND = 20 -- slow; raise for faster\n\npart.Anchored = true\n\nRunService.Heartbeat:Connect(function(dt: number)\n\tpart:PivotTo(part:GetPivot() * CFrame.Angles(0, math.rad(DEGREES_PER_SECOND * dt), 0))\nend)\n```\n\n- It spins around the part's own Y axis. Change the axis by moving the angle into `CFrame.Angles(x, y, z)`.\n- Using `dt` keeps the speed the same at any frame rate.\n- The part is anchored so physics doesn't interfere. If it must be unanchored, use a `HingeConstraint` motor instead.\n- I haven't run this in Studio. It's written from known APIs only.\n- This is fine for a prop or two. For many spinning parts, move the loop to a `LocalScript`. That way the server doesn't replicate every frame.",
+  "cost_usd": 0.0688124,
+  "turns": 3,
+  "seconds": 11.8,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "check": {
+    "skills_ok": true,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}

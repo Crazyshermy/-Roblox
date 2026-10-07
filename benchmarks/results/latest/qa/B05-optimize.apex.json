@@ -1,0 +1,84 @@
+{
+  "model": "sonnet",
+  "prompt": "My Roblox tower defense lags on mobile when there are 300 enemies. Each enemy is a Humanoid R15 rig with a Script inside that does a while true do task.wait() loop calling MoveTo toward the next waypoint and checks Touched for damage. How should I optimize this?",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox",
+    "roblox-performance",
+    "roblox-genres"
+  ],
+  "files_read": [
+    ".claude/skills/roblox-genres/references/systems.md"
+  ],
+  "tool_calls": [
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox",
+        "args": "Tower defense lags on mobile with 300 enemies. Each enemy is an R15 Humanoid rig with a Script doing while true do task.wait() MoveTo to next waypoint + Touched for damage. How to optimize?"
+      }
+    },
+    {
+      "tool": "Glob",
+      "input": {
+        "pattern": ".apex/*.md"
+      }
+    },
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-performance"
+      }
+    },
+    {
+      "tool": "Skill",
+      "input": {
+        "skill": "roblox-genres"
+      }
+    },
+    {
+      "tool": "Read",
+      "input": {
+        "file_path": "/tmp/apex-apex-he2txs1d/.claude/skills/roblox-genres/references/systems.md"
+      }
+    },
+    {
+      "tool": "Grep",
+      "input": {
+        "pattern": "Parallel|Humanoid|Touched|Actor|Bulk|PivotTo|workspace:Get",
+        "path": "/tmp/apex-apex-he2txs1d/.claude/skills/roblox/references/currency.md",
+        "output_mode": "content"
+      }
+    }
+  ],
+  "final_text": "*Apex: performance \u2192 genres*\n\nI haven't profiled your game, so the ranking below is by likely impact, not measurement. Confirm in the MicroProfiler (Ctrl+F6) which side is hurting on a phone, scripts/physics or rendering. Probably both.\n\n## What's costing you\n\n- **300 Humanoid R15 rigs.** Each is about 15 parts, 14 Motor6Ds, a Humanoid state machine and an Animator. Humanoids are a poor fit for hordes. This is likely your biggest cost.\n- **300 scripts each running `task.wait()` plus `MoveTo`.** That's 300 resume points and 300 Humanoid pathing calls per tick.\n- **`Touched` on every limb.** It fires from physics contacts, and R15 has many parts.\n\n## Fixes, in order of payoff\n\n**1. Stop simulating enemies as physics objects.** An enemy should be a row of data: `{pathId, distance, speed, hp, ...}`. Its position is a pure function of distance along the path, so there's no `MoveTo`, waypoint polling or collision. This is the standard Roblox approach for tower defense hordes.\n\n**2. Run one manager loop instead of 300 scripts.**\n\n```lua\n--!strict\n-- Precompute per path: cumulative segment lengths, so position(d) is cheap.\nlocal enemies: {[number]: Enemy} = {}\n\nRunService.Heartbeat:Connect(function(dt)\n\tfor id, e in enemies do\n\t\te.distance += e.speed * dt\n\t\tif e.distance >= e.path.length then\n\t\t\tbaseHealth -= e.damage   -- replaces Touched-for-damage\n\t\t\tdespawn(id)\n\t\tend\n\tend\nend)\n```\n\nAdvance each enemy's segment index incrementally instead of searching. Tower targeting runs off the same table, as a distance check on a throttled timer (about 10 Hz) instead of spatial queries.\n\n**3. Remove `Touched`.** If it detects enemies reaching the base, \"distance \u2265 path length\" covers it. If enemies damage towers, use a range check in the manager loop. `Touched` isn't needed anywhere in this design.\n\n**4. Move rendering to the client.** The server owns HP, kills, speed effects and rewards, and sends:\n- a spawn event: `pathId, serverStartTime, speed`\n- change events for slows and stuns: `id, newSpeed, atTime`\n\nEach client computes position from `workspace:GetServerTimeNow()` and renders cosmetic models from a pool. Moving them with `workspace:BulkMoveTo` or `PivotTo` on anchored, non-colliding parts keeps cost low. Your server then carries 300 table rows instead of 300 rigs, and mobile clients render only what they can see. A weak phone can also drop its detail level without changing gameplay.\n\n*Tradeoff:* clients can drift slightly from the server during slows and stuns. Send a batched position snapshot at 5\u201310 Hz as a correction, or keep the server timeline authoritative and have clients interpolate toward it.\n\n**5. If you want to keep server-side visible models,** at minimum:\n- Replace the Humanoid with a simple anchored model: a few meshes and one `PrimaryPart`.\n- Set `CanCollide`, `CanTouch` and `CanQuery` to false.\n- Move them with `BulkMoveTo`.\n- Fake the walk cycle with a bob and tilt, or limit real animation to nearby enemies.\n\n**6. Pool models.** Reuse models instead of `Clone` and `Destroy` per spawn, since mid-wave spikes hurt mobile.\n\n**7. Cut mobile rendering cost** after the above. Measure each change:\n- Use fewer unique meshes and materials.\n- Set `CastShadow = false` on small parts.\n- Reduce particle rate, size and overdraw.\n- Use mesh LOD where it applies.\n\n## What I'd keep from your design\n\nEnemies stay readable and individually targetable, so tower placement still matters. The data approach keeps that, and tower targeting is easier than with physics-based enemies.\n\n## Suggested order\n\n1. Profile once to get a baseline: 300 enemies, one fixed camera, on a real phone or the Device Emulator.\n2. Do steps 1\u20133 (data simulation, manager loop, no `Touched`) and re-measure.\n3. Do step 4 or 5 and re-measure.\n\n**Not verified:** I haven't opened your project (there are no scripts in the working directory), run a profile, or tested any of this in Studio. The `BulkMoveTo` and `GetServerTimeNow` calls are standard APIs, but check their current signatures in the docs before wiring them in. If you share the enemy script and the spawn code, I can write the drop-in manager and client renderer for your structure.",
+  "cost_usd": 0.1269278,
+  "turns": 10,
+  "seconds": 35.1,
+  "stderr_tail": "",
+  "mode": "apex"
+}

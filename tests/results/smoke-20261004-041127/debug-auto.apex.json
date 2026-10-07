@@ -1,0 +1,45 @@
+{
+  "mode": "apex",
+  "model": "sonnet",
+  "prompt": "My Roblox LocalScript sometimes errors 'attempt to index nil with Humanoid' but only after the player respawns. It's in StarterPlayerScripts and does `local hum = player.Character.Humanoid` at the top. What's wrong?",
+  "user_slash_command": null,
+  "skills_available": [
+    "roblox",
+    "roblox-architecture",
+    "roblox-assets",
+    "roblox-boundary-breaker",
+    "roblox-data",
+    "roblox-debugging",
+    "roblox-game-design",
+    "roblox-game-feel",
+    "roblox-genres",
+    "roblox-init",
+    "roblox-level-design",
+    "roblox-luau",
+    "roblox-networking",
+    "roblox-performance",
+    "roblox-physics-animation",
+    "roblox-review",
+    "roblox-route",
+    "roblox-security",
+    "roblox-status",
+    "roblox-testing",
+    "roblox-ui-ux",
+    "roblox-visual-direction"
+  ],
+  "skills_invoked": [
+    "roblox-debugging"
+  ],
+  "files_read": [],
+  "final_text": "`player.Character` is `nil` when that line runs, so `.Humanoid` indexes nil. I haven't run your code, so this is from the error text and how Roblox handles characters.\n\n**Why it happens**\n- Scripts in `StarterPlayerScripts` run once, when the player joins. They don't restart on respawn.\n- At join, the script can start before the first character exists, so `player.Character` can be nil. That's a race, which fits \"sometimes\".\n- On respawn, `player.Character` goes nil between the old character being removed and the new one being assigned. If anything reads it in that gap, you get the same error. Typical culprits are a function or event handler that does `player.Character.Humanoid`, or a delayed or looping call.\n- If the line only ran once at the top, you'd never see a respawn-specific error. So I suspect it's also inside a function, or the script is being re-cloned somewhere.\n- There's also a second bug. Even when it doesn't error, a `hum` cached at the top points at the dead character's Humanoid after respawn. Any connections you made on it are stale too.\n\nA missing Humanoid on an existing Character would give a different message (\"Humanoid is not a valid member of Model\"). Your message means the Character itself is nil.\n\n**Fix: bind per character, not once at the top**\n\n```lua\nlocal Players = game:GetService(\"Players\")\nlocal player = Players.LocalPlayer\n\nlocal function onCharacterAdded(character: Model)\n\tlocal hum = character:WaitForChild(\"Humanoid\") :: Humanoid\n\t-- set up everything that depends on this character here,\n\t-- and keep connections tied to this character's lifetime\n\thum.Died:Connect(function()\n\t\t-- ...\n\tend)\nend\n\nplayer.CharacterAdded:Connect(onCharacterAdded)\nif player.Character then\n\ttask.spawn(onCharacterAdded, player.Character) -- character already exists at script start\nend\n```\n\n- Don't store `hum` in a long-lived variable. Either rebuild it in `onCharacterAdded`, or fetch it fresh each time and nil-check:\n  `local char = player.Character; local hum = char and char:FindFirstChildOfClass(\"Humanoid\")`.\n- If everything in the script is per-character, you could move it to `StarterCharacterScripts`. It then restarts each spawn, and you can use `script.Parent` as the character.\n\nIf you paste the script, I can check for other stale references, such as Animators, `HumanoidRootPart` and connections that outlive the old character.",
+  "cost_usd": 0.0700684,
+  "turns": 3,
+  "seconds": 19.0,
+  "stderr_tail": "Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.\n",
+  "check": {
+    "skills_ok": true,
+    "markers_ok": true,
+    "missing": [],
+    "forbidden": []
+  }
+}
