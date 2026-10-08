@@ -30,6 +30,7 @@ Verified against `Roblox/creator-docs` (snapshot 2026-10-02) unless marked other
   - Value ≤ **4,194,304** characters per key. Store name, key and scope ≤ **50** chars each. Metadata ≤ 300 chars in total.
   - **Experience-level** limits per minute, shared with Open Cloud: Read **300 + CCU×40**, Write **300 + CCU×20**, List 300 + CCU×2, Remove 300 + CCU×40. `UpdateAsync` consumes both read and write.
   - **Server-level** limits default to Read and Write **60 + players×40**/min. They are creator-configurable via `DataStoreService:SetRateLimitForRequestType()`. Inspect them with `GetRequestBudgetForRequestType()`.
+  - Request types: reads through a `DataStore` object (`GetDataStore`) count as `Enum.DataStoreRequestType.StandardRead`. The `GetAsync` type covers `GlobalDataStore` reads (E4, `DataStoreRequestType.yaml`, 2026-10-08). Live Studio 2026-10: limiting `GetAsync` to 0 didn't throttle `DataStore` reads, while limiting `StandardRead` did.
   - **Per key** (all servers): writes ≤ **4 MB/min**, reads ≤ **25 MB/min** (`KeyThrottled`). Each request rounds up to the next KB. **Storage** cap: 500 MB + 1 MB × lifetime users, measured compressed on latest versions. Don't pre-compress.
   - Throttled requests queue, with **30 per queue**. When a queue is full, requests fail with error codes 301–306.
   - Official docs recommend **session locking** for player data (`player-data-purchasing.md`), and `UpdateAsync` when a write depends on the current value.
@@ -39,6 +40,9 @@ Verified against `Roblox/creator-docs` (snapshot 2026-10-02) unless marked other
 ## Input and UI
 - **Input Action System (IAS)**: full release in 2026 (E4/DevForum). `Workspace.PlayerScriptsUseInputActionSystem` switches default player scripts to IAS. Prefer `InputContext`/`InputAction`/`InputBinding` for new rebindable, cross-device input.
 - `TextChatService` is the current chat system. User-authored text shown to *other* users that bypasses chat must go through `TextService:FilterStringAsync` (or equivalent filtering) (E4).
+
+## Assets
+- A single mesh can't exceed **20,000 triangles**. Avatar items have their own budgets (E4, `art/modeling/specifications.md`, 2026-10-08).
 
 ## Characters
 - `CharacterWalkSpeed` defaults to **16**. Jump: `StarterPlayer.CharacterUseJumpPower` defaults to **true**, so the default jump comes from `JumpPower` 50 and `Workspace.Gravity` (about 6.4 studs), **not** `JumpHeight` 7.2. Measure the real jump in a metrics gym. (E4, `StarterPlayer.yaml`)
@@ -50,4 +54,5 @@ Verified against `Roblox/creator-docs` (snapshot 2026-10-02) unless marked other
 
 ## Studio
 - Multi-client testing: Test → **Server & Clients**, up to **8** clients. Party Simulator emulates `PartyId` (E4, `studio/testing-modes.md`).
+- From code (e.g. Studio MCP `execute_luau`): `StudioTestService:ExecuteMultiplayerTestAsync`, `AddPlayers`, `LeaveTest` and `EndTest`; `StudioDeviceSimulatorService` for device presets (E4, `StudioTestService.yaml`, `StudioDeviceSimulatorService.yaml`, 2026-10-08; used in live Studio 2026-10).
 - Studio MCP tool inventory: see `studio-mcp.md`.

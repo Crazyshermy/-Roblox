@@ -15,7 +15,7 @@ Produce a compact status report. Use only real observations. Don't assume anythi
 5. **Project integration:** does `.apex/project.md` exist, and is it filled in or still a template? Do `.apex/decisions.md` and `.apex/debt.md` exist? Does `CLAUDE.md` contain the `Roblox Apex` block?
 6. **Studio:** do any Roblox Studio MCP tools appear in your toolset (`list_roblox_studios`, `execute_luau`, …)? If yes, say "connected (tools present)". Don't call them unless the user asks. If no, say "not connected" and give the setup pointer from `${CLAUDE_SKILL_DIR}/../roblox/references/studio-mcp.md`.
 
-**Expected inventory (v1.2):** `roblox` · `roblox-architecture` `roblox-assets` `roblox-boundary-breaker` `roblox-data` `roblox-debugging` `roblox-game-design` `roblox-game-feel` `roblox-genres` `roblox-level-design` `roblox-luau` `roblox-networking` `roblox-performance` `roblox-physics-animation` `roblox-review` `roblox-security` `roblox-testing` `roblox-ui-ux` `roblox-visual-direction` · user-only `roblox-status` `roblox-route` `roblox-init`. Check each **name** against what you found. Don't count; mark each name. A plugin install prefixes names with `roblox-apex:`, which is normal.
+**Expected inventory (v1.3):** `roblox` · `roblox-architecture` `roblox-assets` `roblox-blender-modelling` `roblox-boundary-breaker` `roblox-data` `roblox-debugging` `roblox-game-design` `roblox-game-feel` `roblox-genres` `roblox-level-design` `roblox-luau` `roblox-networking` `roblox-performance` `roblox-physics-animation` `roblox-review` `roblox-security` `roblox-testing` `roblox-ui-ux` `roblox-visual-direction` · user-only `roblox-status` `roblox-route` `roblox-init`. Check each **name** against what you found. Don't count; mark each name. A plugin install prefixes names with `roblox-apex:`, which is normal.
 
 Output format:
 ```
@@ -27,6 +27,6 @@ Knowledge snapshot: <date> (<fresh|stale>)
 Project memory: .apex/ <present/filled | template | absent → run /roblox-init>
 CLAUDE.md block: <present | absent>
 Studio MCP: <connected | not connected>
-Studio validation of Roblox Apex itself: NOT VERIFIED (requires local Windows Roblox Studio validation; see tests/STUDIO-TEST.md in the Apex repo)
+Studio validation of Roblox Apex itself: tested once in live Studio (2026-10-07, one tester, Windows); the scripted procedure hasn't been run as written (see docs/BENCHMARKS.md in the Apex repo)
 Issues: <bullets, or "none">
 ```

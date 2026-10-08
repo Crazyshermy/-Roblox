@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.3.0 (2026-10-08)
+Lessons from the first live Roblox Studio testing (2026-10-07) and two verified Blender → Studio imports. Details are in `docs/BENCHMARKS.md` → "Live Studio results".
+- **New skill `roblox-blender-modelling`:** Blender MCP modelling for Roblox. Covers 1 unit = 1 stud, a base pivot, color carried in an embedded sRGB or palette texture (a plain material color imported wrong), the exact FBX export call and 3D Importer settings, and post-import checks (size, triangles, texture pixels, collision, screenshots). Rules carry [verified]/[file-checked]/[untested] tags. Routed from the router, and pointed to from assets.
+- **Studio MCP** (`roblox/references/studio-mcp.md`):
+  - multi-client tests started from `execute_luau` via `StudioTestService`
+  - one `screen_capture` at a time
+  - `execute_luau` edits already sit in one undo recording
+  - a probe's `require` gets a separate module instance
+  - Output clears on playtest; `character_navigation` limits; CoreGui noise in test clients
+  - a new "Before the user saves the place" check: PlaceId, Rojo connection, Save to File, never save over a repo or plugin place file
+- **Rojo** (architecture): use an explicit `CFrame` for parts with children (Rojo reset a parent to the origin); set `servePlaceIds` (Rojo synced one game into another place); legacy chat in `rojo build` places.
+- **Data:** `GetDataStore` throws in unpublished places, so call it in `pcall`, never at module load. `StudioTestService` clients have negative UserIds.
+- **Testing:** reproduce exploits before fixing and re-attack under latency. Network Simulator per client window; device presets carry over to test clients. Forced load failure via the `StandardRead` limit; prove `UpdateAsync` merges with a marker field. `PlayerRemoving` precedes `BindToClose` in Studio.
+- **Security fuzz checklist:** touch-spoof probes (detached limb, corpse, teleports). `firetouchinterest` isn't available in Studio.
+- **Assets:** set `CollisionFidelity` explicitly after every import, because the importer's choice varied for the same mesh. **Currency:** 20,000-triangle mesh limit, DataStore request types, `StudioTestService`/`StudioDeviceSimulatorService`.
+- **Tests and fixtures:**
+  - `tests/fixtures/lighthouse-reference/`: the live-verified partial fix, kept outside the fixture like the answer key
+  - `lighthouse.FLAWS.md` gains "Found live, not planted" (L1–L10); F1–F8 unchanged
+  - live records in `tests/results-latest/studio/`
+  - `STUDIO-TEST.md` setup keeps answer keys and the repo's place file out of the test folder
+  - a `blender-auto` smoke case (not yet run)
+  - `check_api.py` allowlists a DataStore error name and two FBX property names
+- The original fixture (`tests/fixtures/lighthouse/`, `LighthouseKeeper.rbxl`) is unchanged.
+
 ## 1.2.0 (2026-10-04)
 Pre-Studio hardening from a critical review. **Live Roblox Studio: NOT VERIFIED — requires local Windows Roblox Studio validation.**
 - **Windows:** added `.gitattributes`, because a Windows (`autocrlf`) checkout broke `install.sh` in Git Bash. `install.ps1` is now tested under PowerShell 7 (`tests/test_installers.sh`).

@@ -83,6 +83,8 @@ NOT_API = {"ProfileStore", "ProfileService", "Knit", "Matter", "Fusion", "TestEZ
            "Deferred", "Server", "Client", "Edit", "Legacy", "Box", "Hull", "PreciseConvexDecomposition", "Automatic",
            "HumanoidRootPart",  # instance name
            "KeyThrottled",  # DataStore error name (error-codes-and-limits.md)
+           "StandardReadGameServerThrottled",  # DataStore error name (error-codes-and-limits.md)
+           "DiffuseColor", "UnitScaleFactor",  # FBX file properties (roblox-blender-modelling)
            "ArePaidRandomItemsRestricted"}  # key in PolicyService:GetPolicyInfoForPlayerAsync() result (verified in PolicyService.yaml)
 bare = {}
 for root, _, files in os.walk(SKILLS):

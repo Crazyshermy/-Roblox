@@ -32,6 +32,10 @@ Anything in `ReplicatedStorage` or `Workspace` is readable by exploiters, so sec
 - **Rojo** when the filesystem is the source of truth (git, CI, packages via Wally/pesde, external tooling).
 - **Studio Script Sync** (GA 2026) when the project is Studio-first and you just want scripts on disk. It works with Team Create.
 - Don't switch a project's toolchain as a side effect of another task.
+- **Rojo project-file pitfalls** (seen in live Studio with Rojo 7.7.1, 2026-10):
+  - Give any part that has children an explicit `CFrame`, not the `Position` shortcut. A project-file change to a child (a `PointLight`) made Rojo reset its parent part to (0, 0, 0).
+  - Set `servePlaceIds` once the place is published. Without it, `rojo serve` syncs into any place that connects, and it pushed one game's scripts and parts into another place. Check what's connected before the user saves (`${CLAUDE_SKILL_DIR}/../roblox/references/studio-mcp.md` → "Before the user saves the place").
+  - A place built with `rojo build` came up with legacy chat (`ChatVersion` = `LegacyChatService`), and its chat scripts logged CoreGui errors in test clients. Current docs mark that property deprecated, since new Studio-created experiences always use `TextChatService` (E4). Treat legacy-chat noise in a Rojo-built test place as an artifact of the build, not a game bug.
 
 ## Lifecycle checklist (for any new system)
 init order and dependencies · existing players and characters at start · join and leave · respawn · round reset · server shutdown (`BindToClose`) · streaming in and out · hot paths and their cost · who can mutate · how it's tested in isolation.

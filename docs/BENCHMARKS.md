@@ -1,4 +1,29 @@
-# Benchmarks and verification results (current: v1.2.0, 2026-10-04)
+# Benchmarks and verification results (live Studio: 2026-10-07; automated runs: v1.2.0, 2026-10-04)
+
+**Live Roblox Studio: tested once (2026-10-07), by one tester on Windows.** See "Live Studio results" below. It was open-ended testing on the Lighthouse fixture, not the scripted procedure in `tests/STUDIO-TEST.md`. Everything after that section comes from headless runs and the Studio-workflow simulator, which is process evidence only.
+
+## Live Studio results (2026-10-07)
+**Setup:** Claude Code v2.1.293 · Opus 5.5 at xhigh effort · Roblox Apex 1.2.0 · Rojo 7.7.1 (`rojo serve`) · Roblox Studio's built-in MCP server · Windows · Studio version **not recorded**. The place was tested unpublished, then published as a private experience with Studio API access on, for a real-DataStore pass. Full record: `tests/results-latest/studio/lighthouse-2026-10-07.md`. Resulting code: `tests/fixtures/lighthouse-reference/`.
+
+**Possible answer-key contamination.** During the run, `lighthouse.FLAWS.md` sat **one folder above** the test project, where Claude could have read it. Nothing shows whether it did, so **contamination can't be ruled out for the planted flaws F1–F8**. The ten live-found bugs L1–L10 (`tests/fixtures/lighthouse.FLAWS.md` → "Found live, not planted") aren't in the answer key, so they aren't affected. `STUDIO-TEST.md` now says to keep the answer key out of the test folder.
+
+| Area | Result (observed in live Studio unless noted) |
+|---|---|
+| Bugs fixed with live evidence | Planted F1, F2, F3, F6 and the data-safety parts of F5, plus live-found L1–L10 (L3 only partly), each re-checked live after the fix. F4, F7, F8 and session locking were deliberately left open (fixture scope decision D-005) |
+| Sync discipline | Every edit went through Rojo, and sync was proven (`script_read`/`script_grep`, property reads) before each test. No test ran on stale code |
+| Exploits, attacked before and after the fix | Detached-limb touch spoof (77 studs) and corpse limb: got oil before, blocked after, including under Bad 3G. Blink teleport: blocked at zero latency, **got through under Bad 3G**. Teleport-and-stay: **still collects** (needs movement validation). 14 malicious refuel payloads and 50-request spam: rejected or capped after the fix (not testable before it, because the server didn't boot) |
+| Multiplayer | Three 2-client `StudioTestService` runs started from the MCP, with mid-session joins, per-player isolation, simultaneous refuels and leave mid-session. Network Simulator at ~56/127/390 ms measured ping. Device Simulator on iPhone 7 and desktop presets |
+| Real DataStore | Save → load round trip. A forced load failure didn't overwrite the stored record (same version). `UpdateAsync` merge proven with a planted marker field. Shutdown saves landed (~0.5 s) |
+| Visual | Lamp brightness chosen by measuring screenshot pixels (clipped-white ground → 0%). HUD/chat and touch-button/Jump overlap measured at 0 px after the fixes |
+| Not verified | Session locking and autosave (not implemented), a `BindToClose`-initiated save (Studio removes players first), real touch/gamepad hardware, real devices, tablets, glancing high-speed pickups |
+
+**Against the `STUDIO-TEST.md` steps:** 3 (HUD respawn fix), 4 (sync confirmed before playtests), 5–6 (console read, then fixed from the evidence), 7 (respawn mid-playtest with probes) and 8 (security with live attacks) were all exercised. Not recorded: steps 1–2 as separate prompts; whether Claude asked before the first data-writing playtest (the tester's memory notes do record that playtests hit the real store); the "stop `rojo serve`" stale-code check. 9 (design review) was not run, because the tester scoped design out. 10 was partial: visuals were measured, `Lighting` was untouched, and the refuel feel wasn't reworked beyond touch and gamepad input.
+
+**What changed in the skills because of it (v1.3.0):** Studio MCP tool behavior and a pre-save place check (`roblox/references/studio-mcp.md`); Rojo project-file pitfalls (architecture); `GetDataStore` throwing at boot and test-client keys (data); MCP multi-client, latency, device and data-fault techniques (testing); touch-spoof probes (security fuzz checklist); explicit `CollisionFidelity` after import (assets); and the new `roblox-blender-modelling` skill from two verified Blender imports (`tests/results-latest/studio/blender-import-2026-10-08.md`).
+
+---
+
+# Automated results
 
 All runs used headless Claude Code v2.1.289, with **Sonnet** as the subject model unless noted (v1.2 adds Opus and Haiku smoke runs) and an **Opus** session as the blind judge. Answers are compared in random A/B order, and the judge never knows which arm is which.
 
@@ -6,11 +31,9 @@ All runs used headless Claude Code v2.1.289, with **Sonnet** as the subject mode
 - One sample per arm per task, so run-to-run variance is real. The same baseline scored 0.92 and 1.00 on identical runs.
 - LLM judges have stale Roblox knowledge. A judge once flagged the correct remote-throttle figure as invented. Judge "incorrect" flags are checked against the docs before acting on them.
 - Rubrics were written by the skills' author (teaching-to-the-test risk).
-- **No result here comes from real Roblox Studio** (see "Not verified").
+- **No automated result comes from real Roblox Studio.** The Studio-workflow simulator is process evidence only.
 
 These are regression detectors and directional evidence, not science.
-
-**Live Roblox Studio: NOT VERIFIED — requires local Windows Roblox Studio validation.** Nothing below comes from real Studio. The Studio-workflow simulator is process evidence only.
 
 ## v1.2.0 results (2026-10-04)
 | Check | Result |
@@ -116,7 +139,7 @@ This case was measured because plugin users may skip `/roblox-init`.
 | `/roblox-status` | model arithmetic miscounted the inventory | name-based checklist, no counting |
 
 ## Not verified
-- **Real Roblox Studio.** No live Studio or Studio MCP session has been run, because the build environment is Linux. The prepared procedure is `tests/STUDIO-TEST.md`, with the place file `tests/fixtures/LighthouseKeeper.rbxl`. The Studio MCP tool *names* come from Roblox's docs, but parameter shapes are unverified.
+- **Real Roblox Studio, beyond one run.** Live Studio has been tested once (2026-10-07, one tester, one model, Studio version not recorded; see "Live Studio results"). The scripted `tests/STUDIO-TEST.md` procedure hasn't been run as written, and planted-flaw results may be contaminated by the answer key. The live record shows `list_roblox_studios`, `script_read`, `script_grep`, `execute_luau`, `start_stop_play`, `get_console_output`, `screen_capture` and `character_navigation` in use. The other tools in `studio-mcp.md` (assets, generation, `http_get`, `skill`) weren't exercised.
 - **`install.ps1`** has never been executed (no PowerShell available).
 - **Other subject models** (Opus, Haiku) and long multi-session use on a real game.
 - **Variance:** single samples per arm. Repeated-sampling statistics haven't been collected.

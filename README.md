@@ -56,10 +56,10 @@ Then, in your game project, run `/roblox-status` (health check), then `/roblox-i
 
 Skills: see [docs/SKILL-INDEX.md](docs/SKILL-INDEX.md). Design: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Verified so far (v1.2.0)
-**Live Roblox Studio: NOT VERIFIED — requires local Windows Roblox Studio validation.** The test kit is ready: [tests/STUDIO-TEST.md](tests/STUDIO-TEST.md) plus `tests/fixtures/LighthouseKeeper.rbxl`.
+## Verified so far
+**Live Roblox Studio: tested once** (2026-10-07, Apex 1.2.0, one tester on Windows, Opus 5.5, Rojo 7.7.1, Studio's MCP server). Claude fixed the fixture's bugs and re-checked each in live playtests: multi-client runs, simulated latency, device presets, real DataStore saves, and exploits attacked before and after each fix. Answer-key contamination can't be ruled out for the planted flaws. The run was open-ended, so the scripted [tests/STUDIO-TEST.md](tests/STUDIO-TEST.md) procedure hasn't been run as written. Details and limits: [docs/BENCHMARKS.md](docs/BENCHMARKS.md) → "Live Studio results".
 
-Numbers, method and raw data are in [docs/BENCHMARKS.md](docs/BENCHMARKS.md). All of these are single-sample or small-sample runs judged blind by an LLM.
+**Automated results (v1.2.0).** Numbers, method and raw data are in [docs/BENCHMARKS.md](docs/BENCHMARKS.md). All of these are single-sample or small-sample runs judged blind by an LLM.
 - **Fresh install from GitHub:** 15/15 checks for the project and plugin methods in isolated configs. That covers discovery, `/roblox`, `/roblox-status`, `/roblox-route`, `/roblox-init`, the CLAUDE.md block, `.apex/` memory and specialist auto-routing.
 - **Installers:** `install.sh` and `install.ps1` pass install, update, uninstall, conflict and user-level tests (PowerShell 7). `.gitattributes` keeps Windows checkouts working in Git Bash; before v1.2, a Windows checkout broke `install.sh`. **Windows PowerShell 5.1 is untested.**
 - **Q&A benchmark (10 tasks, full run):** Apex beat baseline Claude **9–1**, with rubric coverage 0.78 → 0.98.
@@ -86,7 +86,9 @@ The manual procedure for an interactive session is in [tests/SMOKE-TEST.md](test
 install/               install.sh, install.ps1
 tests/                 validate.py, check_api.py, smoke.py, install_test.py, run_case.py,
                        SMOKE-TEST.md, STUDIO-TEST.md, studio_sim/ (Studio-workflow simulator),
-                       fixtures/lighthouse/ (Rojo test game) + LighthouseKeeper.rbxl
+                       fixtures/lighthouse/ (Rojo test game) + LighthouseKeeper.rbxl,
+                       fixtures/lighthouse-reference/ (live-verified partial fix; an answer key, like lighthouse.FLAWS.md),
+                       results-latest/studio/ (live Studio and Blender import records)
 benchmarks/            tasks.json + run.py (Q&A), project_run.py (real edits in the fixture), results/latest/
 docs/                  ARCHITECTURE, SKILL-INDEX, EVIDENCE-POLICY, CONTRIBUTING, BENCHMARKS, RESEARCH
 docs/legacy-rbxos/     the earlier RBXOS design (archived; its concepts were folded into the skills)
