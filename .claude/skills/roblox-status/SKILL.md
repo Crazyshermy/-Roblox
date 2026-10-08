@@ -27,6 +27,6 @@ Knowledge snapshot: <date> (<fresh|stale>)
 Project memory: .apex/ <present/filled | template | absent → run /roblox-init>
 CLAUDE.md block: <present | absent>
 Studio MCP: <connected | not connected>
-Studio validation of Roblox Apex itself: NOT VERIFIED (requires local Windows Roblox Studio validation; see tests/STUDIO-TEST.md in the Apex repo)
+Studio validation of Roblox Apex itself: tested once in live Studio (2026-10-07, one tester, Windows); the scripted procedure hasn't been run as written (see docs/BENCHMARKS.md in the Apex repo)
 Issues: <bullets, or "none">
 ```

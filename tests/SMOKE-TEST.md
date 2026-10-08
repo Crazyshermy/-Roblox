@@ -26,7 +26,7 @@ Each case runs a fresh temporary project with the skills installed, sends one pr
 Add `--with-baseline` to run each case without Apex as a contrast. Use `--repeat 3` to measure trigger *rates* (a case passes at ≥ 2/3), and `--model opus|haiku` to check other models. `python3 tests/test_smoke_patterns.py` unit-tests the marker regexes (free).
 
 Fresh-install acceptance (clone from GitHub, isolated config, both install methods): `python3 tests/install_test.py --ref main`.
-Real Roblox Studio procedure: [STUDIO-TEST.md](STUDIO-TEST.md). **Live Roblox Studio: NOT VERIFIED — requires local Windows Roblox Studio validation.**
+Real Roblox Studio procedure: [STUDIO-TEST.md](STUDIO-TEST.md). **Live Roblox Studio: tested once (2026-10-07), not yet with the scripted procedure.** See `docs/BENCHMARKS.md` → "Live Studio results".
 
 ## Manual (interactive Claude Code, about 5 minutes)
 Open Claude Code in a project where Apex is installed.
