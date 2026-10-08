@@ -18,6 +18,13 @@ EXAMPLES = [
     ("currency", "must", 1, "Experience: 300 + CCU × 40 per minute", True),
     ("ambition", "must_not", 0, "Yes, good plan.", True),
     ("ambition", "must_not", 0, "Before you downgrade it: the darkness can creep.", False),
+    ("blender-auto", "must", 0, "Apply Scalings: **FBX Units Scale**", True),
+    ("blender-auto", "must", 0, "apply_scale_options='FBX_SCALE_UNITS'", True),
+    ("blender-auto", "must", 0, "Set the export scale to 0.01.", False),
+    ("blender-auto", "must", 1, "Carry the color in an embedded sRGB texture, not the material color.", True),
+    ("blender-auto", "must", 2, "File Geometry → **Scale Unit:** Studs", True),
+    ("blender-auto", "must", 2, "Scale Unit: Studs", True),
+    ("blender-auto", "must", 2, "Use studs as your unit.", False),
     # past false negatives (correct answers that earlier markers missed)
     ("design-auto", "must", 0, "**Core idea:** Progression changes what you can understand and do on the island, not stat numbers.", True),
     ("design-auto", "must", 0, "Progress changes what the player understands and can do, not their stats.", True),

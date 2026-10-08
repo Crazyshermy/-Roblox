@@ -13,6 +13,7 @@ For each client→server remote, decide what the server does in each case below.
 | Timing | spam at 60/s and 500/s; two remotes interleaved to bypass per-remote limits; calls during PlayerRemoving |
 | Concurrency | the same action from two clients on one shared object; trade accept plus inventory change in the same frame |
 | Spatial | act at distance 10,000; act through walls; teleport-then-act |
+| Touch (`Touched` grants) | a limb detached on the client and moved into the part from far away; a corpse limb; teleport in and stay; a short blink teleport. `firetouchinterest` isn't available in Studio, but the client owns its character, so a detached limb stands in for it (verified in live Studio, 2026-10). A server-side range check stops the far-away touch, but **not** teleport-and-stay: the server really sees the character at the part, so that needs movement validation or Server Authority |
 | Economy | buy with a negative quantity; sell an item you don't have; integer overflow on stacked multipliers; rapid buy/sell arbitrage |
 
 Server-side oracles to check after each probe: the value totals didn't change, there are no server errors in the console, server frame time didn't spike, and other players' state wasn't touched.

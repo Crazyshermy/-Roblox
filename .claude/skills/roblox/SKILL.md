@@ -3,10 +3,10 @@ name: roblox
 description: "Use for ANY Roblox, Roblox Studio, Luau or Rojo task, including quick questions, bugs, code, systems, multiplayer, data, security, performance, testing, game design, feel, art, levels and UI. This Roblox Apex router loads the relevant roblox-* specialists, applies .apex/ project memory, and enforces verified, current Roblox standards."
 argument-hint: "[what you want to build, fix, design or ask]"
 metadata:
-  version: 1.2.0
+  version: 1.3.0
 ---
 
-# Roblox Apex: router and execution policy (v1.2.0)
+# Roblox Apex: router and execution policy (v1.3.0)
 
 Request: $ARGUMENTS
 (If that is empty, use the user's latest message or ask what they want. Don't lecture about the system.)
@@ -39,6 +39,7 @@ Load only what the task needs: **trivial → none**, **standard → 1–2**, **s
 | UI, HUD, menus, mobile or controller input, accessibility, prompts, onboarding UX | `roblox-ui-ux` |
 | Physics, constraints, vehicles, character controllers, animation tech, IK, **NPCs, enemy AI, pathfinding, hordes** | `roblox-physics-animation` |
 | Meshes, imports, textures, Creator Store, packages, asset budgets, audio assets | `roblox-assets` |
+| A model made in **Blender** for Roblox, the Blender MCP, FBX export from Blender, a Blender mesh importing at the wrong size, color or orientation | `roblox-blender-modelling` (+ `roblox-assets` only for sourcing or scene budgets) |
 | "Roblox can't do X", "too hard", "simplify", an engine-pushing idea | `roblox-boundary-breaker` |
 | A finished significant implementation or design, or "review this" | `roblox-review` |
 

@@ -7,8 +7,9 @@ description: "Roblox asset pipeline: mesh import, scale and pivots, collision fi
 
 ## Import and setup
 - Model at Roblox scale (1 stud is about 0.28 m in the avatar convention; check the project's character scale). Set pivots deliberately (`PivotTo` and `WorldPivot` are the modern API). Name meshes meaningfully before import.
-- **Collision:** set `CollisionFidelity` per use. `Box` or `Hull` for most props, `PreciseConvexDecomposition` only where needed. Decor gets `CanCollide=false`, `CanQuery=false`, `CanTouch=false`.
-- `RenderFidelity = Automatic` allows LOD. Provide sensible triangle counts for the on-screen size and reuse identical meshes, because identical mesh plus material instances render efficiently.
+- **Collision:** set `CollisionFidelity` per use, **explicitly after every import**. The 3D Importer gave the same mesh `PreciseConvexDecomposition` one day and `Default` the next (seen in live Studio, 2026-10). A value set from a script reads back about a second later. `Box` or `Hull` for most props, `PreciseConvexDecomposition` only where needed. Decor gets `CanCollide=false`, `CanQuery=false`, `CanTouch=false`.
+- `RenderFidelity = Automatic` allows LOD. Provide sensible triangle counts for the on-screen size (one mesh can't exceed 20,000 triangles; see `${CLAUDE_SKILL_DIR}/../roblox/references/currency.md`) and reuse identical meshes, because identical mesh plus material instances render efficiently.
+- **Models built in Blender:** use `roblox-blender-modelling` for the verified export and import settings. Color must travel as a texture; a plain material color imported wrong.
 - **Textures:** size to on-screen importance (don't put 1024² on a pebble). Use `SurfaceAppearance` for PBR on hero assets. `MaterialVariant`s give a consistent material language across parts and terrain. Texture memory is the main mobile memory cost.
 - **Audio:** normalize loudness, trim silence, and use variants for repeated sounds.
   - **Two systems, both current** (E4, `audio/index.md`). `Sound` and `SoundGroup` are simple and not deprecated, which makes them fine for one-shots and UI.

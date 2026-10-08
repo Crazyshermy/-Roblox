@@ -1,19 +1,21 @@
 # Real Roblox Studio test (live Studio MCP)
 
-**Live Roblox Studio: NOT VERIFIED — requires local Windows Roblox Studio validation.** This test has not been run yet. Roblox Apex was built in a Linux cloud container where Roblox Studio can't run. Everything below is prepared so that someone with Studio (Windows or macOS) can run it in about 30–45 minutes. Until it has been run, nothing in Roblox Apex is E5 (live-runtime) verified.
+**Live Roblox Studio: tested once, but not with this exact script.** On 2026-10-07 one tester ran open-ended live testing on this fixture with Apex 1.2.0 on Windows. It covered steps 3–8 and part of 10, but not 1, 2 or 9 as separate prompts. Results, the step mapping and the limits are in `docs/BENCHMARKS.md` → "Live Studio results". The answer key sat one folder above that test project, so planted-flaw results may be contaminated. Setup step 1 below now prevents that. The procedure below hasn't been run as written yet. It takes about 30–45 minutes with Studio on Windows or macOS.
 
-What has been verified instead:
+Also verified, without Studio:
 - **Fixture validity:** all fixture scripts compile with the official Luau compiler, and Rojo 7.4.4 builds the place file.
 - **Simulated Studio workflow:** in `benchmarks/project_run.py`, Apex followed the edit → playtest → console → report loop in every implementation task. The baseline never did.
 
 The simulator imitates only Studio's *tool surface*. It is not Studio.
 
 ## Setup
-1. Install Roblox Apex into an empty folder, e.g. `C:\ApexStudioTest`, using any method in the README. Copy `tests/fixtures/lighthouse/` into it, so the Rojo files are there for Claude to read and edit.
-2. Open `tests/fixtures/LighthouseKeeper.rbxl` in Studio. It was built from the same fixture with Rojo 7.4.4. If you use Rojo, run `rojo serve` in the folder instead and connect, so file edits sync into Studio. **Without Rojo or Script Sync, Claude's file edits won't reach Studio.** Then either enable Script Sync, or tell Claude to edit through the Studio MCP tools.
+1. Install Roblox Apex into an empty folder, e.g. `C:\ApexStudioTest`, using any method in the README. Copy `tests/fixtures/lighthouse/` into it, so the Rojo files are there for Claude to read and edit. **Copy nothing else from `tests/fixtures/`.** `lighthouse.FLAWS.md` and `lighthouse-reference/` are answer keys, and they must not be inside the test folder or any folder above it.
+2. **Copy** `tests/fixtures/LighthouseKeeper.rbxl` into the test folder and open the copy in Studio. Opening the repository's file directly (or the plugin install's copy) and saving changes a tracked file. The place file was built from the same fixture with Rojo 7.4.4. If you use Rojo, run `rojo serve` in the folder instead and connect, so file edits sync into Studio. **Without Rojo or Script Sync, Claude's file edits won't reach Studio.** Then either enable Script Sync, or tell Claude to edit through the Studio MCP tools.
 3. In Studio: Assistant → ⋯ → Manage MCP Servers → enable **Studio as MCP server**. Connect Claude Code (quick-connect, or `claude mcp add` with the command from the Studio docs).
 4. Start Claude Code in the folder, then run `/roblox-status`. It should report **Studio MCP: connected**. If not, stop and fix the connection first.
 5. Run `/roblox-init Co-op lighthouse keepers keep the lamp burning through a storm night.`
+
+**Expect at the first playtest:** in an unpublished place, the fixture's server fails to boot because `GetDataStore` throws at module load. That's a real fixture bug (L1), and diagnosing it from the console is part of the test. Real-DataStore checks need the place published (a private experience is enough) with Studio API access on, and those playtests write real data. Multi-client steps can be started from the MCP with `StudioTestService:ExecuteMultiplayerTestAsync` (see `roblox/references/studio-mcp.md`).
 
 ## The 10 steps
 For each step, record what Claude actually did (tools called) and the outcome in the table at the bottom. **Expected Apex behavior** is what the skills should cause. Deviations are findings.

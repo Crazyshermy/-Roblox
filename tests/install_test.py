@@ -13,7 +13,7 @@ from run_case import run_in  # noqa: E402
 REPO_URL = "https://github.com/Crazyshermy/-Roblox.git"
 REPO_SLUG = "Crazyshermy/-Roblox"
 HERE = os.path.dirname(os.path.abspath(__file__))
-SPECIALISTS = ["roblox-architecture", "roblox-assets", "roblox-boundary-breaker", "roblox-data", "roblox-debugging",
+SPECIALISTS = ["roblox-architecture", "roblox-assets", "roblox-blender-modelling", "roblox-boundary-breaker", "roblox-data", "roblox-debugging",
                "roblox-game-design", "roblox-game-feel", "roblox-genres", "roblox-level-design", "roblox-luau",
                "roblox-networking", "roblox-performance", "roblox-physics-animation", "roblox-review", "roblox-security",
                "roblox-testing", "roblox-ui-ux", "roblox-visual-direction"]
@@ -48,7 +48,7 @@ def project_method(ref, model, out, checks):
     s = run_in(game, "/roblox-status", model, 15, 600, env=env)
     json.dump(s, open(f"{out}/project-status.json", "w"), indent=2)
     disc = norm(s["skills_available"] or [])
-    checks.append(("project: all 22 skills discovered in fresh session", len(disc) == 22 and set(SPECIALISTS) <= disc, f"{len(disc)} discovered"))
+    checks.append(("project: all 23 skills discovered in fresh session", len(disc) == 23 and set(SPECIALISTS) <= disc, f"{len(disc)} discovered"))
     checks.append(("project: /roblox-status reports version + complete inventory", VERSION in s["final_text"] and "inventory: complete" in s["final_text"].lower(), s["final_text"][:120].replace("\n", " ")))
 
     r = run_in(game, "/roblox-route Build a secure player trading system", model, 8, 600, env=env)
@@ -91,7 +91,7 @@ def plugin_method(ref, model, out, checks):
     game = fresh_game(os.path.join(clone, "tests", "fixtures", "lighthouse"))  # no .claude/skills here
     s = run_in(game, "/roblox-status", model, 15, 600, env={"CLAUDE_CONFIG_DIR": cfg})
     json.dump(s, open(f"{out}/plugin-status.json", "w"), indent=2)
-    checks.append(("plugin: skills discovered (namespaced)", len(s["skills_available"] or []) == 22 and all(x.startswith("roblox-apex:") for x in s["skills_available"]), f"{len(s['skills_available'] or [])}"))
+    checks.append(("plugin: skills discovered (namespaced)", len(s["skills_available"] or []) == 23 and all(x.startswith("roblox-apex:") for x in s["skills_available"]), f"{len(s['skills_available'] or [])}"))
     checks.append(("plugin: bare /roblox-status works and reports complete inventory", VERSION in s["final_text"] and "inventory: complete" in s["final_text"].lower(), s["final_text"][:100].replace("\n", " ")))
     a = run_in(game, "Review the RefuelLamp handler in src/server/OilService.luau for exploits. Findings only.", model, 12, 600, env={"CLAUDE_CONFIG_DIR": cfg})
     json.dump(a, open(f"{out}/plugin-auto-security.json", "w"), indent=2)

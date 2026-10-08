@@ -126,6 +126,15 @@ CASES = [
         "must_not": [],
     },
     {
+        "id": "blender-auto",
+        "why": "No /roblox prefix: a Blender modelling request routes to the Blender skill and uses the verified scale and color settings",
+        "prompt": "I'm making a low-poly wooden crate in Blender for my Roblox game. Last time my mesh came into Studio the wrong color. "
+                  "Which FBX export and import settings should I use? Keep it short.",
+        "expect_skills_any": ["roblox-blender-modelling"],
+        "must": [r"(?i)FBX[ _]?Units[ _]?Scale|FBX_SCALE_UNITS", r"(?i)\btexture|TextureID", r"(?i)Scale Unit\W{0,4}Studs"],
+        "must_not": [],
+    },
+    {
         "id": "route-inspect",
         "why": "/roblox-route explains routing for a trading system without executing it",
         "prompt": "/roblox-route Build a secure player trading system",

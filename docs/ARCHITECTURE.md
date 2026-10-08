@@ -3,7 +3,7 @@
 ```
 Claude
  └─ CLAUDE.md block (6 lines: Roblox project, use /roblox, .apex memory, verify, preserve intent, test)
-     └─ /roblox router (~2.3k tokens, loaded on demand)        ← always-visible description (~1.2k tokens for all skills)
+     └─ /roblox router (~2.3k tokens, loaded on demand)        ← always-visible description (~1.4k tokens for all skills)
          ├─ classify: type × size × tool availability
          ├─ route: signal table + mandatory bundles → Skill tool loads 0–4 specialists
          ├─ project memory: .apex/project.md, decisions.md, debt.md
@@ -16,9 +16,9 @@ Claude
 ## Layers
 | Layer | Cost | Contents |
 |---|---|---|
-| Always loaded | ~1.2k tokens | the 19 model-invocable skill descriptions (`/roblox-status`, `/roblox-route`, `/roblox-init` are user-only, so their descriptions cost nothing) plus the 6-line CLAUDE.md block |
+| Always loaded | ~1.4k tokens | the 20 model-invocable skill descriptions (`/roblox-status`, `/roblox-route`, `/roblox-init` are user-only, so their descriptions cost nothing) plus the 6-line CLAUDE.md block |
 | On invoke | ~2.3k | router (`roblox/SKILL.md`) |
-| Per specialist | 0.6–1.8k | the 18 specialists |
+| Per specialist | 0.6–1.8k | the 19 specialists |
 | References | 0.3–1.3k each | read only when the specialist's procedure calls for them (genre cards, anti-slop, currency facts, fuzz checklist…) |
 
 Typical standard task: about 4–5k tokens. System-scale: about 6–7k. Loading everything would be about 30k, and the router never does that.
@@ -43,6 +43,8 @@ Each rule has one home, and other skills point to it:
 - Performance owns measurement and budgets.
 - Game-design owns anti-slop, the player model and experiments.
 - Boundary-breaker owns ambitious-feature technique search.
+- Assets owns general asset rules (collision choice, textures, scene budgets, sourcing). Blender-modelling owns the Blender → FBX → 3D Importer procedure and points to assets for the general rules.
+- Testing owns test techniques. The router's `studio-mcp.md` owns Studio MCP tool behavior and the pre-save place check. Architecture owns Rojo project-file pitfalls.
 - The router owns global standards.
 - `roblox/references/currency.md` is the single home for version-sensitive facts.
 
@@ -57,7 +59,7 @@ Plain, git-tracked markdown created by `/roblox-init`:
 |---|---|---|
 | Canonical skills in `.claude/skills/`, also exposed as a plugin via `"skills": "./.claude/skills/"` | separate plugin `skills/` copy | one source of truth. The repo itself is a working project, and bare `/roblox` works in both modes (verified). |
 | No `!command` dynamic injection in the router | injecting `.apex/` via shell | a failing or unpermitted command aborts the whole skill. That is fragile on Windows and in permission-prompt modes. |
-| 18 specialists | 40-skill catalog / single monolith | description cost and overlap vs everything-always-loaded |
+| 19 specialists | 40-skill catalog / single monolith | description cost and overlap vs everything-always-loaded |
 | Evidence grades internal, plain-language externally | E-labels on every line | the blind judge penalized jargon as noise. Honesty is preserved in plain words. |
 | No daemon, MCP gateway or companion plugin | RBXOS infrastructure | tools already exist (Studio MCP). The value is in judgment, not plumbing. |
 | One route line on by default (`apex_route_line: off` to hide) | always silent | you asked for inspectable routing. It's switchable per project. |
