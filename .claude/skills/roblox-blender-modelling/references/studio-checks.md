@@ -1,6 +1,6 @@
 # Post-import checks in Studio (scripts)
 
-Read this for SKILL.md §5 c–e. Run each script with the Studio MCP's `execute_luau`. Replace `workspace.tower.LighthouseTower` with the imported MeshPart (the Model is named after the file, the MeshPart after the Blender object). Tags are the same as in SKILL.md.
+Read this for SKILL.md §5 c–i and the §6 player-distance check. Run each script with the Studio MCP's `execute_luau`. Replace `workspace.tower.LighthouseTower` with the imported MeshPart (the Model is named after the file, the MeshPart after the Blender object). Tags are the same as in SKILL.md.
 
 ## c) Verify (read-only, Edit DataModel)
 Fill in the expected values from Blender:
@@ -119,3 +119,49 @@ Delete temporary parts afterwards. To compare colors objectively:
 2. Average a box of pixels inside each face. For a single color, you can average the bright, low-saturation pixels in each object's columns instead.
 3. To check for blending, read a line of pixels across each color edge. It should step straight from one color to the other.
 4. Remove the image again.
+
+## f) Texture fidelity by fingerprint [verified method]
+For textures bigger than a few swatches, compare fingerprints instead of pixel lists. For each channel compute the sum, the sum of squares, and the sum of value × (pixel index mod 9973), with pixels in top-to-bottom order. Equal fingerprints on both sides were taken as identical pixels; this method confirmed six uploaded textures (RGB and 8-bit gray, 512² and 512×256) and two later versions. Gray PNGs read back as R = G = B.
+```python
+# Blender: fingerprint of the source PNG (Blender's rows are bottom-up)
+im = bpy.data.images.load(PNG, check_existing=False); im.colorspace_settings.name = "Non-Color"
+W, H = im.size; p = im.pixels[:]; s, sq, ws = [0] * 3, [0] * 3, [0] * 3
+for yt in range(H):
+    base = (H - 1 - yt) * W * 4
+    for x in range(W):
+        k = (yt * W + x) % 9973
+        for c in range(3):
+            v = round(p[base + x * 4 + c] * 255); s[c] += v; sq[c] += v * v; ws[c] += v * k
+bpy.data.images.remove(im); print(W, H, s, sq, ws)
+```
+```lua
+-- Studio: the same fingerprint of a TextureID or SurfaceAppearance map (top-left origin)
+local img = game:GetService("AssetService"):CreateEditableImageAsync(Content.fromUri(ID))
+local W, H = img.Size.X, img.Size.Y
+local buf = img:ReadPixelsBuffer(Vector2.zero, img.Size)
+local s, sq, ws = { 0, 0, 0 }, { 0, 0, 0 }, { 0, 0, 0 }
+for i = 0, W * H - 1 do
+	local k = i % 9973
+	for c = 0, 2 do local v = buffer.readu8(buf, i * 4 + c); s[c + 1] += v; sq[c + 1] += v * v; ws[c + 1] += v * k end
+end
+img:Destroy()
+```
+`SurfaceAppearance.ColorMap`, `NormalMap`, `RoughnessMap` and `MetalnessMap` were readable from `execute_luau`.
+
+## g) Player-distance views at the user's pixel density [verified method]
+- **Blender render (SKILL.md §6):** render at the Studio viewport size (`workspace.CurrentCamera.ViewportSize`, e.g. 1366 × 766) and vertical FOV (70°: camera Sensor Fit = Vertical, `angle_y` = 70°), with the sun from `Lighting:GetSunDirection()` mapped to Blender axes (SKILL.md §1).
+- `screen_capture` returns an image only about 497 × 279, much smaller than the user's viewport. Read `workspace.CurrentCamera.ViewportSize` and `FieldOfView`.
+- **Match the user's pixel density** by narrowing the field of view for the capture: FOV = `2·atan((279/2) / ((viewportHeight/2) / tan(FOV/2)))`. That's 28.62° for a 766-px-tall viewport at 70°. The capture's centre then shows what the user sees at 1:1. Set the FOV back afterwards.
+- **Compare old vs new under the same light:**
+  - Put temporary, unrotated copies side by side in a temp Folder, check overlaps with `GetPartBoundsInBox`, and delete the folder afterwards.
+  - Or capture each model from an identical offset, centred.
+- **Measure:** mask the object's pixels, keep the connected region nearest the image centre, and use the standard deviation of a 3×3 high-pass as "local contrast". JPEG noise raises every number a little, so compare like with like.
+- Camera at 15 studs: e.g. offset (−3, 10.5, −10.2) or (−4.5, 5.25, −13.35) from the model's centre.
+
+## h) PBR maps, A/B [verified method]
+Clone the MeshPart, clear one map on the clone (`sa.NormalMap = ""` worked from `execute_luau`), and screenshot the original and the clone from the same relative camera, one capture at a time. Measure the difference (for a normal map, the row-to-row luminance stdev over the relief; for metalness, the mean luminance of the metal areas), then delete the clones.
+
+## i) "It looks tilted": geometry or camera? [verified method]
+- Read `Orientation`. Then take the ring centres from `EditableMesh` vertices at the top and bottom Y, using the midpoint of each ring's bounding box. Don't average the vertices: seam duplicates bias the mean (0.3° false tilt in the test).
+- Capture from a level camera and check that the silhouette edges are vertical.
+- A downward 70° camera with the object near the frame edge made a perfectly vertical barrel appear to lean 22° (measured with `WorldToViewportPoint` on its top and bottom centres).

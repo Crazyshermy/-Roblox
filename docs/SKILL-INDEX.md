@@ -19,7 +19,7 @@
 | `roblox-ui-ux` | auto / router | hierarchy, mobile, input (IAS), controller, accessibility, implementation | none |
 | `roblox-physics-animation` | auto / router | assemblies, movers, ownership, controllers, cameras, Animator, IK | none |
 | `roblox-assets` | auto / router | import, collision, LOD, textures, packages, sourcing, AI generation, budgets | none |
-| `roblox-blender-modelling` | auto / router | Blender MCP modelling for Roblox: scale, pivots, color via textures, FBX export, 3D Importer settings, post-import checks | `palette.md`, `fbx-check.md`, `studio-checks.md` |
+| `roblox-blender-modelling` | auto / router | Blender MCP modelling for Roblox: scale, pivots, color via textures, baked and PBR textures, FBX export, 3D Importer settings, post-import and player-distance checks, Open Cloud uploads | `palette.md`, `textures.md`, `fbx-check.md`, `studio-checks.md`, `open-cloud.md` |
 | `roblox-boundary-breaker` | auto / router | experience vs mechanism, verified limits, technique families, scope honesty | none |
 | `roblox-review` | auto / router | multi-lens, evidence-backed, severity-ranked critique | none |
 | `roblox-status` | `/roblox-status` only | install, discovery and project-integration health | none |

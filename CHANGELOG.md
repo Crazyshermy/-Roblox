@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.4.0 (2026-10-09)
+Blender texture, PBR and Open Cloud lessons from a second round of verified imports (2026-10-08). Records are in `tests/results-latest/studio/blender-import-2026-10-08.md`.
+- **`roblox-blender-modelling`:**
+  - **New `textures.md`:** baked object-space procedurals → `TextureID` with exact pixels, wood grain UVs that run along the plank, worn stone by decimation, and PBR maps → `SurfaceAppearance` (wiring, normal bake, grayscale PNG writer, `use_tspace=True`).
+  - **New `open-cloud.md`:** upload and update a Model with the Open Cloud Assets API, only when the user asks. Covers key handling, the `;` curl gotcha, package, anchor and yaw fixes after insert, and why placed copies don't pick up a new version by themselves.
+  - **New §6, visual check from player distance:** in the first texture test every technical check passed, but the user still rejected both models at play distance.
+  - Axis mapping, a winding and mirrored-UV check, and Box/Hull results on the new meshes. `studio-checks.md` gains texture fingerprints, captures at the user's pixel density, PBR A/B tests and a tilt-vs-perspective check.
+  - Reshaped to stay within the size guidelines: 127 lines, with a 326-character description. The one-color code moved into `palette.md`.
+- **`currency.md`:** the texture docs disagree on the maximum size (4096 vs 1024), and Open Cloud asset Create and Update are beta (with the package and `AutoUpdate` defaults).
+- Router, `roblox-assets` and `SKILL-INDEX.md` now name textures and Open Cloud uploads as triggers.
+
 ## 1.3.0 (2026-10-08)
 Lessons from the first live Roblox Studio testing (2026-10-07) and two verified Blender → Studio imports. Details are in `docs/BENCHMARKS.md` → "Live Studio results".
 - **New skill `roblox-blender-modelling`:** Blender MCP modelling for Roblox. Covers 1 unit = 1 stud, a base pivot, color carried in an embedded sRGB or palette texture (a plain material color imported wrong), the exact FBX export call and 3D Importer settings, and post-import checks (size, triangles, texture pixels, collision, screenshots). Rules carry [verified]/[file-checked]/[untested] tags. Routed from the router, and pointed to from assets.
