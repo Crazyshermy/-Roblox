@@ -7,7 +7,8 @@ Blender texture, PBR and Open Cloud lessons from a second round of verified impo
   - **New `open-cloud.md`:** upload and update a Model with the Open Cloud Assets API, only when the user asks. Covers key handling, the `;` curl gotcha, package, anchor and yaw fixes after insert, and why placed copies don't pick up a new version by themselves.
   - **New §6, visual check from player distance:** in the first texture test every technical check passed, but the user still rejected both models at play distance.
   - Axis mapping, a winding and mirrored-UV check, and Box/Hull results on the new meshes. `studio-checks.md` gains texture fingerprints, captures at the user's pixel density, PBR A/B tests and a tilt-vs-perspective check.
-  - Reshaped to stay within the size guidelines: 127 lines, with a 326-character description. The one-color code moved into `palette.md`.
+  - A new rule near the top: [verified] means verified in earlier testing, not by Claude in the current session. Claude says "these settings were verified in earlier testing" and claims its own verification only for checks it ran. A smoke answer had said "I verified these settings on a crate" without running anything.
+  - Reshaped to stay within the size guidelines: 129 lines, with a 326-character description. The one-color code moved into `palette.md`.
 - **`currency.md`:** the texture docs disagree on the maximum size (4096 vs 1024), and Open Cloud asset Create and Update are beta (with the package and `AutoUpdate` defaults).
 - Router, `roblox-assets` and `SKILL-INDEX.md` now name textures and Open Cloud uploads as triggers.
 

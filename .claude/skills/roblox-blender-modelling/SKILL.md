@@ -12,6 +12,8 @@ Every rule here is tagged:
 - **[file-checked]**: confirmed in Blender and in the exported FBX, but not yet after an import. What Studio does with it stays [untested] until an import confirms it.
 - **[untested]**: a reasonable recommendation that hasn't been confirmed in Studio. Say so when you use it, and never report it as verified.
 
+**[verified] means verified in earlier testing, not by you in this session.** When you pass on a tagged rule, say "these settings were verified in earlier testing". Never write "I verified" or "in my notes" for it. Claim your own verification only for checks you actually ran in this session, and list those in §7.
+
 ## Workflow
 1. **Check tools.** Run the Blender MCP's `get_addon_status` and `get_scene_info`. You need the Studio MCP (`list_roblox_studios`) after the import. If no Studio is listed, ask the user to turn on *Assistant → … → Manage MCP Servers → Enable Studio as MCP server*.
 2. **Build** the model (§1) and **color** it (§2).
