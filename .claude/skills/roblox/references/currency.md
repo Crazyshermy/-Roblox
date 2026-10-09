@@ -43,6 +43,8 @@ Verified against `Roblox/creator-docs` (snapshot 2026-10-02) unless marked other
 
 ## Assets
 - A single mesh can't exceed **20,000 triangles**. Avatar items have their own budgets (E4, `art/modeling/specifications.md`, 2026-10-08).
+- **Texture size: the docs disagree.** The Resolution bullet says "up to 4096×4096", while the map-size table and the UV mapping section say **1024×1024** maximum. The table's budgets by asset size: 64–128² for 1×1×1, 256² for 2×2×2, 512² for 4×4×4, 1024² for 8×8×8 (E4, `art/modeling/texture-specifications.md`, 2026-10-09). Stay ≤ 1024 until a bigger upload is checked. 512² and 512×256 uploaded at full size (live Studio 2026-10-08).
+- **Open Cloud Assets API** (E4, `cloud/guides/usage-assets.md`, 2026-10-09): Create Asset and Update Asset are **beta** endpoints. One asset per call, up to 20 MB. Only `.fbx` content can be updated, and each update makes a new version. FBX models upload as **packages**, and `PackageLink.AutoUpdate` is false when a package is created (E4, `PackageLink.yaml`).
 
 ## Characters
 - `CharacterWalkSpeed` defaults to **16**. Jump: `StarterPlayer.CharacterUseJumpPower` defaults to **true**, so the default jump comes from `JumpPower` 50 and `Workspace.Gravity` (about 6.4 studs), **not** `JumpHeight` 7.2. Measure the real jump in a metrics gym. (E4, `StarterPlayer.yaml`)

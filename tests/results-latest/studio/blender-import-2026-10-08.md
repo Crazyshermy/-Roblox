@@ -32,3 +32,51 @@ These are the imports behind the **[verified]** tags in `.claude/skills/roblox-b
 
 ## Not tested
 3–4 swatch palettes (1-texel margin), the bottom face, very long view distances, several objects in one FBX, vertex colors, `PreciseConvexDecomposition` and `Box` on these meshes, whether `Color` shows while the texture loads, whether one Ctrl+Z reverts exactly one `execute_luau` call, and whether Ctrl+S misbehaves for local place files (forum reports only).
+
+## Texture, PBR and Open Cloud tests (2026-10-08, evening)
+**Run details:** as above, plus Claude Code 2.1.295 · Opus 5.5 (effort and Apex version not recorded) · the Open Cloud Assets API v1 from Git Bash with Windows' `curl.exe`. Same tester. These are the imports behind the texture, PBR, player-distance and Open Cloud **[verified]** tags added in Apex 1.4.0. Asset and user IDs are left out of this record.
+
+### Test models
+| Model | Triangles | Size (studs) | Texture |
+|---|---|---|---|
+| Worn stone block, v1 | 44 | 3 × 2 × 2 | 512² baked albedo |
+| Worn stone block, v2: chipped corners, worn edges, one crack | 560 (decimated from ~43k, within 0.008 studs) | 3 × 2 × 2 | 512² baked albedo with baked AO |
+| Wooden plank, v1 → v2 → v3 → v3.1 (wider grain, latewood lines, irregular spacing) | 12 | 6 × 0.3 × 1 | 512×256 baked wood grain |
+| Barrel, 24-sided, steel hoops | 288 | 2.2 × 3.2 × 2.2 | 512² color, normal, roughness and metalness |
+
+### Results (Importer, SKILL.md §3–§4 settings, `use_tspace=True` for the barrel)
+| Check | Result |
+|---|---|
+| Baked procedural → `TextureID` | All textures read back byte-identical (per-channel sums and fingerprints). 512×512 and 512×256 kept full size |
+| Axis mapping | Blender (x, y, z) arrived as (−x, z, y), a 180° turn about the vertical, not a mirror. `EditableMesh` reports V as 1 − Blender's V (same image) |
+| Wood grain | With +U along the length on every long face, the grain ran along the plank in Studio |
+| Triangle count | 560 = 560 (stone v2) and 12 = 12 (plank) |
+| PBR → `SurfaceAppearance` | ColorMap, NormalMap, RoughnessMap and MetalnessMap all present and byte-identical; roughness not inverted; `TextureID` empty, AlphaMode Overlay, `Color` white. 8-bit grayscale PNGs read back as R = G = B |
+| PBR A/B | NormalMap cleared on a copy: painted-surface row-to-row luminance stdev 3.07 → 0.46 (hoop relief gone). MetalnessMap cleared: scraped-steel mean luminance 89 → 145 (reflective → flat grey) |
+| CollisionFidelity on import | Default on all three meshes |
+| Hull | Barrel: matched the 24-sided wall (1.091–1.100) and closed over the shallow lid recess. Stone v2: within 0.01 studs of the faces, followed the corner chip (1.39 instead of 1.5). Raycasts only |
+| Box | Plank: side hits at exactly 3.000 and 0.500, top at 0.300. Raycasts only, no playtest |
+| Re-import of unchanged geometry | Plank v2 kept the same MeshId as v1 and got a new TextureID |
+| Blender vs Studio color | Stone v2 front face 106,109,110 in Studio vs 98,98,94 in a Blender EEVEE render from the same camera and sun; barrel paint 36,81,166 vs 21,71,124. Studio rendered brighter and cooler |
+| "Tilted" barrel | Axis 0.00000° from vertical, base at Y = 0. A downward 70° camera with the barrel near the frame edge showed a 22° lean (`WorldToViewportPoint`) |
+
+### Player-distance review
+Every technical check on stone v1 and plank v1 passed, but the user's visual review rejected both: the stone read as a tiled box and the plank as flat tan at play distance. This led to the SKILL.md §6 check.
+- 1:1 captures: `screen_capture` returns about 497 × 279. A `FieldOfView` of 28.62 (for a 1366 × 766 viewport at 70°) matched the user's pixel density at the capture's centre.
+- Plank local grain contrast at 15 studs, 1:1, 3×3 high-pass stdev: v1 5.0, v2 9.1–10.9, v3 6.7 (more natural, softer), v3.1 10.1. The user judged evenly spaced, uniformly wavy grain as stylized.
+- Stone v2 in Studio matched its Blender render from the same camera.
+
+### Open Cloud Assets API (plank v3 and v3.1)
+| Check | Result |
+|---|---|
+| Create (`POST /assets/v1/assets`, `assetType` Model, `expectedPrice` 0) | Operation done within 3 s, moderation Approved, no fee |
+| A `;` in the request JSON | `400 Unterminated string`; nothing created (curl's `-F` reads `;` as a separator) |
+| Key handling | Read from a user-scope environment variable at each call and passed on stdin (`-H @-`); never printed or written |
+| Compared with the Importer | Same size (no scale setting), axis mapping, pivot, 12 triangles and byte-identical texture. Different: arrived as a package (Model + `PackageLink`), `Anchored` false, a new MeshId for geometry identical to an earlier upload. `Color` and `CollisionFidelity` at defaults |
+| Studio MCP `insert_asset` | Landed at the camera focus with a −144° yaw and an `Assistant:<guid>` CollectionService tag |
+| `InsertService:LoadAsset` | Latest revision as a plain Model, no `PackageLink` |
+| Update (`PATCH`, content only, no `updateMask`) | Done within 3 s as revision 2 of the same asset, Approved. New TextureID, byte-identical to the new PNG; MeshId reused (geometry unchanged) |
+| Placed package copy after the update | Stayed on `PackageLink.VersionNumber` 1 with the old TextureID for ~100 s. `AutoUpdate` and `Status` aren't readable from MCP `execute_luau`, so "AutoUpdate off" is inferred from the docs, not read |
+
+### Not tested
+Textures above 1024 px, an export without tangents, group creators, glTF/GLB uploads, metadata-only updates, version rollback, updating a placed copy from Studio's package menu or with AutoUpdate on, and a playtest on the stone, plank or barrel collision.
