@@ -3,10 +3,10 @@ name: roblox
 description: "Use for ANY Roblox, Roblox Studio, Luau or Rojo task, including quick questions, bugs, code, systems, multiplayer, data, security, performance, testing, game design, feel, art, levels and UI. This Roblox Apex router loads the relevant roblox-* specialists, applies .apex/ project memory, and enforces verified, current Roblox standards."
 argument-hint: "[what you want to build, fix, design or ask]"
 metadata:
-  version: 1.4.0
+  version: 1.5.0
 ---
 
-# Roblox Apex: router and execution policy (v1.4.0)
+# Roblox Apex: router and execution policy (v1.5.0)
 
 Request: $ARGUMENTS
 (If that is empty, use the user's latest message or ask what they want. Don't lecture about the system.)
@@ -37,6 +37,7 @@ Load only what the task needs: **trivial → none**, **standard → 1–2**, **s
 | Lighting, atmosphere, color, art style, materials, VFX look, "make it look good" | `roblox-visual-direction` |
 | Maps, layout, navigation, encounters, exploration, pacing through space | `roblox-level-design` |
 | UI, HUD, menus, mobile or controller input, accessibility, prompts, onboarding UX | `roblox-ui-ux` |
+| Polish, the first minute, tutorials, onboarding, the new-player experience, or player-facing work about to be called done or ready to ship | `roblox-player-pass` |
 | Physics, constraints, vehicles, character controllers, animation tech, IK, **NPCs, enemy AI, pathfinding, hordes** | `roblox-physics-animation` |
 | Meshes, imports, textures, Creator Store, packages, asset budgets, audio assets | `roblox-assets` |
 | A model made in **Blender** for Roblox, the Blender MCP, FBX export from Blender, a Blender mesh importing at the wrong size, color, texture or orientation, baked or PBR textures from Blender, an Open Cloud upload of a Blender model | `roblox-blender-modelling` (+ `roblox-assets` only for sourcing or scene budgets) |

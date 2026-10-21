@@ -15,6 +15,7 @@ Read this when adding purchases, deciding what to sell, or instrumenting and tun
 
 ## Instrument (`AnalyticsService`)
 - **Funnels:** `LogOnboardingFunnelStepEvent` for the first session, `LogFunnelStepEvent` for shops and quests. Find where players drop.
+  - **Read funnels split by device** (phone, tablet, console, desktop). A drop on one device can hide in the overall numbers. Funnel filters include device data, and they apply only to a funnel's first step, so a player who switches devices counts under the device they started on (`production/analytics/funnel-events.md`, 2026-10, E4). One creator reported finding console players stuck at one step only after splitting the funnel this way (one creator's account, E1).
 - **Economy:** `LogEconomyEvent` for every source and sink, so you can see inflation and which sinks are actually used.
 - **Progression:** `LogProgressionStartEvent`, `LogProgressionCompleteEvent` and `LogProgressionFailEvent` for levels and attempts. Use `LogCustomEvent` for the rest.
 - Decide the 3–5 questions you need answered *before* instrumenting. Logging everything answers nothing.

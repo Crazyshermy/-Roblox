@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.5.0 (2026-10-21)
+A new-player pass, from a first-minute baseline and retest in live Studio (2026-10-17 and 2026-10-21). The record is in `tests/results-latest/studio/lighthouse-first-minute-2026-10-21.md`.
+- **New skill `roblox-player-pass`:** play the first session as a brand-new player on a small phone, a tablet, a console preset and desktop. Covers:
+  - a target written before playing (fantasy, first goal, first fun)
+  - first fun timed with timestamps, not estimated
+  - a stuck-point log
+  - onboarding funnel steps (`LogOnboardingFunnelStepEvent`)
+  - a hand-off of what Claude can't judge: sounds, asset rights (an unknown license blocks shipping), real hardware, fun
+  - a 10-second clarity check and a clip moment
+  - a report block
+  The motivation is one YouTube creator's account (E1), labeled as such. Only what runs in Studio counts as verified. Routed from the router for polish, the first minute, tutorials, onboarding, the new-player experience, and player-facing work about to be called done or ready to ship.
+  - **Evidence so far:** the retest ran a v1 draft. It covered tablet and console presets, funnel calls and a stuck-point count that the baseline didn't. The runs also differed in the answer key, the Studio tools and Rojo, so this is suggestive, not proof. The v2 changes have **not** been run live: timed first fun, the 10-second report line, the asset-rights rule and the Rojo check.
+- **Pointers:** `roblox-review` (Experience lens) and `roblox-testing` (Playtesting for experience) point to the new skill. `monetization-liveops.md` says to read funnels split by device. Per the docs, funnel filters include device data and apply at a funnel's first step. A console example is labeled as one creator's account.
+- **Rojo (architecture):**
+  - Use an explicit `CFrame` for **every** part, not only parts with children. Two childless parts placed with `Position` reset to the origin after a `Color` and `Material` change (seen in testing).
+  - Read a service node added to the project file mid-session back in Studio. `Lighting` didn't live-sync once, although `rojo build` included it (seen once, cause unconfirmed).
+- **Status lines:** live Studio is now described as three sessions (2026-10-07, 2026-10-17, 2026-10-21), all with the project's Apex 1.2.0 skills.
+- **Tests:** a `player-pass-auto` smoke case with pattern examples. `install_test.py` and the `/roblox-status` inventory include the new skill.
+  - **Smoke (Sonnet, 2026-10-21): 15/15.** `player-pass-auto` routed to the new skill in 2/2 runs. `currency` first failed only because on Windows the runner decoded `×` with the system code page. It passed with `PYTHONUTF8=1`.
+  - **B06-mobile-ui rerun:** Apex 0.83 vs baseline 0.67. Player-pass correctly didn't load. **The baseline arm had the tester's claude.ai `game-ui-design` skill loaded, so this isn't a comparison against plain Claude.** The judge's two flags on Apex trace to existing `roblox-ui-ux` lines, not to this release.
+  - **P10-mobile-controls not run:** `project_run.py` gives each session an empty config dir, which hides a subscription login.
+  - **Fresh-install test (`install_test.py --ref player-pass-v1.5`) only partly run.**
+    - **Plugin method:** installing from GitHub passed, and all 24 namespaced skills were discovered, including `roblox-apex:roblox-player-pass`. The two checks that need a session (`/roblox-status`, auto-routing) didn't run, because the test's empty config dir hides a subscription login, as with P10.
+    - **Project method:** it didn't start on Windows, because the test runs `install/install.sh` directly and Windows can't execute it.
+
 ## 1.4.0 (2026-10-09)
 Blender texture, PBR and Open Cloud lessons from a second round of verified imports (2026-10-08). Records are in `tests/results-latest/studio/blender-import-2026-10-08.md`.
 - **`roblox-blender-modelling`:**

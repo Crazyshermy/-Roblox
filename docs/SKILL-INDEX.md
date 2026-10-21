@@ -22,6 +22,7 @@
 | `roblox-blender-modelling` | auto / router | Blender MCP modelling for Roblox: scale, pivots, color via textures, baked and PBR textures, FBX export, 3D Importer settings, post-import and player-distance checks, Open Cloud uploads | `palette.md`, `textures.md`, `fbx-check.md`, `studio-checks.md`, `open-cloud.md` |
 | `roblox-boundary-breaker` | auto / router | experience vs mechanism, verified limits, technique families, scope honesty | none |
 | `roblox-review` | auto / router | multi-lens, evidence-backed, severity-ranked critique | none |
+| `roblox-player-pass` | auto / router | the first session as a brand-new player on every device: stuck points, timed first fun, onboarding funnel steps, 10-second and clip checks, a hand-off of what Claude can't judge | none |
 | `roblox-status` | `/roblox-status` only | install, discovery and project-integration health | none |
 | `roblox-route` | `/roblox-route <task>` only | dry-run routing explanation | none |
 | `roblox-init` | `/roblox-init [desc]` only | create `.apex/` memory and the CLAUDE.md block | `templates/` |
@@ -36,6 +37,7 @@ Coverage map for the requested areas:
 - **Art:** visual-direction.
 - **Levels:** level-design.
 - **UX/UI:** ui-ux.
+- **New-player experience:** player-pass (with ui-ux for onboarding UX).
 - **Multiplayer:** networking.
 - **Self-review:** review.
 - **Ambition:** boundary-breaker.
