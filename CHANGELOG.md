@@ -21,6 +21,9 @@ A new-player pass, from a first-minute baseline and retest in live Studio (2026-
   - **Smoke (Sonnet, 2026-10-21): 15/15.** `player-pass-auto` routed to the new skill in 2/2 runs. `currency` first failed only because on Windows the runner decoded `×` with the system code page. It passed with `PYTHONUTF8=1`.
   - **B06-mobile-ui rerun:** Apex 0.83 vs baseline 0.67. Player-pass correctly didn't load. **The baseline arm had the tester's claude.ai `game-ui-design` skill loaded, so this isn't a comparison against plain Claude.** The judge's two flags on Apex trace to existing `roblox-ui-ux` lines, not to this release.
   - **P10-mobile-controls not run:** `project_run.py` gives each session an empty config dir, which hides a subscription login.
+  - **Fresh-install test (`install_test.py --ref player-pass-v1.5`) only partly run.**
+    - **Plugin method:** installing from GitHub passed, and all 24 namespaced skills were discovered, including `roblox-apex:roblox-player-pass`. The two checks that need a session (`/roblox-status`, auto-routing) didn't run, because the test's empty config dir hides a subscription login, as with P10.
+    - **Project method:** it didn't start on Windows, because the test runs `install/install.sh` directly and Windows can't execute it.
 
 ## 1.4.0 (2026-10-09)
 Blender texture, PBR and Open Cloud lessons from a second round of verified imports (2026-10-08). Records are in `tests/results-latest/studio/blender-import-2026-10-08.md`.
