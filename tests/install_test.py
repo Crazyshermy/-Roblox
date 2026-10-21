@@ -15,8 +15,8 @@ REPO_SLUG = "Crazyshermy/-Roblox"
 HERE = os.path.dirname(os.path.abspath(__file__))
 SPECIALISTS = ["roblox-architecture", "roblox-assets", "roblox-blender-modelling", "roblox-boundary-breaker", "roblox-data", "roblox-debugging",
                "roblox-game-design", "roblox-game-feel", "roblox-genres", "roblox-level-design", "roblox-luau",
-               "roblox-networking", "roblox-performance", "roblox-physics-animation", "roblox-review", "roblox-security",
-               "roblox-testing", "roblox-ui-ux", "roblox-visual-direction"]
+               "roblox-networking", "roblox-performance", "roblox-physics-animation", "roblox-player-pass", "roblox-review",
+               "roblox-security", "roblox-testing", "roblox-ui-ux", "roblox-visual-direction"]
 VERSION = __import__("re").search(r"version: (\S+)", open(os.path.join(os.path.dirname(HERE), ".claude", "skills", "roblox", "SKILL.md")).read()).group(1)
 WRITE_TOOLS = ("Skill Read Glob Grep Write Edit", "Bash WebFetch WebSearch Agent")
 
@@ -91,7 +91,7 @@ def plugin_method(ref, model, out, checks):
     game = fresh_game(os.path.join(clone, "tests", "fixtures", "lighthouse"))  # no .claude/skills here
     s = run_in(game, "/roblox-status", model, 15, 600, env={"CLAUDE_CONFIG_DIR": cfg})
     json.dump(s, open(f"{out}/plugin-status.json", "w"), indent=2)
-    checks.append(("plugin: skills discovered (namespaced)", len(s["skills_available"] or []) == 23 and all(x.startswith("roblox-apex:") for x in s["skills_available"]), f"{len(s['skills_available'] or [])}"))
+    checks.append(("plugin: skills discovered (namespaced)", len(s["skills_available"] or []) == 24 and all(x.startswith("roblox-apex:") for x in s["skills_available"]), f"{len(s['skills_available'] or [])}"))
     checks.append(("plugin: bare /roblox-status works and reports complete inventory", VERSION in s["final_text"] and "inventory: complete" in s["final_text"].lower(), s["final_text"][:100].replace("\n", " ")))
     a = run_in(game, "Review the RefuelLamp handler in src/server/OilService.luau for exploits. Findings only.", model, 12, 600, env={"CLAUDE_CONFIG_DIR": cfg})
     json.dump(a, open(f"{out}/plugin-auto-security.json", "w"), indent=2)

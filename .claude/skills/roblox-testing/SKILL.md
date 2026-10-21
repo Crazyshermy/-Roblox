@@ -41,4 +41,4 @@ Risks remaining: …
 Never claim "tested" for something that was only read or reasoned about.
 
 ## Playtesting for experience (not just bugs)
-Correctness tests don't show whether something is fun or clear. For player-experience claims, define what you'd observe (time to first objective, where players hesitate, what they ignore), run sessions with real players when possible, and treat AI or simulated playtests as hypothesis generators, not evidence of fun. See `roblox-game-design` → experiments.
+Correctness tests don't show whether something is fun or clear. For player-experience claims, define what you'd observe (time to first objective, where players hesitate, what they ignore), run sessions with real players when possible, and treat AI or simulated playtests as hypothesis generators, not evidence of fun. See `roblox-game-design` → experiments. For a structured first-session pass on every device (stuck points, timed first fun, onboarding funnel steps), use `roblox-player-pass`.

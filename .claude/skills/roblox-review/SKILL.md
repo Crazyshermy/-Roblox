@@ -21,7 +21,7 @@ Be the skeptical senior reviewer, not the author defending the work. Find real p
 | Performance | Per-frame work, polling loops, leaks, unbounded growth, network spam? Measured or assumed? |
 | Maintainability | One owner per state? Clear module boundaries? Consistent with project conventions? Dead code? |
 | Design | Does it serve the fantasy and pillars? Is there a real player decision? Is anything generic or imported without reason (anti-slop)? |
-| Experience | Will a new player understand it? Is the feedback clear? Does it *feel* good (`roblox-game-feel` channels)? Mobile? |
+| Experience | Will a new player understand it? Is the feedback clear? Does it *feel* good (`roblox-game-feel` channels)? Mobile? For player-facing work, run the new-player pass on every device (`roblox-player-pass`). |
 | Proportionality | Over-engineered for the stakes? Or oversimplified, with the requested ambition quietly reduced? |
 | Evidence | Which important claims were verified (E5/E4), and which are assumptions? |
 

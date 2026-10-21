@@ -21,12 +21,13 @@ Each case runs a fresh temporary project with the skills installed, sends one pr
 | `pet-request` | anti-slop respects an explicit request | builds the server module (with a weights/`PolicyService` mention); no refusal or lecture |
 | `npc-ai` | NPC/enemy AI routing | physics-animation loaded; path status/`Blocked`, network ownership, `MoveTo` timeout |
 | `prompt-security` | client-initiated `ProximityPrompt` grants | security loaded; cooldown/once-only and distance/state checks |
+| `player-pass-auto` | new-player pass auto-routing with no prefix | player-pass loaded; a phone or touch run and a console or gamepad run; funnel steps, first fun, stuck points or the 10-second test |
 | `route-inspect` | `/roblox-route` explains routing | names security, data, networking, plus skipped skills |
 
 Add `--with-baseline` to run each case without Apex as a contrast. Use `--repeat 3` to measure trigger *rates* (a case passes at ≥ 2/3), and `--model opus|haiku` to check other models. `python3 tests/test_smoke_patterns.py` unit-tests the marker regexes (free).
 
 Fresh-install acceptance (clone from GitHub, isolated config, both install methods): `python3 tests/install_test.py --ref main`.
-Real Roblox Studio procedure: [STUDIO-TEST.md](STUDIO-TEST.md). **Live Roblox Studio: tested once (2026-10-07), not yet with the scripted procedure.** See `docs/BENCHMARKS.md` → "Live Studio results".
+Real Roblox Studio procedure: [STUDIO-TEST.md](STUDIO-TEST.md). **Live Roblox Studio: tested in three sessions (2026-10-07, 2026-10-17, 2026-10-21; all with the project's Apex 1.2.0 skills), not yet with the scripted procedure.** See `docs/BENCHMARKS.md` → "Live Studio results" and "First-minute baseline and retest".
 
 ## Manual (interactive Claude Code, about 5 minutes)
 Open Claude Code in a project where Apex is installed.

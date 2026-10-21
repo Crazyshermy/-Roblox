@@ -135,6 +135,15 @@ CASES = [
         "must_not": [],
     },
     {
+        "id": "player-pass-auto",
+        "why": "No /roblox prefix: a 'polish the first minute' request routes to roblox-player-pass and plans a pass on every device",
+        "prompt": "My Roblox co-op game works now. Polish the first minute for brand-new players before I ship it. "
+                  "What will you check? Keep it short.",
+        "expect_skills_any": ["roblox-player-pass"],
+        "must": [r"(?i)phone|touch|mobile", r"(?i)console|gamepad|controller", r"(?i)funnel|first fun|stuck|10.second"],
+        "must_not": [],
+    },
+    {
         "id": "route-inspect",
         "why": "/roblox-route explains routing for a trading system without executing it",
         "prompt": "/roblox-route Build a secure player trading system",

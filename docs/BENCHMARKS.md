@@ -1,6 +1,6 @@
-# Benchmarks and verification results (live Studio: 2026-10-07; automated runs: v1.2.0, 2026-10-04)
+# Benchmarks and verification results (live Studio: 2026-10-07, 2026-10-17, 2026-10-21; automated runs: v1.2.0, 2026-10-04)
 
-**Live Roblox Studio: tested once (2026-10-07), by one tester on Windows.** See "Live Studio results" below. It was open-ended testing on the Lighthouse fixture, not the scripted procedure in `tests/STUDIO-TEST.md`. Everything after that section comes from headless runs and the Studio-workflow simulator, which is process evidence only.
+**Live Roblox Studio: tested in three sessions by one tester on Windows, all with the project's Apex 1.2.0 skills.** 2026-10-07 was open-ended bug fixing on the Lighthouse fixture ("Live Studio results" below). 2026-10-17 and 2026-10-21 were a first-minute baseline and retest ("First-minute baseline and retest" below). None followed the scripted procedure in `tests/STUDIO-TEST.md`. Everything after those sections comes from headless runs and the Studio-workflow simulator, which is process evidence only.
 
 ## Live Studio results (2026-10-07)
 **Setup:** Claude Code v2.1.293 · Opus 5.5 at xhigh effort · Roblox Apex 1.2.0 · Rojo 7.7.1 (`rojo serve`) · Roblox Studio's built-in MCP server · Windows · Studio version **not recorded**. The place was tested unpublished, then published as a private experience with Studio API access on, for a real-DataStore pass. Full record: `tests/results-latest/studio/lighthouse-2026-10-07.md`. Resulting code: `tests/fixtures/lighthouse-reference/`.
@@ -34,6 +34,9 @@ All runs used headless Claude Code v2.1.289, with **Sonnet** as the subject mode
 - **No automated result comes from real Roblox Studio.** The Studio-workflow simulator is process evidence only.
 
 These are regression detectors and directional evidence, not science.
+
+## First-minute baseline and retest (2026-10-17 and 2026-10-21)
+Both runs got the same prompt ("Make the first minute of Lighthouse Keeper great for a brand-new player…") on the fixture's 2026-10-07 end state. The baseline ran **Apex 1.2.0 (project install)**, and the retest ran **Apex 1.2.0 + roblox-player-pass v1 draft**. Only the retest covered tablet and console presets, logged onboarding funnel steps (they fired in Studio), counted stuck points (11 found, 11 fixed) and proposed a clip moment. Its first-fun time was estimated, not measured, and an unknown-license sound wasn't flagged as blocking. Those gaps led to the v2 changes in 1.5.0, which haven't been run live. **The runs also differed in the answer key (the baseline read it), the Studio tools (the baseline had no native MCP tools) and Rojo (not running in the baseline), so the comparison is suggestive, not proof.** Full record: `tests/results-latest/studio/lighthouse-first-minute-2026-10-21.md`.
 
 ## v1.2.0 results (2026-10-04)
 | Check | Result |
@@ -139,7 +142,7 @@ This case was measured because plugin users may skip `/roblox-init`.
 | `/roblox-status` | model arithmetic miscounted the inventory | name-based checklist, no counting |
 
 ## Not verified
-- **Real Roblox Studio, beyond one run.** Live Studio has been tested once (2026-10-07, one tester, one model, Studio version not recorded; see "Live Studio results"). The scripted `tests/STUDIO-TEST.md` procedure hasn't been run as written, and planted-flaw results may be contaminated by the answer key. The live record shows `list_roblox_studios`, `script_read`, `script_grep`, `execute_luau`, `start_stop_play`, `get_console_output`, `screen_capture` and `character_navigation` in use. The other tools in `studio-mcp.md` (assets, generation, `http_get`, `skill`) weren't exercised.
+- **Real Roblox Studio, beyond a few runs.** Live Studio has been tested in three sessions (2026-10-07, 2026-10-17, 2026-10-21; one tester, one model, Studio version not recorded, all with the project's Apex 1.2.0 skills). The scripted `tests/STUDIO-TEST.md` procedure hasn't been run as written, and planted-flaw results may be contaminated by the answer key. The live record shows `list_roblox_studios`, `script_read`, `script_grep`, `execute_luau`, `start_stop_play`, `get_console_output`, `screen_capture` and `character_navigation` in use. The other tools in `studio-mcp.md` (assets, generation, `http_get`, `skill`) weren't exercised on 2026-10-07. The 2026-10-21 retest used `search_asset` and `http_get`.
 - **`install.ps1`** has never been executed (no PowerShell available).
 - **Other subject models** (Opus, Haiku) and long multi-session use on a real game.
 - **Variance:** single samples per arm. Repeated-sampling statistics haven't been collected.

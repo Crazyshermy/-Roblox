@@ -25,6 +25,13 @@ EXAMPLES = [
     ("blender-auto", "must", 2, "File Geometry → **Scale Unit:** Studs", True),
     ("blender-auto", "must", 2, "Scale Unit: Studs", True),
     ("blender-auto", "must", 2, "Use studs as your unit.", False),
+    ("player-pass-auto", "must", 0, "Small phone, touch only: nothing under the thumbstick.", True),
+    ("player-pass-auto", "must", 1, "Console preset with a gamepad: B closes every menu.", True),
+    ("player-pass-auto", "must", 1, "Desktop at 1080p with keyboard and mouse.", False),
+    ("player-pass-auto", "must", 2, "Log 5 onboarding funnel steps on the server.", True),
+    ("player-pass-auto", "must", 2, "Time spawn to first fun with os.clock().", True),
+    ("player-pass-auto", "must", 2, "10-second test: could a kid say what the game is?", True),
+    ("player-pass-auto", "must", 2, "Make the lighting moodier.", False),
     # past false negatives (correct answers that earlier markers missed)
     ("design-auto", "must", 0, "**Core idea:** Progression changes what you can understand and do on the island, not stat numbers.", True),
     ("design-auto", "must", 0, "Progress changes what the player understands and can do, not their stats.", True),
