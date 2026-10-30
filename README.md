@@ -54,7 +54,7 @@ Then, in your game project, run `/roblox-status` (health check), then `/roblox-i
 | `/roblox-status` | Version, skills on disk vs actually discovered, knowledge freshness, project memory, Studio MCP. |
 | `/roblox-init [description]` | Creates `.apex/project.md`, `decisions.md`, `debt.md` and the CLAUDE.md block. |
 
-Skills: see [docs/SKILL-INDEX.md](docs/SKILL-INDEX.md). Design: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Skills: see [docs/SKILL-INDEX.md](docs/SKILL-INDEX.md). Design: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Gameplay reference clips: [references/clips/](references/clips/README.md).
 
 ## Verified so far
 **Live Roblox Studio: tested in three sessions**, all by one tester on Windows with the project's Apex 1.2.0 skills. On 2026-10-07 (Opus 5.5, Rojo 7.7.1, Studio's MCP server), Claude fixed the fixture's bugs and re-checked each in live playtests: multi-client runs, simulated latency, device presets, real DataStore saves, and exploits attacked before and after each fix. Answer-key contamination can't be ruled out for the planted flaws. The run was open-ended, so the scripted [tests/STUDIO-TEST.md](tests/STUDIO-TEST.md) procedure hasn't been run as written. Details and limits: [docs/BENCHMARKS.md](docs/BENCHMARKS.md) → "Live Studio results".
